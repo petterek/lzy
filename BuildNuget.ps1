@@ -29,18 +29,18 @@ if(Test-Path $saveHash) {
 
 
 $projects | % {
-    
+
     $_.Project
-    
+
     $outstanding = (git status $_.Path --porcelain) | Out-String
     $msg = ((git log $lastRev`.`.$currRev --format=%B $_.Path) | Out-String )
 
     if(!($force)) {
-        if (!($outstanding -eq "")){ 
+        if (!($outstanding -eq "")){
             Write-Host $outstanding
             Write-Host "Commit all changes before building"
-            return 
-        } 
+            return
+        }
 
 
         if (($currRev -eq $lastRev) -or ($msg -eq ""))   {
@@ -48,8 +48,8 @@ $projects | % {
             return
         }
     }
-            
-    #Updating spec file with release notes. 
+
+    #Updating spec file with release notes.
      $specFile = (Resolve-Path $_.Path).Path + $_.Project + ".nuspec"
      [xml]$xml = Get-Content $specFile
      $xml.package.metadata.releaseNotes = $msg.ToString()
@@ -58,11 +58,11 @@ $projects | % {
     #End
 
     $p = $_.Path+$_.Project+".vbproj"
-    
-    .\nuget pack $p  -OutputDirectory $output -Build -IncludeReferencedProjects -Symbols  -Properties Configuration=$configuration 
-    
-    
 
+    .\nuget pack $p  -OutputDirectory $output -Build -IncludeReferencedProjects -Symbols -Properties Configuration=$configuration
+
+
+    #Reverting spec file
     git checkout $specFile
     "Release notes:"
     $msg
@@ -70,12 +70,12 @@ $projects | % {
 
 "Pushing symbols"
 
-$output = "..\nuget\core\"
+$output = "..\nuget\" + $repo
 $symbolServer = "http://symbol.itaslan.infotjenester.no/nuget/Core"
 
 Get-ChildItem $output -Filter *.symbols.nupkg | % {
     .\nuget push $_.FullName p:p  -source $symbolServer
 }
 
-$currRev | Set-Content $saveHash 
+$currRev | Set-Content $saveHash
 

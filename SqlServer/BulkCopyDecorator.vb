@@ -25,12 +25,12 @@ Friend Class BulkCopyDecorator(Of T)
 
     Public ReadOnly Property Depth As Integer Implements IDataReader.Depth
         Get
-            Throw New NotImplementedException(NameOf(Depth))
+            Throw New NotImplementedException("Depth")
         End Get
     End Property
 
     Public Function GetSchemaTable() As DataTable Implements IDataReader.GetSchemaTable
-        Throw New NotImplementedException(NameOf(GetSchemaTable))
+        Throw New NotImplementedException("GetSchemaTable")
     End Function
 
     Public ReadOnly Property IsClosed As Boolean Implements IDataReader.IsClosed
@@ -62,27 +62,27 @@ Friend Class BulkCopyDecorator(Of T)
     End Property
 
     Public Function GetBoolean(i As Integer) As Boolean Implements IDataRecord.GetBoolean
-        Throw New NotImplementedException(NameOf(GetBoolean))
+        Throw New NotImplementedException("GetBoolean")
     End Function
 
     Public Function GetByte(i As Integer) As Byte Implements IDataRecord.GetByte
-        Throw New NotImplementedException(NameOf(GetByte))
+        Throw New NotImplementedException("GetByte")
     End Function
 
     Public Function GetBytes(i As Integer, fieldOffset As Long, buffer() As Byte, bufferoffset As Integer, length As Integer) As Long Implements IDataRecord.GetBytes
-        Throw New NotImplementedException(NameOf(GetBytes))
+        Throw New NotImplementedException("GetBytes")
     End Function
 
     Public Function GetChar(i As Integer) As Char Implements IDataRecord.GetChar
-        Throw New NotImplementedException(NameOf(GetChar))
+        Throw New NotImplementedException("GetChar")
     End Function
 
     Public Function GetChars(i As Integer, fieldoffset As Long, buffer() As Char, bufferoffset As Integer, length As Integer) As Long Implements IDataRecord.GetChars
-        Throw New NotImplementedException(NameOf(GetChars))
+        Throw New NotImplementedException("GetChars")
     End Function
 
     Public Function GetData(i As Integer) As IDataReader Implements IDataRecord.GetData
-        Throw New NotImplementedException(NameOf(GetData))
+        Throw New NotImplementedException("GetData")
     End Function
 
     Public Function GetDataTypeName(i As Integer) As String Implements IDataRecord.GetDataTypeName
@@ -90,11 +90,11 @@ Friend Class BulkCopyDecorator(Of T)
     End Function
 
     Public Function GetDateTime(i As Integer) As Date Implements IDataRecord.GetDateTime
-        Throw New NotImplementedException(NameOf(GetDateTime))
+        Throw New NotImplementedException("GetDateTime")
     End Function
 
     Public Function GetDecimal(i As Integer) As Decimal Implements IDataRecord.GetDecimal
-        Throw New NotImplementedException(NameOf(GetDecimal))
+        Throw New NotImplementedException("GetDecimal")
     End Function
 
     Public Function GetDouble(i As Integer) As Double Implements IDataRecord.GetDouble
@@ -106,7 +106,7 @@ Friend Class BulkCopyDecorator(Of T)
     End Function
 
     Public Function GetFloat(i As Integer) As Single Implements IDataRecord.GetFloat
-        Throw New NotImplementedException(NameOf(GetFloat))
+        Throw New NotImplementedException("GetFloat")
     End Function
 
     Public Function GetGuid(i As Integer) As Guid Implements IDataRecord.GetGuid
@@ -150,7 +150,7 @@ Friend Class BulkCopyDecorator(Of T)
     End Function
 
     Public Function GetValues(values() As Object) As Integer Implements IDataRecord.GetValues
-        Throw New NotImplementedException(NameOf(GetValues))
+        Throw New NotImplementedException("GetValues")
     End Function
 
     Public Function IsDBNull(i As Integer) As Boolean Implements IDataRecord.IsDBNull
@@ -159,13 +159,13 @@ Friend Class BulkCopyDecorator(Of T)
 
     Default Public Overloads ReadOnly Property Item(i As Integer) As Object Implements IDataRecord.Item
         Get
-            Throw New NotImplementedException(NameOf(Item))
+            Throw New NotImplementedException("Item")
         End Get
     End Property
 
     Default Public Overloads ReadOnly Property Item(name As String) As Object Implements IDataRecord.Item
         Get
-            Throw New NotImplementedException(NameOf(Item))
+            Throw New NotImplementedException("Item")
         End Get
     End Property
 
