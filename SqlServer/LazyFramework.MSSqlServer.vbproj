@@ -108,6 +108,7 @@
     <ProjectReference Include="..\Framework\LazyFramework.vbproj">
       <Project>{d72ca321-6426-4493-bcc5-961284f1c51a}</Project>
       <Name>LazyFramework</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\Lazyframework.Data\Lazyframework.Data.vbproj">
       <Project>{05175b67-f72a-4618-b050-87d1057156a2}</Project>

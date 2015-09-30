@@ -1,8 +1,8 @@
-param([bool]$force = $true,[string]$configuration = "release",$output = "..\nuget\",[string]$repo = "lzy\")
+param([bool]$force = $true,[string]$configuration = "release",$output = "..\nuget\", [string]$repo = "lzy\")
 
 $projects = @(
     @{Path = '.\Framework\'; Project = 'LazyFramework'}
-    @{Path = '.\LazyFramework.Logging\'; Project = 'LazyFramework.Logging'}
+   ,@{Path = '.\LazyFramework.Logging\'; Project = 'LazyFramework.Logging'}
    ,@{Path = '.\Lazyframework.Data\'; Project = 'LazyFramework.Data'}
    ,@{Path = '.\SqlServer\'; Project = 'LazyFramework.MSSqlServer'}
    ,@{Path = '.\LazyFramework.EventHandling\'; Project = 'LazyFramework.EventHandling'}
@@ -58,6 +58,8 @@ $projects | % {
     #End
 
     $p = $_.Path+$_.Project+".vbproj"
+
+    $p
 
     .\nuget pack $p  -OutputDirectory $output -Build -IncludeReferencedProjects -Symbols -Properties Configuration=$configuration
 
