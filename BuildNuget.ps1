@@ -1,12 +1,12 @@
-param([bool]$force = $true,[string]$configuration = "release",$output = "..\nuget\", [string]$repo = "lzy\")
+param([bool]$force = $true,[string]$configuration = "release", $output = "..\nuget\", [string]$repo = "lzy\")
 
 $projects = @(
     @{Path = '.\Framework\'; Project = 'LazyFramework'}
-   #,@{Path = '.\LazyFramework.Logging\'; Project = 'LazyFramework.Logging'}
-   #,@{Path = '.\Lazyframework.Data\'; Project = 'LazyFramework.Data'}
-   #,@{Path = '.\SqlServer\'; Project = 'LazyFramework.MSSqlServer'}
-   #,@{Path = '.\LazyFramework.EventHandling\'; Project = 'LazyFramework.EventHandling'}
-   #,@{Path = '.\LazyFramework.CQRS\'; Project = 'LazyFramework.CQRS'}
+   ,@{Path = '.\LazyFramework.Logging\'; Project = 'LazyFramework.Logging'}
+   ,@{Path = '.\Lazyframework.Data\'; Project = 'LazyFramework.Data'}
+   ,@{Path = '.\SqlServer\'; Project = 'LazyFramework.MSSqlServer'}
+   ,@{Path = '.\LazyFramework.EventHandling\'; Project = 'LazyFramework.EventHandling'}
+   ,@{Path = '.\LazyFramework.CQRS\'; Project = 'LazyFramework.CQRS'}
 )
 
 $output = $output + $repo
@@ -62,7 +62,8 @@ $projects | % {
 
     $p
 
-    .\nuget pack $p  -OutputDirectory $output -MSBuildVersion 14 -IncludeReferencedProjects -Symbols -Properties Configuration=$configuration
+    C:\Windows\Microsoft.NET\Framework64\v4.0.30319\MSBuild.exe $p /p:Configuration=$configuration /t:Rebuild
+    .\nuget pack $p  -OutputDirectory $output -IncludeReferencedProjects -Symbols 
 
 
     #Reverting spec file
