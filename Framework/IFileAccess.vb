@@ -3,5 +3,7 @@
 ''' </summary>
 ''' <remarks></remarks>
 Public Interface IFileAccess
-    Function GetData(ByVal File As String, ByVal Command As CommandInfo, ByVal o As IORDataObject, ByVal ParamArray Parameters As Object()) As Boolean
+    Function GetData(ByVal file As String, ByVal command As CommandInfo, ByVal o As IORDataObject, ByVal ParamArray parameters As Object()) As Boolean
 End Interface
+
+

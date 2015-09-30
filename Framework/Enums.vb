@@ -25,8 +25,6 @@ Public Enum FillResultEnum As Integer
     ''' <remarks></remarks>
     UpdateOK = 4
 End Enum
-
-
 <Flags()> _
 Public Enum DataAccessTypes As Integer
     SQLServer = 1

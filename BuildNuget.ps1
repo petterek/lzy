@@ -2,14 +2,15 @@ param([bool]$force = $true,[string]$configuration = "release",$output = "..\nuge
 
 $projects = @(
     @{Path = '.\Framework\'; Project = 'LazyFramework'}
-   ,@{Path = '.\LazyFramework.Logging\'; Project = 'LazyFramework.Logging'}
-   ,@{Path = '.\Lazyframework.Data\'; Project = 'LazyFramework.Data'}
-   ,@{Path = '.\SqlServer\'; Project = 'LazyFramework.MSSqlServer'}
-   ,@{Path = '.\LazyFramework.EventHandling\'; Project = 'LazyFramework.EventHandling'}
-   ,@{Path = '.\LazyFramework.CQRS\'; Project = 'LazyFramework.CQRS'}
+   #,@{Path = '.\LazyFramework.Logging\'; Project = 'LazyFramework.Logging'}
+   #,@{Path = '.\Lazyframework.Data\'; Project = 'LazyFramework.Data'}
+   #,@{Path = '.\SqlServer\'; Project = 'LazyFramework.MSSqlServer'}
+   #,@{Path = '.\LazyFramework.EventHandling\'; Project = 'LazyFramework.EventHandling'}
+   #,@{Path = '.\LazyFramework.CQRS\'; Project = 'LazyFramework.CQRS'}
 )
 
 $output = $output + $repo
+
 
 if(!(Test-Path $output)){ New-Item $output -ItemType Directory}
 
@@ -61,7 +62,7 @@ $projects | % {
 
     $p
 
-    .\nuget pack $p  -OutputDirectory $output -Build -IncludeReferencedProjects -Symbols -Properties Configuration=$configuration
+    .\nuget pack $p  -OutputDirectory $output -MSBuildVersion 14 -IncludeReferencedProjects -Symbols -Properties Configuration=$configuration
 
 
     #Reverting spec file
