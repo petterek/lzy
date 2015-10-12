@@ -1,4 +1,4 @@
-param([bool]$force = $true,[string]$configuration = "release", $output = "..\nuget\", [string]$repo = "lzy\")
+param([bool]$force = $true,[string]$configuration = "Debug", $output = "..\nuget\", [string]$repo = "lzy\")
 
 $projects = @(
     @{Path = '.\Framework\'; Project = 'LazyFramework'}
@@ -28,6 +28,10 @@ if(Test-Path $saveHash) {
 }
 
 
+#Build solution
+C:\Windows\Microsoft.NET\Framework64\v4.0.30319\MSBuild.exe .\LazyFramework.sln /p:Configuration=$configuration /t:Clean,Rebuild /nologo /v:q
+
+
 
 $projects | % {
 
@@ -54,17 +58,16 @@ $projects | % {
      $specFile = (Resolve-Path $_.Path).Path + $_.Project + ".nuspec"
      [xml]$xml = Get-Content $specFile
      $xml.package.metadata.releaseNotes = $msg.ToString()
-     $xml.package.metadata.version = $xml.package.metadata.version + "-alpha"
+     #$xml.package.metadata.version = $xml.package.metadata.version + "-alpha"
      $xml.Save($specFile)
     #End
 
     $p = $_.Path+$_.Project+".vbproj"
-
+    
     $p
-
-    C:\Windows\Microsoft.NET\Framework64\v4.0.30319\MSBuild.exe $p /p:Configuration=$configuration /t:Rebuild
-    .\nuget pack $p  -OutputDirectory $output -IncludeReferencedProjects -Symbols 
-
+        
+    
+    .\nuget pack $p  -OutputDirectory $output -IncludeReferencedProjects -Symbols
 
     #Reverting spec file
     git checkout $specFile
@@ -82,4 +85,5 @@ Get-ChildItem $output -Filter *.symbols.nupkg | % {
 }
 
 $currRev | Set-Content $saveHash
+
 

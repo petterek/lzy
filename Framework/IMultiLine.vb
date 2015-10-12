@@ -17,5 +17,8 @@ Public Interface IMultiLine
         Read = 1
     End Enum
 
+
+
+
 End Interface
 

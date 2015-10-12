@@ -58,7 +58,7 @@ Imports NUnit.Framework
     <Test> Public Sub SelectMany()
 
         Dim cmd As New data.CommandInfo
-        cmd.CommandText = "select * from Hrunit"
+        cmd.CommandText = "select Id,Name,Inactive from Hrunit"
         cmd.TypeOfCommand = commandTypeEnum.Read
         cmd.Parameters.Add("Id", DbType.Int32, 1)
 

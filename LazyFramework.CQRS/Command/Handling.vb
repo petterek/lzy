@@ -1,5 +1,6 @@
 ﻿Imports System.Reflection
 Imports LazyFramework.EventHandling
+Imports LazyFramework.Pipeline
 Imports LazyFramework.Utils
 
 Namespace Command
@@ -9,6 +10,15 @@ Namespace Command
         Private Shared ReadOnly PadLock As New Object
         Private Shared _handlers As Dictionary(Of Type, List(Of MethodInfo))
         Private Shared _commadList As Dictionary(Of String, Type)
+
+
+        Private Shared ReadOnly Property PipeLine As CommandPipeLine
+            Get
+                Static pipe As New CommandPipeLine
+                Return pipe
+            End Get
+        End Property
+
 
 
         ''' <summary>
@@ -68,41 +78,36 @@ Namespace Command
         Public Shared Sub ExecuteCommand(command As IAmACommand)
 
             If AllHandlers.ContainsKey(command.GetType) Then
-                'If TypeOf (command) Is ActionBase Then
-                '    DirectCast(command, ActionBase).OnActionBegin()
-                'End If
 
-                If TypeOf (command) Is CommandBase Then
-                    If Not IsCommandAvailable(CType(command, CommandBase)) Then
-                        EventHub.Publish(New NoAccess(command))
-                        Throw New ActionIsNotAvailableException(command, command.User)
-                    End If
-                End If
 
-                If Not CanUserRunCommand(CType(command, CommandBase)) Then
-                    EventHub.Publish(New NoAccess(command))
-                    Throw New ActionSecurityAuthorizationFaildException(command, command.User)
-                End If
 
-                Validation.Handling.ValidateAction(command)
+                PipeLine.Execute(Of IAmACommand, Object)(Function()
+                                                             If Not CanUserRunCommand(CType(command, CommandBase)) Then
+                                                                 EventHub.Publish(New NoAccess(command))
+                                                                 Throw New ActionSecurityAuthorizationFaildException(command, command.User)
+                                                             End If
 
-                Try
-                    Dim temp = AllHandlers(command.GetType)(0).Invoke(Nothing, {command})
-                    If temp IsNot Nothing Then
-                        command.SetResult(Transform.Handling.TransformResult(command, temp))
-                    End If
+                                                             Validation.Handling.ValidateAction(command)
 
-                    'If TypeOf (command) Is ActionBase Then
-                    '    DirectCast(command, ActionBase).OnActionComplete()
-                    'End If
+                                                             Try
+                                                                 Dim temp = AllHandlers(command.GetType)(0).Invoke(Nothing, {command})
+                                                                 If temp IsNot Nothing Then
+                                                                     command.SetResult(Transform.Handling.TransformResult(command, temp))
+                                                                 End If
 
-                Catch ex As TargetInvocationException
-                    Logging.Log.Error(command, ex)
-                    Throw ex.InnerException
-                Catch ex As Exception
-                    Logging.Log.Error(command, ex)
-                    Throw
-                End Try
+                                                                 'If TypeOf (command) Is ActionBase Then
+                                                                 '    DirectCast(command, ActionBase).OnActionComplete()
+                                                                 'End If
+
+                                                             Catch ex As TargetInvocationException
+                                                                 Logging.Log.Error(command, ex)
+                                                                 Throw ex.InnerException
+                                                             Catch ex As Exception
+                                                                 Logging.Log.Error(command, ex)
+                                                                 Throw
+                                                             End Try
+                                                             Return Nothing
+                                                         End Function,command)
             Else
                 Dim notImplementedException = New NotImplementedException(command.ActionName)
                 Logging.Log.Error(command, notImplementedException)
@@ -110,6 +115,8 @@ Namespace Command
             End If
 
             command.ActionComplete()
+            
+
             'Logging.Log.Command(command)
         End Sub
 
@@ -126,5 +133,28 @@ Namespace Command
         End Function
 
 
+    End Class
+
+    Friend Class CommandPipeLine
+        Inherits Pipeline.Base
+
+        Public Sub New()
+            Me.AddPreExecuteStep(New IsCommandAvailableStep)
+        End Sub
+
+    End Class
+
+    Friend Class IsCommandAvailableStep
+        Implements IPipelineStep
+        
+        Public Sub ExecuteStep(Of TContext)(context As TContext) Implements IPipelineStep.ExecuteStep
+            If TypeOf (context) Is CommandBase Then
+                Dim command = DirectCast(context,IAmACommand)
+                If Not command.IsAvailable Then
+                    EventHub.Publish(New NoAccess(command))
+                    Throw New ActionIsNotAvailableException(command, command.User)
+                End If
+            End If
+        End Sub
     End Class
 End Namespace
