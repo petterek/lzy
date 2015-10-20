@@ -96,11 +96,11 @@ Namespace Runtime
         End Property
 
         Public Function GetEnumerator() As IEnumerator(Of KeyValuePair(Of TKey, TValue)) Implements IEnumerable(Of KeyValuePair(Of TKey, TValue)).GetEnumerator
-
+            Return Nothing
         End Function
 
         Public Function GetEnumerator1() As IEnumerator Implements IEnumerable.GetEnumerator
-
+            Return Nothing
         End Function
     End Class
 End NameSpace
