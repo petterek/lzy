@@ -1,3 +1,5 @@
+Imports System.Data
+
 Public Class ParameterInfo
     Private _Name As String
     Private _DBType As DbType

@@ -286,8 +286,7 @@ End Class
     End Sub
 
     <Test> Public sub EmptyObjectIsRead()
-        Dim res As Test
-
+        
         Assert.DoesNotThrow(Sub() Newtonsoft.Json.JsonConvert.DeserializeObject(of Test)("{}"))
         Assert.DoesNotThrow(Sub() LazyFramework.Utils.Json.Reader.StringToObject(of Test)("{}"))
 

@@ -1,5 +1,4 @@
 ﻿Imports LazyFramework.CQRS.Logging
-Imports LazyFramework.Data
 
 
 Public Class HandlerNotFound

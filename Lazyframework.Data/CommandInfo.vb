@@ -1,3 +1,5 @@
+Imports System.Data
+
 Public Class CommandInfo
     Private _commandText As String
 

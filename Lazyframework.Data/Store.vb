@@ -1,4 +1,6 @@
-﻿Imports System.Reflection
+﻿Imports System.Data
+Imports System.Linq
+Imports System.Reflection
 Imports System.Runtime.InteropServices
 Imports System.Text.RegularExpressions
 Imports LazyFramework.Utils
@@ -38,7 +40,7 @@ Public Class Store
 #Region "Privates"
 
         Private Shared Sub ExecReaderWithStream(Of T As {New, WillDisposeThoseForU})(ByVal connectionInfo As ServerConnectionInfo, ByVal command As CommandInfo, data As FillStatus(Of T), readerOptions As CommandBehavior, handler As HandleReader(Of T), dataObjectType As Type)
-            Dim pluginCollection As List(Of DataModificationPluginBase)
+            Dim pluginCollection As List(Of DataModificationPluginBase) = Nothing
             Dim provider = connectionInfo.GetProvider
 
             Dim cmd = provider.CreateCommand(command)
