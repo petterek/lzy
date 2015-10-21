@@ -190,7 +190,7 @@ Namespace Data
             If Not Fillers.ContainsKey(key) Then
                 SyncLock PadLock
                     If Not Fillers.ContainsKey(key) Then
-                        Fillers(key) = New DataFiller(dataReader, t)
+                        Fillers(key) = New DataFiller(dataReader, t,commandInfo.CommandText.Contains("*"c))
                     End If
                 End SyncLock
             End If
