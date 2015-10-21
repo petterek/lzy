@@ -1,4 +1,5 @@
 ﻿Imports System.Data.SqlClient
+Imports System.Linq.Expressions
 Imports System.Reflection
 
 
@@ -10,6 +11,8 @@ Public Class DataFiller
         Private ReadOnly _col As Integer
         Private ReadOnly _name As String
         Private ReadOnly _fieldInfo As FieldInfo
+
+        Private setter As Action(Of Object,Object)
 
         Public Sub New(ByVal reader As Object, ByVal col As Integer, ByVal fieldInfo As FieldInfo, ByVal name As String, ByVal mapByName As Boolean)
             _col = col
@@ -27,8 +30,30 @@ Public Class DataFiller
                 Else
                     _getValue = AddressOf GetPrimitiveType
                 End If
-
             End If
+
+
+            Dim objType = fieldInfo.DeclaringType
+            Dim valType = fieldInfo.FieldType
+
+            Dim assignmentMethod = GetType(FieldInfoDecorator).
+                                    GetMethod("Assigner", BindingFlags.Static Or BindingFlags.NonPublic).
+                                    MakeGenericMethod(valType)
+
+
+            Dim exObjParam = Expression.Parameter(GetType(Object), "theObject")
+            Dim exValParam = Expression.Parameter(GetType(Object), "theProperty")
+            Dim exObjConverted = Expression.Convert(exObjParam, objType)
+            Dim exValConverted = Expression.Convert(exValParam, valType)
+            Dim exMember = Expression.Field(exObjConverted, fieldInfo)
+            Dim exAssignment = Expression.Call(assignmentMethod, exMember, exValConverted)
+
+            setter = Expression.Lambda(Of Action(Of Object, Object))(exAssignment, exObjParam, exValParam).Compile()
+
+        End Sub
+
+        Private Shared Sub Assigner(Of T)(ByRef out As T, inValue As T)
+            out = inValue
         End Sub
 
         Private ReadOnly _getValue As GetValueDelegate
@@ -52,9 +77,11 @@ Public Class DataFiller
             Dim tempValue = _getValue(reader)
 
             If TypeOf (tempValue) Is DBNull Then
-                _fieldInfo.SetValue(o, Nothing)
+                setter(o,Nothing)
+                '_fieldInfo.SetValue(o, Nothing)
             Else
-                _fieldInfo.SetValue(o, tempValue)
+                setter(o,tempValue)
+                '_fieldInfo.SetValue(o, tempValue)
             End If
         End Sub
 
