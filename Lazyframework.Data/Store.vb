@@ -203,7 +203,10 @@ Public Class Store
                 SyncLock PadLock
                     If Not Fillers.ContainsKey(key) Then
                         Fillers(key) = New DataFiller(dataReader, t,commandInfo.CommandText.Contains("*"c))
+<<<<<<< HEAD:Lazyframework.Data/Store.vb
 
+=======
+>>>>>>> Version-1:Framework/Data/Store.vb
                     End If
                 End SyncLock
             End If
@@ -220,3 +223,7 @@ Public Class Store
 #End Region
 
     End Class
+<<<<<<< HEAD:Lazyframework.Data/Store.vb
+=======
+End Namespace
+>>>>>>> Version-1:Framework/Data/Store.vb
