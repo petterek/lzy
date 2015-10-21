@@ -13,30 +13,12 @@ Public Class DataFiller
         Private ReadOnly _fieldInfo As FieldInfo
         Private ReadOnly _setter As Action(Of Object, Object)
 
-        Private Shared Function CreateSetter(propertyInfo As PropertyInfo) As Action(Of Object, Object)
-            Dim targetType = propertyInfo.DeclaringType
-            Dim methodInfo = propertyInfo.GetSetMethod()
-            Dim exTarget = Expression.Parameter(GetType(Object), "t")
-            Dim exValue = Expression.Parameter(GetType(Object), "p")
-            Dim exBody = Expression.Call(Expression.Convert(exTarget, targetType), methodInfo, Expression.Convert(exValue, propertyInfo.PropertyType))
-            Return Expression.Lambda(Of Action(Of Object, Object))(exBody, exTarget, exValue).Compile()
-        End Function
-
         Private Shared Function CreateSetter(fieldInfo As FieldInfo) As Action(Of Object, Object)
             Dim targetType = fieldInfo.DeclaringType
             Dim exTarget = Expression.Parameter(GetType(Object), "t")
             Dim exValue = Expression.Parameter(GetType(Object), "p")
 
-            Dim exBody As Expression = Nothing
-
-            If Not fieldInfo.FieldType.IsByRef Then
-                Dim isNullExpression = Expression.Assign(Expression.Field(Expression.Convert(exTarget, targetType), fieldInfo), Expression.Default(fieldInfo.FieldType))
-                Dim isNotNullExpression = Expression.Assign(Expression.Field(Expression.Convert(exTarget, targetType), fieldInfo), Expression.Convert(exValue, fieldInfo.FieldType))
-                exBody = Expression.IfThenElse(Expression.Equal(exValue, Expression.Constant(Nothing, targetType)), isNullExpression, isNotNullExpression)
-            Else
-                Expression.Assign(Expression.Field(Expression.Convert(exTarget, targetType), fieldInfo), Expression.Convert(exValue, fieldInfo.FieldType))
-            End If
-
+            Dim exBody As Expression = Expression.Assign(Expression.Field(Expression.Convert(exTarget, targetType), fieldInfo), Expression.Convert(exValue, fieldInfo.FieldType))
             Return Expression.Lambda(Of Action(Of Object, Object))(exBody, exTarget, exValue).Compile()
         End Function
 
