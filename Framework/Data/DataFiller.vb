@@ -1,4 +1,5 @@
 ﻿Imports System.Data.SqlClient
+Imports System.Linq.Expressions
 Imports System.Reflection
 
 
@@ -10,6 +11,35 @@ Public Class DataFiller
         Private ReadOnly _col As Integer
         Private ReadOnly _name As String
         Private ReadOnly _fieldInfo As FieldInfo
+        Private ReadOnly _setter As Action(Of Object, Object)
+
+        Private Shared Function CreateSetter(propertyInfo As PropertyInfo) As Action(Of Object, Object)
+            Dim targetType = propertyInfo.DeclaringType
+            Dim methodInfo = propertyInfo.GetSetMethod()
+            Dim exTarget = Expression.Parameter(GetType(Object), "t")
+            Dim exValue = Expression.Parameter(GetType(Object), "p")
+            Dim exBody = Expression.Call(Expression.Convert(exTarget, targetType), methodInfo, Expression.Convert(exValue, propertyInfo.PropertyType))
+            Return Expression.Lambda(Of Action(Of Object, Object))(exBody, exTarget, exValue).Compile()
+        End Function
+
+        Private Shared Function CreateSetter(fieldInfo As FieldInfo) As Action(Of Object, Object)
+            Dim targetType = fieldInfo.DeclaringType
+            Dim exTarget = Expression.Parameter(GetType(Object), "t")
+            Dim exValue = Expression.Parameter(GetType(Object), "p")
+
+            Dim exBody As Expression = Nothing
+
+            If Not fieldInfo.FieldType.IsByRef Then
+                Dim isNullExpression = Expression.Assign(Expression.Field(Expression.Convert(exTarget, targetType), fieldInfo), Expression.Default(fieldInfo.FieldType))
+                Dim isNotNullExpression = Expression.Assign(Expression.Field(Expression.Convert(exTarget, targetType), fieldInfo), Expression.Convert(exValue, fieldInfo.FieldType))
+                exBody = Expression.IfThenElse(Expression.Equal(exValue, Expression.Constant(Nothing, targetType)), isNullExpression, isNotNullExpression)
+            Else
+                Expression.Assign(Expression.Field(Expression.Convert(exTarget, targetType), fieldInfo), Expression.Convert(exValue, fieldInfo.FieldType))
+            End If
+
+            Return Expression.Lambda(Of Action(Of Object, Object))(exBody, exTarget, exValue).Compile()
+        End Function
+
 
         Public Sub New(ByVal reader As Object, ByVal col As Integer, ByVal fieldInfo As FieldInfo, ByVal name As String, ByVal mapByName As Boolean)
             _col = col
@@ -27,8 +57,9 @@ Public Class DataFiller
                 Else
                     _getValue = AddressOf GetPrimitiveType
                 End If
-
             End If
+
+            _setter = CreateSetter(fieldInfo)
         End Sub
 
         Private ReadOnly _getValue As GetValueDelegate
@@ -51,10 +82,14 @@ Public Class DataFiller
         Public Sub SetValueToObject(reader As IDataReader, o As Object)
             Dim tempValue = _getValue(reader)
 
+
+
             If TypeOf (tempValue) Is DBNull Then
-                _fieldInfo.SetValue(o, Nothing)
+                _setter(o, Nothing)
+                '_fieldInfo.SetValue(o, Nothing)
             Else
-                _fieldInfo.SetValue(o, tempValue)
+                _setter(o, tempValue)
+                '_fieldInfo.SetValue(o, tempValue)
             End If
         End Sub
 
