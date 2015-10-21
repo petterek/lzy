@@ -11,8 +11,17 @@ Public Class DataFiller
         Private ReadOnly _col As Integer
         Private ReadOnly _name As String
         Private ReadOnly _fieldInfo As FieldInfo
+        Private ReadOnly _setter As Action(Of Object, Object)
 
-        Private setter As Action(Of Object,Object)
+        Private Shared Function CreateSetter(fieldInfo As FieldInfo) As Action(Of Object, Object)
+            Dim targetType = fieldInfo.DeclaringType
+            Dim exTarget = Expression.Parameter(GetType(Object), "t")
+            Dim exValue = Expression.Parameter(GetType(Object), "p")
+
+            Dim exBody As Expression = Expression.Assign(Expression.Field(Expression.Convert(exTarget, targetType), fieldInfo), Expression.Convert(exValue, fieldInfo.FieldType))
+            Return Expression.Lambda(Of Action(Of Object, Object))(exBody, exTarget, exValue).Compile()
+        End Function
+
 
         Public Sub New(ByVal reader As Object, ByVal col As Integer, ByVal fieldInfo As FieldInfo, ByVal name As String, ByVal mapByName As Boolean)
             _col = col
@@ -32,28 +41,7 @@ Public Class DataFiller
                 End If
             End If
 
-
-            Dim objType = fieldInfo.DeclaringType
-            Dim valType = fieldInfo.FieldType
-
-            Dim assignmentMethod = GetType(FieldInfoDecorator).
-                                    GetMethod("Assigner", BindingFlags.Static Or BindingFlags.NonPublic).
-                                    MakeGenericMethod(valType)
-
-
-            Dim exObjParam = Expression.Parameter(GetType(Object), "theObject")
-            Dim exValParam = Expression.Parameter(GetType(Object), "theProperty")
-            Dim exObjConverted = Expression.Convert(exObjParam, objType)
-            Dim exValConverted = Expression.Convert(exValParam, valType)
-            Dim exMember = Expression.Field(exObjConverted, fieldInfo)
-            Dim exAssignment = Expression.Call(assignmentMethod, exMember, exValConverted)
-
-            setter = Expression.Lambda(Of Action(Of Object, Object))(exAssignment, exObjParam, exValParam).Compile()
-
-        End Sub
-
-        Private Shared Sub Assigner(Of T)(ByRef out As T, inValue As T)
-            out = inValue
+            _setter = CreateSetter(fieldInfo)
         End Sub
 
         Private ReadOnly _getValue As GetValueDelegate
@@ -76,11 +64,13 @@ Public Class DataFiller
         Public Sub SetValueToObject(reader As IDataReader, o As Object)
             Dim tempValue = _getValue(reader)
 
+
+
             If TypeOf (tempValue) Is DBNull Then
-                setter(o,Nothing)
+                _setter(o, Nothing)
                 '_fieldInfo.SetValue(o, Nothing)
             Else
-                setter(o,tempValue)
+                _setter(o, tempValue)
                 '_fieldInfo.SetValue(o, tempValue)
             End If
         End Sub
