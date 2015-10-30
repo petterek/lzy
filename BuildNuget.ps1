@@ -1,4 +1,4 @@
-param([bool]$force = $true,[string]$configuration = "Debug", $output = "..\nuget\", [string]$repo = "lzy\")
+param([bool]$force = $false,[string]$configuration = "debug", $output = "..\nuget\",[string] $symbolServer = "http://symbol.itaslan.infotjenester.no/nuget/Core" , [string]$repo = "lzy\")
 
 $projects = @(
     @{Path = '.\Framework\'; Project = 'LazyFramework'}
@@ -9,6 +9,8 @@ $projects = @(
    ,@{Path = '.\LazyFramework.CQRS\'; Project = 'LazyFramework.CQRS'}
 )
 
+if($force){ C:\Windows\Microsoft.NET\Framework64\v4.0.30319\MSBuild.exe .\LazyFramework.sln /p:Configuration=$configuration /t:Clean,Rebuild /nologo /v:q}
+
 $output = $output + $repo
 
 
@@ -17,9 +19,6 @@ if(!(Test-Path $output)){ New-Item $output -ItemType Directory}
 $saveHash = $output+"lastbuild.log"
 #Skal vi slette alle versionene inne i denne katalogen før vi bygger????
 
-$remove = $output + "*.nupkg"
-del $remove
-
 $lastRev = ""
 $currRev = git log -1 --format=%H
 
@@ -27,63 +26,92 @@ if(Test-Path $saveHash) {
     $lastRev = Get-Content($saveHash)
 }
 
-
-#Build solution
-C:\Windows\Microsoft.NET\Framework64\v4.0.30319\MSBuild.exe .\LazyFramework.sln /p:Configuration=$configuration /t:Clean,Rebuild /nologo /v:q
-
+$packed = New-Object System.Collections.ArrayList
+$toBuild = New-Object System.Collections.ArrayList
 
 
 $projects | % {
 
-    $_.Project
-
     $outstanding = (git status $_.Path --porcelain) | Out-String
-    $msg = ((git log $lastRev`.`.$currRev --format=%B $_.Path) | Out-String )
+    $msg =  ((git log $lastRev`.`.$currRev --format=%B $_.Path) | Out-String )
+    $add = $true;	
+
+    $msg
 
     if(!($force)) {
-        if (!($outstanding -eq "")){
-            Write-Host $outstanding
-            Write-Host "Commit all changes before building"
-            return
+            if (!($outstanding -eq "")){ 
+                Write-Host $outstanding
+                Write-Host "Commit all changes before building"
+                $add = $false
+            } 
+
+            if (($currRev -eq $lastRev) -or ($msg -eq ""))   {
+                ": nothing to build "
+                $add = $false
+            }
+
+            if($add){ 
+                $toBuild.Add($_)
+            }
+            
+
+        }else {
+            $toBuild = $projects
         }
 
+    #Update authors
+	$specFile = (Resolve-Path $_.Path).Path + $_.Project + ".nuspec"
+	[xml]$xml = Get-Content $specFile
+    $author = ((git log --all --format='%aN' | sort -u) | Out-String).ToString()
+	$xml.package.metadata.authors =  $author
+    $xml.package.metadata.releaseNotes = "`r`n" + ((git log -1 --pretty=oneline) | Out-String) + $msg.ToString()
+	$xml.Save($specFile)
 
-        if (($currRev -eq $lastRev) -or ($msg -eq ""))   {
-            ": nothing to build "
-            return
-        }
+}
+
+$toBuild | % {
+    
+    $_.Project
+    
+    $match = $_.Project + "\.\d+\.\d+\.\d+\.\d+\..*"
+    
+    Get-ChildItem $output |  
+    Where-Object {$_.Name -match "$match"} | % {
+        del $_.FullName
     }
-
-    #Updating spec file with release notes.
-     $specFile = (Resolve-Path $_.Path).Path + $_.Project + ".nuspec"
-     [xml]$xml = Get-Content $specFile
-     $xml.package.metadata.releaseNotes = $msg.ToString()
-     #$xml.package.metadata.version = $xml.package.metadata.version + "-alpha"
-     $xml.Save($specFile)
-    #End
-
-    $p = $_.Path+$_.Project+".vbproj"
+          
+	$p = $_.Path + $_.Project + ".*proj"
+    $p = (Get-Item $p).FullName
     
-    $p
-        
+    if($force){
+        .\nuget pack $p  -OutputDirectory $output -IncludeReferencedProjects -Symbols
+        }
+        else{
+        .\nuget pack $p  -OutputDirectory $output -IncludeReferencedProjects -Symbols -Build
+        }
     
-    .\nuget pack $p  -OutputDirectory $output -IncludeReferencedProjects -Symbols
+	$packed.Add($_.Project)
 
-    #Reverting spec file
-    git checkout $specFile
+    
     "Release notes:"
     $msg
 }
 
+"Reverting nuspec files"
+git checkout *.nuspec
+
+"Writing revison info"
+$currRev | Set-Content $saveHash 
+
+
 "Pushing symbols"
-
 $output = "..\nuget\" + $repo
-$symbolServer = "http://symbol.itaslan.infotjenester.no/nuget/Core"
 
-Get-ChildItem $output -Filter *.symbols.nupkg | % {
-    .\nuget push $_.FullName p:p  -source $symbolServer
+$packed | % {
+     $match = $_ + "\.\d+\.\d+\.\d+\.\d+\.symbols"
+     Get-ChildItem $output |  
+     Where-Object {$_.Name -match "$match"} | % {
+        .\nuget push $_.FullName  p:p -source $symbolServer    
+    }
+	
 }
-
-$currRev | Set-Content $saveHash
-
-
