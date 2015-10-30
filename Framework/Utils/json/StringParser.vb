@@ -9,9 +9,13 @@ Namespace Utils.Json
         Public Delegate Function Match(input As String) As Boolean
 
         Private Shared ReadOnly ML As New MatchList From {
-            {Function(inp) Inp = "\\", Function(r As IReader)
+            {Function(inp) inp = "\\", Function(r As IReader)
                                            r.ClearBuffer()
                                            Return "\"
+                                       End Function},
+            {Function(inp) inp = "\""", Function(r As IReader)
+                                           r.ClearBuffer()
+                                           Return Chr(34)
                                        End Function},
             {Function(inp) inp = "\n", Function(r As IReader)
                                            r.ClearBuffer()

@@ -201,8 +201,8 @@ End Class
     End Sub
 
     <Test> Public Sub ParseTextWithEscapeObject()
-        Dim p = Utils.Json.Reader.StringToObject(Of Person)("{""Navn"":""Petter\nGjermund\\""}")
-        Assert.AreEqual("Petter" & vbCrLf & "Gjermund\", p.Navn)
+        Dim p = Utils.Json.Reader.StringToObject(Of Person)("{""Navn"":""Petter\nGjermund\\ \""Han er skikkelig tøff\"" ""}")
+        Assert.AreEqual("Petter" & vbCrLf & "Gjermund\ ""Han er skikkelig tøff"" "  , p.Navn)
         'Assert.AreEqual(43, p.Alder)
     End Sub
 
