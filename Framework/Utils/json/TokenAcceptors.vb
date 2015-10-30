@@ -118,7 +118,7 @@ Namespace Utils.Json
         Public Shared TypeParserMapper As New Dictionary(Of Type, Builder) From {
                                                                             {GetType(String), New StringParser},
                                                                             {GetType(Integer), New IntegerParser},
-                                                                            {GetType(Int64), New IntegerParser},
+                                                                            {GetType(Int64), New LongParser},
                                                                             {GetType(Int16), New IntegerParser},
                                                                             {GetType(Date), New DateParser},
                                                                             {GetType(Double), New DoubleParser},
