@@ -292,8 +292,21 @@ End Class
 
     End sub
 
+    <test> public sub LongValueIsParsed
+        
+        Dim v As ClassWithLong
+        Assert.DoesNotThrow(Sub() v = Reader.StringToObject(Of ClassWithLong)("{""Value"":1446212820320}"))
+        Assert.AreEqual(1446212820320,v.Value)
+
+
+    End Sub
+
 End Class
 
+
+Public Class ClassWithLong
+    Public Value As Long
+End Class
 
 Public Class Holder(Of T)
     Public Value As T

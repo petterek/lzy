@@ -14,4 +14,23 @@ Namespace Utils.Json
         End Function
 
     End Class
+
+    Friend Class LongParser
+        Inherits Builder
+
+        Public Sub New()
+            MyBase.New(GetType(Integer))
+        End Sub
+        Public Overrides Function Parse(nextChar As IReader) As Object
+            TokenAcceptors.WhiteSpace(nextChar)
+            While IsNumeric(nextChar.Peek)
+                nextChar.PeekToBuffer()
+            End While
+            Return Long.Parse(nextChar.Buffer)
+
+        End Function
+
+    End Class
+
+
 End Namespace
