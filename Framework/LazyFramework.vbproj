@@ -124,19 +124,8 @@
     <Compile Include="ClassFactory\SessionInstance.vb" />
     <Compile Include="ClassFactory\SessionNotCreatedException.vb" />
     <Compile Include="ClassFactory\TypeInfo.vb" />
-    <Compile Include="DataAccess\DataModificationPluginBase.vb" />
-    <Compile Include="DataAccess\IDatareaderDecorator.vb" />
-    <Compile Include="DataAccess\ParmeterInfoCollection.vb" />
-    <Compile Include="DataAccess\PluginNotFoundException.vb" />
     <Compile Include="Events\Events.vb" />
     <Compile Include="GlobalSuppressions.vb" />
-    <Compile Include="IDataAccess.vb" />
-    <Compile Include="IDataModificationPlugin.vb" />
-    <Compile Include="IDoNotFirePlugin.vb" />
-    <Compile Include="IFileAccess.vb" />
-    <Compile Include="IHasIdentity.vb" />
-    <Compile Include="IMultiLine.vb" />
-    <Compile Include="IORDataObject.vb" />
     <Compile Include="Runtime\Constants.vb" />
     <Compile Include="Runtime\Context.vb" />
     <Compile Include="Runtime\ExecutionContext.vb" />
@@ -151,10 +140,6 @@
     <Compile Include="Utils\ChangedValues.vb" />
     <Compile Include="BaseClasses\LazyDictionary.vb" />
     <Compile Include="Utils\Configuration.vb" />
-    <Compile Include="DataAccess\DataAccess.vb">
-    </Compile>
-    <Compile Include="Enums.vb" />
-    <Compile Include="Events.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -195,7 +180,6 @@
     <Compile Include="Utils\PluginValidator.vb" />
     <Compile Include="Utils\TestHelpers\QueryValidator.vb" />
     <Compile Include="Utils\ResponseThread.vb" />
-    <Compile Include="DataAccess\SQLServer.vb" />
     <Compile Include="Utils\Timing.vb" />
     <Compile Include="Utils\TypeValidation\TypeValidation.vb" />
   </ItemGroup>

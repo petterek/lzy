@@ -134,7 +134,7 @@ Imports NUnit.Framework
 
     <Test> Public Sub UseExpression()
         Dim cmd As New CommandInfo
-        cmd.TypeOfCommand = CommandInfoCommandTypeEnum.Read
+        cmd.TypeOfCommand = CommandTypeEnum.Read
 
         'cmd.CommandQuery 
 

@@ -80,7 +80,6 @@
     <Compile Include="ActioninfoTest.vb" />
     <Compile Include="ClassFactory.vb" />
     <Compile Include="CommandHub.vb" />
-    <Compile Include="ConnectionString.vb" />
     <Compile Include="CreateCustomer.vb" />
     <Compile Include="FileExtensionTest.vb" />
     <Compile Include="Helpers.vb" />
@@ -105,10 +104,8 @@
     <Compile Include="PipelineTest.vb" />
     <Compile Include="PubSub.vb" />
     <Compile Include="Query.vb" />
-    <Compile Include="QueryValidator.vb" />
     <Compile Include="ResponseThread.vb" />
     <Compile Include="SpawnThread.vb" />
-    <Compile Include="TypeValidation.vb" />
     <Compile Include="UtilsConfig.vb" />
     <Compile Include="UtilsJson.vb" />
     <Compile Include="ValidatorTest.vb" />

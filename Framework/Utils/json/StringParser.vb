@@ -70,6 +70,7 @@ Namespace Utils.Json
                     While ML.ContainsKey(nextChar.BufferPeek)
                         cur = nextChar.PeekToBuffer()
                     End While
+                    
                     buffer.Append(ML(nextChar.BufferPreLastPeek)(nextChar))
                 Else
                     cur = nextChar.PeekToBuffer
