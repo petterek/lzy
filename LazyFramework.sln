@@ -11,6 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{B6A318C8-C
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{13670540-F037-44C1-BB09-C33A2CFCFBDB}"
 	ProjectSection(SolutionItems) = preProject
+		BuildNuget.ps1 = BuildNuget.ps1
 		README.md = README.md
 	EndProjectSection
 EndProject

@@ -36,6 +36,13 @@ Public Class Store
     End Sub
 
 
+    Public Shared Sub ExecAsync(connectionInfo As ServerConnectionInfo, ByVal command As CommandInfo)
+
+
+        dim t = New System.Threading.Thread( Sub(e) Exec(connectionInfo,command) )
+        t.Start
+        
+    End Sub
 
 #Region "Privates"
 

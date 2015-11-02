@@ -1,4 +1,4 @@
-param([bool]$force = $false,[string]$configuration = "debug", $output = "..\nuget\",[string] $symbolServer = "http://symbol.itaslan.infotjenester.no/nuget/Core" , [string]$repo = "lzy\")
+param([bool]$force = $false,[string]$configuration = "Debug", $output = "..\nuget\",[string] $symbolServer = "http://symbol.itaslan.infotjenester.no/nuget/Core" , [string]$repo = "lzy\")
 
 $projects = @(
     @{Path = '.\Framework\'; Project = 'LazyFramework'}
