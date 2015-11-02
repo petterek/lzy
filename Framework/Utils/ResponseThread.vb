@@ -74,7 +74,6 @@
         Public Sub Clear()
             _AllMessages.Clear()
             ThreadStore.Remove(Timerforthread)
-            Querys = New QueryInfo
         End Sub
 
         Public Sub ClearMessages()
@@ -100,8 +99,6 @@
                 SetThreadValue(ResponseThreadSlot, value)
             End Set
         End Property
-
-        Public Property Querys As New QueryInfo
         
         Private Const MyStoreName As String = "FC2ED2E8-47BA-4374-80C4-CD51ADE709E5"
 
@@ -129,30 +126,6 @@
 
             Return Runtime.Context.Current.Storage
 
-            'If HttpContext.Current IsNot Nothing Then
-            '    If HttpContext.Current.Items(MyStoreName) Is Nothing Then
-            '        HttpContext.Current.Items(MyStoreName) = New Dictionary(Of String, Object)
-            '    End If
-            '    Return CType(HttpContext.Current.Items(MyStoreName), Dictionary(Of String, Object))
-            'ElseIf OperationContext.Current IsNot Nothing Then
-            '    If OperationContext.Current.Extensions.Find(Of ServiceBag)() Is Nothing Then
-            '        OperationContext.Current.Extensions.Add(New ServiceBag)
-            '    End If
-            '    Return OperationContext.Current.Extensions.Find(Of ServiceBag).AllItems
-            'Else
-            '    If TestHelpers.TestContext.Current IsNot Nothing Then
-            '        If Not TestHelpers.TestContext.Current.Items.ContainsKey(MyStoreName) Then
-            '            TestHelpers.TestContext.Current.Items.Add(MyStoreName, New Dictionary(Of String, Object))
-            '        End If
-            '        Return CType(TestHelpers.TestContext.Current.Items(MyStoreName), Dictionary(Of String, Object))
-            '    Else
-            '        Dim ldss As LocalDataStoreSlot = Thread.GetNamedDataSlot(MyStoreName)
-            '        If Thread.GetData(ldss) Is Nothing Then
-            '            Thread.SetData(ldss, New Dictionary(Of String, Object))
-            '        End If
-            '        Return CType(Thread.GetData(ldss), Dictionary(Of String, Object))
-            '    End If
-            'End If
         End Function
         
         Public Overrides Function ToString() As String
@@ -167,80 +140,6 @@
             Return ret
         End Function
 
-        Public Class QueryInfo
-            Property Count As Integer = 0
-
-            Property LogDetails As Boolean = False
-
-            ''' <summary>
-            ''' Gives u the number of ms that the system has used to retrvie data from the DB and fill object with that data.
-            ''' </summary>
-            ''' <value></value>
-            ''' <returns></returns>
-            ''' <remarks></remarks>
-            ReadOnly Property Time As Integer
-                Get
-                    Return CInt(CDbl(Ticks / Stopwatch.Frequency) * 1000)
-                End Get
-            End Property
-
-            ReadOnly Property Frq As Long
-                Get
-                    Return Stopwatch.Frequency
-                End Get
-            End Property
-
-            Public Ticks As Long = 0
-            Public Max As CommandInfo
-
-            Public addLock As New Object
-            Sub Add(ByVal dbName As String, ByVal c As CommandInfo)
-                If dbName Is Nothing Then Return
-                Add(c)
-                If Not Servers.ContainsKey(dbName) Then
-                    SyncLock addLock
-                        If Not Servers.ContainsKey(dbName) Then
-                            Servers(dbName) = New QueryInfo
-                        End If
-                    End SyncLock
-                End If
-                Servers(dbName).Add(c)
-            End Sub
-
-
-            Private _cmdLock As New Object
-            Private Sub Add(ByVal c As CommandInfo)
-                SyncLock _cmdLock
-                    Count += 1
-                    Ticks += c.CommandDuration
-                    If Max Is Nothing Then
-                        Max = c
-                    Else
-                        If Max.CommandDuration < c.CommandDuration Then
-                            Max = c
-                        End If
-                    End If
-                    If LogDetails Then
-                        If Not _commands.ContainsKey(c.CommandText) Then
-                            _commands.Add(c.CommandText, c)
-                        Else
-                            _commands(c.CommandText).CommandDuration += c.CommandDuration
-                            _commands(c.CommandText).Count += 1
-                        End If
-                    End If
-                End SyncLock
-            End Sub
-
-            Public Property Servers As New Dictionary(Of String, QueryInfo)
-
-            Private _commands As New Dictionary(Of String, CommandInfo)
-            Public ReadOnly Property Commands As Dictionary(Of String, CommandInfo)
-                Get
-                    Return _commands
-                End Get
-            End Property
-
-        End Class
     End Class
 End Namespace
 

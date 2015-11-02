@@ -148,7 +148,7 @@ Imports NUnit.Framework
 
     End Sub
 
-    <Test> Sub vetikkehelt()
+    <Test> public Sub vetikkehelt()
         Using New LazyFramework.ClassFactory.SessionInstance
             Dim sub1 = Substitute.For(Of ITest)()
             sub1.TestValue.Returns(Function()
