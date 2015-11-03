@@ -4,14 +4,13 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{478C54CA-00C8-4F36-B3C5-AE7291270F70}</ProjectGuid>
+    <ProjectGuid>{8D83ED21-F150-414C-9E50-31EFAABF0062}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>LazyFramework.CQRS</RootNamespace>
-    <AssemblyName>LazyFramework.CQRS</AssemblyName>
+    <RootNamespace>Lazyframework.Webhooks</RootNamespace>
+    <AssemblyName>Lazyframework.Webhooks</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>Windows</MyType>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -19,19 +18,17 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\Debug\</OutputPath>
-    <DocumentationFile>LazyFramework.CQRS.xml</DocumentationFile>
+    <DocumentationFile>Lazyframework.Webhooks.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>Full</DebugType>
+    <DebugType>pdbonly</DebugType>
     <DefineDebug>false</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DocumentationFile>LazyFramework.CQRS.xml</DocumentationFile>
+    <DocumentationFile>Lazyframework.Webhooks.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
-    <RemoveIntegerChecks>true</RemoveIntegerChecks>
-    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <PropertyGroup>
     <OptionExplicit>On</OptionExplicit>
@@ -47,46 +44,27 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Net.Http" />
   </ItemGroup>
   <ItemGroup>
     <Import Include="Microsoft.VisualBasic" />
     <Import Include="System" />
     <Import Include="System.Collections" />
     <Import Include="System.Collections.Generic" />
+    <Import Include="System.Data" />
     <Import Include="System.Diagnostics" />
     <Import Include="System.Linq" />
+    <Import Include="System.Xml.Linq" />
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ActionBase.vb" />
-    <Compile Include="ActionContext\ActionContext.vb" />
-    <Compile Include="ActionContext\Handling.vb" />
-    <Compile Include="ActionInfo.vb" />
-    <Compile Include="ActionIsNotAvailableException.vb" />
-    <Compile Include="ActionLink\ActionLinkBase.vb" />
-    <Compile Include="ActionLink\Handling.vb" />
-    <Compile Include="ActionSecurity.vb" />
-    <Compile Include="ActionSecurityAuthorizationFaildException.vb" />
-    <Compile Include="ActionValidationBaseException.vb" />
-    <Compile Include="Command\CommandBase.vb" />
-    <Compile Include="Command\ExpectsEvent.vb" />
-    <Compile Include="Command\Handling.vb" />
-    <Compile Include="Command\IAmACommand.vb" />
-    <Compile Include="Command\IHandleCommand.vb" />
-    <Compile Include="Dto\DtoBase.vb" />
-    <Compile Include="Dto\IActionDescriptor.vb" />
-    <Compile Include="Dto\ISupportActionList.vb" />
-    <Compile Include="ExecutionContext.vb" />
-    <Compile Include="HandlerNotFound.vb" />
-    <Compile Include="IActionBase.vb" />
-    <Compile Include="IActionSecurity.vb" />
-    <Compile Include="IAmAnAction.vb" />
-    <Compile Include="Logging\CommandInfo.vb" />
-    <Compile Include="Logging\ErrorInfo.vb" />
-    <Compile Include="Logging\Log.vb" />
-    <Compile Include="Logging\QueryInfo.vb" />
-    <Compile Include="Monitor\MonitorAttribute.vb" />
+    <Compile Include="Class1.vb" />
+    <Compile Include="ConfigStore.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -102,25 +80,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="NoAccess.vb" />
-    <Compile Include="Query\Handling.vb" />
-    <Compile Include="Query\IAmAQuery.vb" />
-    <Compile Include="Query\IHandleQuery.vb" />
-    <Compile Include="Query\ParalellQueryBase.vb" />
-    <Compile Include="Query\QueryBase.vb" />
-    <Compile Include="Query\QueryExecuted.vb" />
-    <Compile Include="Query\QueryLogEvent.vb" />
-    <Compile Include="Transform\EntityTransformerProvider.vb" />
-    <Compile Include="Transform\Handling.vb" />
-    <Compile Include="Transform\ITransformEntityToDto.vb" />
-    <Compile Include="Transform\ITransformerFactory.vb" />
-    <Compile Include="Transform\TransformerBase.vb" />
-    <Compile Include="Transform\TransformerFactoryBase.vb" />
-    <Compile Include="Transform\TransformerFactoryForActionAllreadyExists.vb" />
-    <Compile Include="Validation\Handling.vb" />
-    <Compile Include="Validation\IValidateAction.vb" />
-    <Compile Include="Validation\ValidateActionBase.vb" />
-    <Compile Include="Validation\ValidationException.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">
@@ -131,7 +90,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="LazyFramework.CQRS.nuspec" />
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>
@@ -147,24 +105,8 @@
       <Project>{d72ca321-6426-4493-bcc5-961284f1c51a}</Project>
       <Name>LazyFramework</Name>
     </ProjectReference>
-    <ProjectReference Include="..\LazyFramework.EventHandling\LazyFramework.EventHandling.vbproj">
-      <Project>{ef6603ed-7f45-4bc4-bee0-ff7193cc8cfe}</Project>
-      <Name>LazyFramework.EventHandling</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\LazyFramework.Logging\LazyFramework.Logging.vbproj">
-      <Project>{80f1df77-210f-4e39-ae66-2fadcc420cdc}</Project>
-      <Name>LazyFramework.Logging</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
-  </PropertyGroup>
-  <PropertyGroup>
-    <PreBuildEvent>
-    </PreBuildEvent>
-  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

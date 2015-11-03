@@ -120,7 +120,6 @@
     <Compile Include="ClassFactory\SessionNotCreatedException.vb" />
     <Compile Include="ClassFactory\TypeInfo.vb" />
     <Compile Include="Events\Events.vb" />
-    <Compile Include="GlobalSuppressions.vb" />
     <Compile Include="Runtime\Constants.vb" />
     <Compile Include="Runtime\Context.vb" />
     <Compile Include="Runtime\ExecutionContext.vb" />

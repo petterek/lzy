@@ -94,9 +94,9 @@ Namespace Query
         Public Shared Function ExecuteQuery(q As IAmAQuery) As Object
 
             If Not ActionSecurity.Current.UserCanRunThisAction(q.User, q) Then
-                Dim actionSecurityAuthorizationFaildException1 As ActionSecurityAuthorizationFaildException = New ActionSecurityAuthorizationFaildException(q, q.User)
-                Logging.Log.Error(q,actionSecurityAuthorizationFaildException1 )
-                Throw actionSecurityAuthorizationFaildException1
+                Dim actionSecurityAuthorizationFaildException As ActionSecurityAuthorizationFaildException = New ActionSecurityAuthorizationFaildException(q, q.User)
+                Logging.Log.Error(q,actionSecurityAuthorizationFaildException )
+                Throw actionSecurityAuthorizationFaildException
             End If
 
             Validation.Handling.ValidateAction(q)
