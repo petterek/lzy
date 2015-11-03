@@ -261,6 +261,16 @@ Imports NUnit.Framework
 
     End Sub
 
+    <Test> Public sub ExecScalar()
+        Dim cmd2 As New data.CommandInfo
+        cmd2.CommandText = "select count(*) from Hrunit "
+        cmd2.TypeOfCommand = CommandTypeEnum.Read
+        Dim ret As Integer
+
+        Assert.DoesNotThrow(Sub() ret = CType(Store.ExecScalar(Connection, cmd2), Integer) )
+        Assert.AreNotEqual(0, ret)
+    End sub
+
 End Class
 
 Public Class StreamTo

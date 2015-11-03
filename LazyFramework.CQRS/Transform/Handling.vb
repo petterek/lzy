@@ -70,11 +70,11 @@ Namespace Transform
         Public Shared Function TransformAndAddAction(ByVal action As IAmAnAction, ByVal transformer As ITransformEntityToDto, e As Object) As Object
             Dim securityContext As Object
             If transformer Is Nothing Then Return Nothing
-            If TypeOf (e) Is IProvideSecurityContext Then
-                securityContext = DirectCast(e, IProvideSecurityContext).Context
-            Else
-                securityContext = e
-            End If
+            'If TypeOf (e) Is IProvideSecurityContext Then
+            '    securityContext = DirectCast(e, IProvideSecurityContext).Context
+            'Else
+            '    securityContext = e
+            'End If
 
             If Not ActionSecurity.Current.EntityIsAvailableForUser(action.User, action, securityContext) Then Return Nothing
 

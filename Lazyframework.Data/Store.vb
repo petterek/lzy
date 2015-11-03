@@ -44,6 +44,35 @@ Public Class Store
         
     End Sub
 
+    Public Shared Function ExecScalar(connectionInfo As ServerConnectionInfo, command As CommandInfo) as Object
+        Dim provider = connectionInfo.GetProvider
+        Dim sw As New Stopwatch
+        sw.Start()
+       Dim executeScalar As Object
+
+        Try
+            Using cmd = provider.CreateCommand(command)
+                Using conn = provider.CreateConnection(connectionInfo)
+                    cmd.Connection = conn
+                    conn.Open()
+                    executeScalar = cmd.ExecuteScalar()
+                End Using
+            End Using
+            sw.Stop()
+
+            Dim loginfo As New DbRequestOkLog With {.DbName = connectionInfo, .Command = command, .Took = sw.ElapsedMilliseconds}
+            LazyFramework.Logging.Log.Write(Of DbRequestLog)(Logging.LogLevelEnum.Info, loginfo)
+        Catch ex As Exception
+            sw.Stop()
+            Dim loginfo As New DbRequestFaildLog With {.DbName = connectionInfo, .Command = command, .Took = sw.ElapsedMilliseconds, .Error = ex}
+            LazyFramework.Logging.Log.Write(Of DbRequestFaildLog)(Logging.LogLevelEnum.Info, loginfo)
+            Throw
+        End Try
+
+        Return executeScalar
+    End Function
+
+
 #Region "Privates"
 
     Private Shared Sub ExecReaderWithStream(Of T As {New, WillDisposeThoseForU})(ByVal connectionInfo As ServerConnectionInfo, ByVal command As CommandInfo, data As FillStatus(Of T), readerOptions As CommandBehavior, handler As HandleReader(Of T), dataObjectType As Type)

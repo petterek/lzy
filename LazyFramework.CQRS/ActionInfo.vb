@@ -97,9 +97,9 @@ Imports LazyFramework.CQRS.Command
                 If TypeOf (createInstance) Is CommandBase Then
                     CType(createInstance, CommandBase).SetInnerEntity(entity)
                 End If
-                If Not ActionSecurity.Current.UserCanRunThisAction(user, createInstance, If(TypeOf (entity) Is IProvideSecurityContext, DirectCast(entity, IProvideSecurityContext).Context, entity)) Then
-                    Return False
-                End If
+                'If Not ActionSecurity.Current.UserCanRunThisAction(user, createInstance, If(TypeOf (entity) Is IProvideSecurityContext, DirectCast(entity, IProvideSecurityContext).Context, entity)) Then
+                '    Return False
+                'End If
                 Return True
             End If
             Return False
