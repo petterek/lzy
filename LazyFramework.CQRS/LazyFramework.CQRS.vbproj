@@ -82,6 +82,7 @@
     <Compile Include="IActionBase.vb" />
     <Compile Include="IActionSecurity.vb" />
     <Compile Include="IAmAnAction.vb" />
+    <Compile Include="IProvideSecurityContext.vb" />
     <Compile Include="Logging\CommandInfo.vb" />
     <Compile Include="Logging\ErrorInfo.vb" />
     <Compile Include="Logging\Log.vb" />
