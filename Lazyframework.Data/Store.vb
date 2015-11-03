@@ -61,11 +61,11 @@ Public Class Store
             sw.Stop()
 
             Dim loginfo As New DbRequestOkLog With {.DbName = connectionInfo, .Command = command, .Took = sw.ElapsedMilliseconds}
-            LazyFramework.Logging.Log.Write(Of DbRequestLog)(Logging.LogLevelEnum.Info, loginfo)
+            LazyFramework.Logging.Log.Write(Of DbRequestLog)( loginfo,Logging.LogLevelEnum.Info)
         Catch ex As Exception
             sw.Stop()
             Dim loginfo As New DbRequestFaildLog With {.DbName = connectionInfo, .Command = command, .Took = sw.ElapsedMilliseconds, .Error = ex}
-            LazyFramework.Logging.Log.Write(Of DbRequestFaildLog)(Logging.LogLevelEnum.Info, loginfo)
+            LazyFramework.Logging.Log.Write(Of DbRequestFaildLog)(loginfo,Logging.LogLevelEnum.Info)
             Throw
         End Try
 
@@ -143,11 +143,11 @@ Public Class Store
             End Using
             sw.Stop()
             Dim loginfo As New DbRequestOkLog With {.DbName = connectionInfo, .Command = command, .Took = sw.ElapsedMilliseconds}
-            LazyFramework.Logging.Log.Write(Of DbRequestLog)(Logging.LogLevelEnum.Info, loginfo)
+            LazyFramework.Logging.Log.Write(Of DbRequestLog)( loginfo,Logging.LogLevelEnum.Info)
         Catch ex As Exception
             sw.Stop()
             Dim loginfo As New DbRequestFaildLog With {.DbName = connectionInfo, .Command = command, .Took = sw.ElapsedMilliseconds, .Error = ex}
-            LazyFramework.Logging.Log.Write(Of DbRequestFaildLog)(Logging.LogLevelEnum.Info, loginfo)
+            LazyFramework.Logging.Log.Write(Of DbRequestFaildLog)( loginfo,Logging.LogLevelEnum.Info)
             Throw
         End Try
     End Sub

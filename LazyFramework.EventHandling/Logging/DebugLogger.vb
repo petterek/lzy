@@ -15,7 +15,7 @@ Namespace Logging
 
     Friend Class Logger
         Public Shared Sub Write(ByVal e As IAmAnEvent)
-            LazyFramework.Logging.Log.Write(Of IAmAnEvent)(LazyFramework.Logging.LogLevelEnum.Info Or LazyFramework.Logging.LogLevelEnum.Verbose, e)
+            LazyFramework.Logging.Log.Write(Of IAmAnEvent)( e,LazyFramework.Logging.LogLevelEnum.Info Or LazyFramework.Logging.LogLevelEnum.Verbose)
         End Sub
     End Class
 

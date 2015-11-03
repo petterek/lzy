@@ -13,7 +13,7 @@ Namespace Logging
             input.Type = ex.GetType.FullName
             input.Params = action
 
-            LazyFramework.Logging.Log.Write(Of ErrorInfo)(LazyFramework.Logging.LogLevelEnum.Error,input)
+            LazyFramework.Logging.Log.Write(Of ErrorInfo)(input,LazyFramework.Logging.LogLevelEnum.Error)
 
         End Sub
 

@@ -15,7 +15,7 @@ Imports NUnit.Framework
         Log.AddWriter(Of SomeInfoClass)(logWriter1)
         Log.AddWriter(Of object)(objectLogger)
 
-        LazyFramework.Logging.Log.Write(Of SomeInfoClass)(LogLevelEnum.Verbose, New SomeInfoClass)
+        LazyFramework.Logging.Log.Write(Of SomeInfoClass)( New SomeInfoClass,LogLevelEnum.Verbose)
 
         Assert.IsInstanceOf(Of SomeInfoClass)(logWriter1.JustForTest)
         Assert.IsNotNull(objectLogger.anyObject)
