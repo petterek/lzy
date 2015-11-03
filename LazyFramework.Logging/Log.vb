@@ -25,7 +25,7 @@ Public Class Log
     End Property
 
 
-    Public Shared Sub Write (of T )(level As LogLevelEnum,data As T)
+    Public Shared Sub Write (of T )(data As T, Optional level As LogLevelEnum = LogLevelEnum.Error)
         Dim loginfo As New LogInfo
         loginfo.LogData = data
         loginfo.DataType = GetType(T).FullName
@@ -44,8 +44,9 @@ Public Class Log
 End Class
 
 Public Enum LogLevelEnum
+    [Verbose] = -1
     [Error] = 1
     [Warning] = 2
     [Info] = 4
-    [Verbose] = -1
+    [System] = 8
 End Enum

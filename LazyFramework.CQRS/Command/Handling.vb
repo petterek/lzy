@@ -1,5 +1,6 @@
 ﻿Imports System.Reflection
 Imports LazyFramework.EventHandling
+Imports LazyFramework.Logging
 Imports LazyFramework.Pipeline
 Imports LazyFramework.Utils
 
@@ -115,9 +116,8 @@ Namespace Command
             End If
 
             command.ActionComplete()
-            
 
-            'Logging.Log.Command(command)
+            Log.Write(command,LogLevelEnum.System)
         End Sub
 
         Public Shared Function IsCommandAvailable(cmd As CommandBase) As Boolean
