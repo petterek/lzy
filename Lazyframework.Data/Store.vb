@@ -209,11 +209,7 @@ Public Class Store
                     If value IsNot Nothing Then
                         p.Value = value
                     Else
-                        If pi.IsNullable Then
-                            p.Value = DBNull.Value
-                        Else
-                            Throw New ParameterNotNullableException(pi.Name)
-                        End If
+                        p.Value = DBNull.Value
                     End If
                 End If
             End If
