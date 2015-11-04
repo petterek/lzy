@@ -226,26 +226,12 @@ Imports NUnit.Framework
     End Sub
 
 
-    <Test> Public sub NullableParemeterIsMappedAgainstNoNullableFieldThrowsException
-        Dim cmd2 As New Data.CommandInfo
-        cmd2.CommandText = "select * from Hrunit where id = @Id"
-        cmd2.TypeOfCommand = CommandTypeEnum.Read
-        cmd2.Parameters.Add("Id", DbType.Int32,True)
-
-        Dim data As New InheritedDataObject
-        data.Id = 27
-        Assert.Throws(Of InvalidCastException)(sub()
-                                                   LazyFramework.Data.Store.Exec(Connection, cmd2, data)
-                                               End Sub)
-        
-    End sub
-
     <Test> Public Sub ProprtiesOfBaseClassIsFilledIfNotFOundOnInstanceClass()
 
         Dim cmd2 As New Data.CommandInfo
         cmd2.CommandText = "select * from Hrunit where id = @Id"
         cmd2.TypeOfCommand = CommandTypeEnum.Read
-        cmd2.Parameters.Add("Id", DbType.Int32,False)
+        cmd2.Parameters.Add("Id", DbType.Int32, False)
 
         Dim data As New InheritedDataObject
         data.Id = 27
@@ -282,6 +268,7 @@ Imports NUnit.Framework
         Assert.DoesNotThrow(Sub() ret = CType(Store.ExecScalar(Connection, cmd2), Integer))
         Assert.AreNotEqual(0, ret)
     End Sub
+
 
 End Class
 

@@ -4,7 +4,7 @@ Public Class ParameterInfo
     Private _Name As String
     Private _DBType As DbType
     Private _Size As Integer
-    Private _IsNullable As Boolean
+    Private _allowNull As Boolean
     Private _Value As Object
 
     Public Property Name() As String
@@ -34,12 +34,12 @@ Public Class ParameterInfo
         End Set
     End Property
 
-    Public Property IsNullable() As Boolean
+    Public Property AllowNull() As Boolean
         Get
-            Return _IsNullable
+            Return _allowNull
         End Get
         Set(ByVal value As Boolean)
-            _IsNullable = value
+            _allowNull = value
         End Set
     End Property
 
