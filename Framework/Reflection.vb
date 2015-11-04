@@ -13,9 +13,7 @@ Public Class Reflection
         Return AllTypes.FindAll(Function(type) t.IsAssignableFrom(type))
 
     End Function
-
     Private Shared _allTypes As List(Of Type)
-
     Private Shared ReadOnly _PadLock As New Object
     Private Shared ReadOnly Property AllTypes() As List(Of Type)
         Get
@@ -111,4 +109,27 @@ Public Class Reflection
             Return _allTypes
         End Get
     End Property
+
+
+
+    ''' <summary>
+    ''' Finds the private field named _Name or Public field Name  if existes in the object 
+    ''' </summary>
+    ''' <param name="currType"></param>
+    ''' <param name="name"></param>
+    ''' <returns></returns>
+    Public shared Function SearchForFieldInfo(currType As Type, name As String) As FieldInfo
+        Dim fieldInfo As FieldInfo = Nothing
+
+        While fieldInfo Is Nothing AndAlso currType IsNot Nothing
+            fieldInfo = currType.GetField("_" & name, BindingFlags.IgnoreCase Or BindingFlags.NonPublic Or BindingFlags.Instance)
+            If fieldInfo Is Nothing Then
+                fieldInfo = currType.GetField(name, BindingFlags.IgnoreCase Or BindingFlags.Instance Or BindingFlags.Public)
+            End If
+            currType = currType.BaseType
+        End While
+
+        Return fieldInfo
+    End Function
+
 End Class

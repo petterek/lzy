@@ -89,16 +89,12 @@ Public Class DataFiller
             Dim currType As Type
             currType = t
 
-            While fieldInfo Is Nothing AndAlso currType IsNot Nothing
-                fieldInfo = currType.GetField("_" & n, BindingFlags.IgnoreCase Or BindingFlags.NonPublic Or BindingFlags.Instance)
-                If fieldInfo Is Nothing Then
-                    fieldInfo = currType.GetField(n, BindingFlags.IgnoreCase Or BindingFlags.Instance Or BindingFlags.Public Or BindingFlags.FlattenHierarchy)
-                End If
-                If fieldInfo IsNot Nothing Then
-                    _fields.Add(New FieldInfoDecorator(dataReader, x, fieldInfo, n, mapByName))
-                End If
-                currType = currType.BaseType
-            End While
+            fieldInfo = LazyFramework.Reflection.SearchForFieldInfo(currType,  n)
+            
+
+            If fieldInfo IsNot Nothing Then
+                _fields.Add(New FieldInfoDecorator(dataReader, x, fieldInfo, n, mapByName))
+            End If
         Next
     End Sub
 

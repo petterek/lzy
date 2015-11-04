@@ -1,24 +1,20 @@
 ﻿
 <Serializable> Public NotInheritable Class ParmeterInfoCollection
     Inherits Dictionary(Of String, ParameterInfo)
-
-    Public Overloads Function Add(ByVal name As String, ByVal dbType As DbType) As ParameterInfo
-        Return Add(name, dbType, 0, False, New ValueNotSet)
-    End Function
-
-    Public Overloads Function Add(ByVal name As String, ByVal dbType As DbType, ByVal value As Object) As ParameterInfo
-        Return Add(name, dbType, 0, False, value)
-    End Function
-
-    Public Overloads Function Add(ByVal name As String, ByVal dbType As DbType, nullable As Boolean, ByVal value As Object) As ParameterInfo
-        Return Add(name, dbType, 0, nullable, value)
-    End Function
-
-    Public Overloads Function Add(ByVal name As String, ByVal dbType As DbType, ByVal size As Integer, ByVal nullable As Boolean) As ParameterInfo
-        Return Add(name, dbType, size, nullable, New ValueNotSet)
+    Public Overloads Function Add(ByVal name As String, ByVal dbType As DbType, nullable As Boolean) As ParameterInfo
+        Return Add(name, dbType, nullable, 0, New ValueNotSet)
     End Function
     
-    Public Overloads Function Add(ByVal name As String, ByVal dbType As DbType, ByVal size As Integer, ByVal nullable As Boolean, ByVal value As Object) As ParameterInfo
+    Public Overloads Function Add(ByVal name As String, ByVal dbType As DbType, nullable As Boolean, ByVal value As Object) As ParameterInfo
+        Return Add(name, dbType, nullable, 0, value)
+    End Function
+
+    
+    'Public Overloads Function Add(ByVal name As String, ByVal dbType As DbType, ByVal size As Integer, ByVal nullable As Boolean) As ParameterInfo
+    '    Return Add(name, dbType, size, nullable, New ValueNotSet)
+    'End Function
+    
+    Public Overloads Function Add(ByVal name As String, ByVal dbType As DbType, ByVal nullable As Boolean, ByVal size As Integer, ByVal value As Object) As ParameterInfo
         Dim p As New ParameterInfo
         p.Name = name
         p.DbType = dbType

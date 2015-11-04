@@ -39,16 +39,16 @@ Public Class Store
     Public Shared Sub ExecAsync(connectionInfo As ServerConnectionInfo, ByVal command As CommandInfo)
 
 
-        dim t = New System.Threading.Thread( Sub(e) Exec(connectionInfo,command) )
-        t.Start
-        
+        Dim t = New System.Threading.Thread(Sub(e) Exec(connectionInfo, command))
+        t.Start()
+
     End Sub
 
-    Public Shared Function ExecScalar(connectionInfo As ServerConnectionInfo, command As CommandInfo) as Object
+    Public Shared Function ExecScalar(connectionInfo As ServerConnectionInfo, command As CommandInfo) As Object
         Dim provider = connectionInfo.GetProvider
         Dim sw As New Stopwatch
         sw.Start()
-       Dim executeScalar As Object
+        Dim executeScalar As Object
 
         Try
             Using cmd = provider.CreateCommand(command)
@@ -61,11 +61,11 @@ Public Class Store
             sw.Stop()
 
             Dim loginfo As New DbRequestOkLog With {.DbName = connectionInfo, .Command = command, .Took = sw.ElapsedMilliseconds}
-            LazyFramework.Logging.Log.Write(Of DbRequestLog)( loginfo,Logging.LogLevelEnum.Info)
+            LazyFramework.Logging.Log.Write(Of DbRequestLog)(loginfo, Logging.LogLevelEnum.Info)
         Catch ex As Exception
             sw.Stop()
             Dim loginfo As New DbRequestFaildLog With {.DbName = connectionInfo, .Command = command, .Took = sw.ElapsedMilliseconds, .Error = ex}
-            LazyFramework.Logging.Log.Write(Of DbRequestFaildLog)(loginfo,Logging.LogLevelEnum.Info)
+            LazyFramework.Logging.Log.Write(Of DbRequestFaildLog)(loginfo, Logging.LogLevelEnum.Info)
             Throw
         End Try
 
@@ -143,11 +143,11 @@ Public Class Store
             End Using
             sw.Stop()
             Dim loginfo As New DbRequestOkLog With {.DbName = connectionInfo, .Command = command, .Took = sw.ElapsedMilliseconds}
-            LazyFramework.Logging.Log.Write(Of DbRequestLog)( loginfo,Logging.LogLevelEnum.Info)
+            LazyFramework.Logging.Log.Write(Of DbRequestLog)(loginfo, Logging.LogLevelEnum.Info)
         Catch ex As Exception
             sw.Stop()
             Dim loginfo As New DbRequestFaildLog With {.DbName = connectionInfo, .Command = command, .Took = sw.ElapsedMilliseconds, .Error = ex}
-            LazyFramework.Logging.Log.Write(Of DbRequestFaildLog)( loginfo,Logging.LogLevelEnum.Info)
+            LazyFramework.Logging.Log.Write(Of DbRequestFaildLog)(loginfo, Logging.LogLevelEnum.Info)
             Throw
         End Try
     End Sub
@@ -193,16 +193,26 @@ Public Class Store
                 p.Value = pi.Value
             Else
                 'Read the value from the object... 
-                Dim f = dataObjectType.GetField("_" & pi.Name, BindingFlags.IgnoreCase Or BindingFlags.NonPublic Or BindingFlags.Instance)
+                Dim f = Reflection.SearchForFieldInfo(dataObjectType, pi.Name) 'dataObjectType.GetField("_" & pi.Name, System.Reflection.BindingFlags.IgnoreCase Or System.Reflection.BindingFlags.NonPublic Or System.Reflection.BindingFlags.Instance)
+
                 If f Is Nothing Then
                     Throw New MissingFieldException("_" & pi.Name)
                 Else
+
+                    If pi.IsNullable Then
+                        If Not f.FieldType.IsAssignableFrom(GetType(Nullable)) Then
+                            Throw new InvalidCastException("Cannot map non nullable field:"& f.Name & " to nullable parameter:" & pi.Name)
+                        End If
+                    End If
+
                     Dim value As Object = f.GetValue(data)
                     If value IsNot Nothing Then
                         p.Value = value
                     Else
                         If pi.IsNullable Then
                             p.Value = DBNull.Value
+                        Else
+                            Throw New ParameterNotNullableException(pi.Name)
                         End If
                     End If
                 End If
@@ -254,4 +264,12 @@ Public Class Store
     Private Delegate Sub HandleReader(Of T As New)(filler As FillObject, reader As IDataReader, data As FillStatus(Of T))
 #End Region
 
+End Class
+
+Friend Class ParameterNotNullableException
+    Inherits Exception
+
+    Public Sub New(name As String)
+        MyBase.New(name)
+    End Sub
 End Class
