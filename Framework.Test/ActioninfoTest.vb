@@ -1,6 +1,8 @@
 ﻿Imports LazyFramework.CQRS
 Imports NUnit.Framework
 Imports System.Security.Principal
+Imports LazyFramework.CQRS.ExecutionProfile
+Imports LazyFramework.CQRS.Security
 
 <TestFixture> Public Class ActioninfoTest
 
@@ -32,22 +34,30 @@ End Class
 Public Class SomeOtherActionBase(Of T)
     Implements IActionBase
 
-
+    Private _profile as IExecutionProfile
 
     Public Function ActionName() As String Implements IActionBase.ActionName
         Return "m.m"
     End Function
 
-    Public Function IsAvailable(user As IPrincipal, o As Object) As Boolean Implements IActionBase.IsAvailable
+    Public Function IsAvailable(profile As IExecutionProfile, o As Object) As Boolean Implements IActionBase.IsAvailable
         Return True
     End Function
 
-    Public Function IsAvailable(user As IPrincipal) As Boolean Implements IActionBase.IsAvailable
+    Public Function IsAvailable(profile As IExecutionProfile) As Boolean Implements IActionBase.IsAvailable
         Return True
     End Function
 
     Public Function IsAvailable() As Boolean Implements IActionBase.IsAvailable
         Return True
+    End Function
+
+    Public Sub SetProfile(profile As IExecutionProfile) Implements IActionBase.SetProfile
+        _profile = profile
+    End Sub
+
+    Public Function ExecutionProfile() As IExecutionProfile Implements IActionBase.ExecutionProfile
+        Return _profile
     End Function
 End Class
 

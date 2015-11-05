@@ -1,5 +1,7 @@
 ﻿Imports NUnit.Framework
 Imports System.Security.Principal
+Imports LazyFramework.CQRS
+Imports LazyFramework.CQRS.ExecutionProfile
 
 <TestFixture> Public Class ValidatorTest
 
@@ -21,11 +23,11 @@ Public Class ToValidate
     
     Property Id As Integer
 
-    Public Overrides Function IsAvailable(user As IPrincipal, o As Object) As Boolean
+    Public Overrides Function IsAvailable(profile As IExecutionProfile, o As Object) As Boolean
         Return True
     End Function
 
-    Public Overrides Function IsAvailable(user As IPrincipal) As Boolean
+    Public Overrides Function IsAvailable(profile As IExecutionProfile) As Boolean
         Return True
     End Function
 

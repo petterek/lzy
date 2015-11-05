@@ -1,4 +1,5 @@
 ﻿Imports System.Security.Principal
+Imports LazyFramework.CQRS.ExecutionProfile
 
 Namespace Query
     Public MustInherit Class QueryBase
@@ -9,11 +10,11 @@ Namespace Query
             Return True
         End Function
 
-        Public Overrides Function IsAvailable(user As IPrincipal) As Boolean
+        Public Overrides Function IsAvailable(profile As IExecutionProfile) As Boolean
             Return True
         End Function
 
-        Public Overrides Function IsAvailable(user As IPrincipal, o As Object) As Boolean
+        Public Overrides Function IsAvailable(profile As IExecutionProfile, o As Object) As Boolean
             Return True
         End Function
     End Class
@@ -28,19 +29,19 @@ Namespace Query
     Public MustInherit Class QueryBase(Of TResultEntity)
         Inherits QueryBase
 
-        Public Overrides Function IsAvailable(user As IPrincipal, o As Object) As Boolean
-            Return IsActionAvailable(user, CType(o, TResultEntity))
+        Public Overrides Function IsAvailable(profile As IExecutionProfile, o As Object) As Boolean
+            Return IsActionAvailable(profile, CType(o, TResultEntity))
         End Function
-        Public Overrides Function IsAvailable(user As IPrincipal) As Boolean
-            Return IsActionAvailable(user)
+        Public Overrides Function IsAvailable(profile As IExecutionProfile) As Boolean
+            Return IsActionAvailable(profile)
         End Function
 
 
 
-        Public Overridable Function IsActionAvailable(user As IPrincipal) As Boolean
+        Public Overridable Function IsActionAvailable(profile As IExecutionProfile) As Boolean
             Return True
         End Function
-        Public Overridable Function IsActionAvailable(user As IPrincipal, entity As TResultEntity) As Boolean
+        Public Overridable Function IsActionAvailable(profile As IExecutionProfile, entity As TResultEntity) As Boolean
             Return True
         End Function
 

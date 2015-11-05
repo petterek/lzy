@@ -1,6 +1,4 @@
-﻿
-
-
+﻿Namespace Security
     Public Class ActionSecurity
         Private Shared _actionSecurity As IActionSecurity
 
@@ -15,4 +13,4 @@
             End Get
         End Property
     End Class
-
+End NameSpace

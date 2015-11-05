@@ -2,6 +2,9 @@
 Imports NUnit.Framework
 Imports LazyFramework.CQRS.Transform
 Imports LazyFramework.Test
+Imports System.Security.Principal
+Imports LazyFramework.CQRS.ExecutionProfile
+Imports LazyFramework.CQRS.Security
 
 Public Class DebugLogger
     Implements CQRS.Monitor.IMonitorWriter
@@ -23,6 +26,7 @@ End Class
 
         LazyFramework.ClassFactory.Clear()
         LazyFramework.ClassFactory.SetTypeInstance(Of IActionSecurity)(New TestSecurity)
+        LazyFramework.ClassFactory.SetTypeInstance(Of IExecutionProfileProvider)(New TestExecutionProfileProvider)
 
         'Debug.Print(Now.Ticks.ToString)
 
@@ -66,10 +70,56 @@ End Class
         Dim res = CQRS.Query.Handling.ExecuteQuery(q)
 
         Assert.AreEqual(100, q.Id)
-                
+
 
     End Sub
 End Class
+
+Public Class TestExecutionProfileProvider
+    Implements IExecutionProfileProvider
+
+    Public Function GetExecutionProfile() As IExecutionProfile Implements IExecutionProfileProvider.GetExecutionProfile
+        Return New TestExecutionProfile(1)
+    End Function
+End Class
+
+Public Class TestExecutionProfile
+    Implements IExecutionProfile
+
+    Private v As Integer
+
+    Public Sub New(v As Integer)
+        Me.v = v
+    End Sub
+
+    Public Function Application() As IApplicationInfo Implements IExecutionProfile.Application
+        Return New ApplicationInfo(v)
+    End Function
+
+    Public Function User() As IPrincipal Implements IExecutionProfile.User
+        Return System.Threading.Thread.CurrentPrincipal
+    End Function
+End Class
+
+Public Class ApplicationInfo
+    Implements IApplicationInfo
+
+    Private ReadOnly _i As Integer
+
+    Public Sub New(i As Integer)
+        _i = i
+    End Sub
+
+    Public Function Id() As String Implements IApplicationInfo.Id
+        Return CType(_i, String)
+    End Function
+
+    Public Function Name() As String Implements IApplicationInfo.Name
+        Return "lkløkl"
+    End Function
+End Class
+
+
 
 
 Public Class TestQueryContext

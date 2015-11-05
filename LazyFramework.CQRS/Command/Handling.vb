@@ -1,4 +1,5 @@
 ﻿Imports System.Reflection
+Imports LazyFramework.CQRS.Security
 Imports LazyFramework.EventHandling
 Imports LazyFramework.Logging
 Imports LazyFramework.Pipeline
@@ -80,12 +81,11 @@ Namespace Command
 
             If AllHandlers.ContainsKey(command.GetType) Then
 
-
-
+                command.SetProfile(LazyFramework.ClassFactory.GetTypeInstance(Of LazyFramework.CQRS.ExecutionProfile.IExecutionProfileProvider).GetExecutionProfile)
                 PipeLine.Execute(Of IAmACommand, Object)(Function()
                                                              If Not CanUserRunCommand(CType(command, CommandBase)) Then
                                                                  EventHub.Publish(New NoAccess(command))
-                                                                 Throw New ActionSecurityAuthorizationFaildException(command, command.User)
+                                                                 Throw New ActionSecurityAuthorizationFaildException(command, command.ExecutionProfile.User)
                                                              End If
 
                                                              Validation.Handling.ValidateAction(command)
@@ -126,9 +126,9 @@ Namespace Command
 
         Public Shared Function CanUserRunCommand(cmd As CommandBase) As Boolean
             If cmd.GetInnerEntity Is Nothing Then
-                Return ActionSecurity.Current.UserCanRunThisAction(cmd.User, cmd)
+                Return ActionSecurity.Current.UserCanRunThisAction(cmd.ExecutionProfile, cmd)
             Else
-                Return ActionSecurity.Current.UserCanRunThisAction(cmd.User, cmd, cmd.GetInnerEntity)
+                Return ActionSecurity.Current.UserCanRunThisAction(cmd.ExecutionProfile, cmd, cmd.GetInnerEntity)
             End If
         End Function
 
@@ -152,7 +152,7 @@ Namespace Command
                 Dim command = DirectCast(context,IAmACommand)
                 If Not command.IsAvailable Then
                     EventHub.Publish(New NoAccess(command))
-                    Throw New ActionIsNotAvailableException(command, command.User)
+                    Throw New ActionIsNotAvailableException(command, command.ExecutionProfile.User)
                 End If
             End If
         End Sub

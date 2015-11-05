@@ -2,6 +2,7 @@
 Imports System.Runtime.CompilerServices
 Imports LazyFramework.Utils
 Imports LazyFramework.CQRS.Monitor
+Imports LazyFramework.CQRS.Security
 Imports LazyFramework.EventHandling
 
 Namespace Query
@@ -92,9 +93,11 @@ Namespace Query
         End Property
 
         Public Shared Function ExecuteQuery(q As IAmAQuery) As Object
-
-            If Not ActionSecurity.Current.UserCanRunThisAction(q.User, q) Then
-                Dim actionSecurityAuthorizationFaildException As ActionSecurityAuthorizationFaildException = New ActionSecurityAuthorizationFaildException(q, q.User)
+            
+            q.SetProfile(LazyFramework.ClassFactory.GetTypeInstance(Of LazyFramework.CQRS.ExecutionProfile.IExecutionProfileProvider).GetExecutionProfile)
+            
+            If Not ActionSecurity.Current.UserCanRunThisAction(q.ExecutionProfile, q) Then
+                Dim actionSecurityAuthorizationFaildException As ActionSecurityAuthorizationFaildException = New ActionSecurityAuthorizationFaildException(q, q.ExecutionProfile.User)
                 Logging.Log.Error(q,actionSecurityAuthorizationFaildException )
                 Throw actionSecurityAuthorizationFaildException
             End If
@@ -137,7 +140,7 @@ Namespace Query
                         mon.HandlerName = Handlers(q.GetType)(0).Name
                         mon.ActionName = q.GetType().FullName
                         mon.Params = q
-                        mon.User() = q.User.Identity.Name
+                        mon.User() = q.ExecutionProfile.User.Identity.Name
                         Monitor.Handling.AddToQueue(mon)
                     End If
 

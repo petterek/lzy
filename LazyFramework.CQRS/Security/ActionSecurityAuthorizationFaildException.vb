@@ -1,5 +1,7 @@
 ﻿Imports System.Security.Principal
 
+Namespace Security
+
 
     Public Class ActionSecurityAuthorizationFaildException
         Inherits ActionValidationBaseException
@@ -8,4 +10,4 @@
         End Sub
 
     End Class
-
+End NameSpace

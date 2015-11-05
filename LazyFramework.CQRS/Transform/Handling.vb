@@ -1,6 +1,7 @@
 ﻿
 Imports LazyFramework.CQRS.Dto
 Imports System.Linq
+Imports LazyFramework.CQRS.Security
 
 Namespace Transform
     Public Class Handling
@@ -76,13 +77,13 @@ Namespace Transform
             '    securityContext = e
             'End If
 
-            If Not ActionSecurity.Current.EntityIsAvailableForUser(action.User, action, securityContext) Then Return Nothing
+            If Not ActionSecurity.Current.EntityIsAvailableForUser(action.ExecutionProfile, action, securityContext) Then Return Nothing
 
             Dim transformEntity As Object = transformer.TransformEntity(e)
             If transformEntity Is Nothing Then Return Nothing
 
             If TypeOf (transformEntity) Is ISupportActionList Then
-                CType(transformEntity, ISupportActionList).Actions.AddRange(ActionSecurity.Current.GetActionList(action.User, action, e))
+                CType(transformEntity, ISupportActionList).Actions.AddRange(ActionSecurity.Current.GetActionList(action.ExecutionProfile, action, e))
             End If
             If TypeOf transformEntity Is ActionContext.ActionContext Then
 

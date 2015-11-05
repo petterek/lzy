@@ -66,8 +66,8 @@
     <Compile Include="ActionIsNotAvailableException.vb" />
     <Compile Include="ActionLink\ActionLinkBase.vb" />
     <Compile Include="ActionLink\Handling.vb" />
-    <Compile Include="ActionSecurity.vb" />
-    <Compile Include="ActionSecurityAuthorizationFaildException.vb" />
+    <Compile Include="Security\ActionSecurity.vb" />
+    <Compile Include="Security\ActionSecurityAuthorizationFaildException.vb" />
     <Compile Include="ActionValidationBaseException.vb" />
     <Compile Include="Command\CommandBase.vb" />
     <Compile Include="Command\ExpectsEvent.vb" />
@@ -80,9 +80,12 @@
     <Compile Include="ExecutionContext.vb" />
     <Compile Include="HandlerNotFound.vb" />
     <Compile Include="IActionBase.vb" />
-    <Compile Include="IActionSecurity.vb" />
+    <Compile Include="ExecutionProfile\IExecutionProfile.vb" />
+    <Compile Include="Security\IActionSecurity.vb" />
     <Compile Include="IAmAnAction.vb" />
-    <Compile Include="IProvideSecurityContext.vb" />
+    <Compile Include="ExecutionProfile\IApplicationInfo.vb" />
+    <Compile Include="ExecutionProfile\IExecutionProfileProvider.vb" />
+    <Compile Include="Security\IProvideSecurityContext.vb" />
     <Compile Include="Logging\CommandInfo.vb" />
     <Compile Include="Logging\ErrorInfo.vb" />
     <Compile Include="Logging\Log.vb" />
@@ -103,7 +106,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="NoAccess.vb" />
+    <Compile Include="Security\NoAccess.vb" />
     <Compile Include="Query\Handling.vb" />
     <Compile Include="Query\IAmAQuery.vb" />
     <Compile Include="Query\IHandleQuery.vb" />

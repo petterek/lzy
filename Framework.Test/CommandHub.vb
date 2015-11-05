@@ -3,6 +3,8 @@ Imports LazyFramework.CQRS
 Imports LazyFramework.CQRS.Command
 Imports NUnit.Framework
 Imports System.Security.Principal
+Imports LazyFramework.CQRS.ExecutionProfile
+Imports LazyFramework.CQRS.Security
 
 <TestFixture> Public Class CommandHub
     
@@ -10,6 +12,7 @@ Imports System.Security.Principal
         Runtime.Context.Current = New Runtime.WinThread
         LazyFramework.ClassFactory.Clear()
         LazyFramework.ClassFactory.SetTypeInstance(Of IActionSecurity)(New TestSecurity)
+        LazyFramework.ClassFactory.SetTypeInstance(Of IExecutionProfileProvider)(New TestExecutionProfileProvider)
     End Sub
 
     <TearDown> Public Sub TearDown()
@@ -113,19 +116,19 @@ End Class
 Public Class TestSecurity
     Implements IActionSecurity
     
-    Public Function EntityIsAvailableForUser(user As Security.Principal.IPrincipal, action As IAmAnAction, entity As Object) As Boolean Implements IActionSecurity.EntityIsAvailableForUser
+    Public Function EntityIsAvailableForUser(profile As IExecutionProfile, action As IAmAnAction, entity As Object) As Boolean Implements IActionSecurity.EntityIsAvailableForUser
         Return True
     End Function
 
-    Public Function GetActionList(user As Security.Principal.IPrincipal, action As IActionBase, entity As Object) As List(Of IActionDescriptor) Implements IActionSecurity.GetActionList
+    Public Function GetActionList(profile As IExecutionProfile, action As IActionBase, entity As Object) As List(Of IActionDescriptor) Implements IActionSecurity.GetActionList
         Return New List(Of IActionDescriptor)
     End Function
 
-    Public Function UserCanRunThisAction(user As IPrincipal, c As IActionBase) As Boolean Implements IActionSecurity.UserCanRunThisAction
+    Public Function UserCanRunThisAction(profile As IExecutionProfile, c As IActionBase) As Boolean Implements IActionSecurity.UserCanRunThisAction
         Return True
     End Function
 
-    Public Function UserCanRunThisAction(user As IPrincipal, action As IActionBase, entity As Object) As Boolean Implements IActionSecurity.UserCanRunThisAction
+    Public Function UserCanRunThisAction(profile As IExecutionProfile, action As IActionBase, entity As Object) As Boolean Implements IActionSecurity.UserCanRunThisAction
         Return True
     End Function
 End Class

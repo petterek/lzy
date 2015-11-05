@@ -1,9 +1,11 @@
 ﻿Imports System.Security.Principal
+Imports LazyFramework.CQRS.ExecutionProfile
 
 Namespace ActionLink
     Public MustInherit Class ActionLinkBase
         Implements IActionBase
-        
+
+        Private _profile as IExecutionProfile
 
         Public Overridable Function ActionName() As String Implements IActionBase.ActionName
             Return Me.GetType.FullName
@@ -17,13 +19,20 @@ Namespace ActionLink
 
 
         Public MustOverride Function IsAvailable() As Boolean Implements IActionBase.IsAvailable
-        Public MustOverride Function IsAvailable(user As IPrincipal) As Boolean Implements IActionBase.IsAvailable
-        Public MustOverride Function IsAvailable(user As IPrincipal, o As Object) As Boolean Implements IActionBase.IsAvailable
+        Public MustOverride Function IsAvailable(profile As IExecutionProfile) As Boolean Implements IActionBase.IsAvailable
+        Public MustOverride Function IsAvailable(profile As IExecutionProfile, o As Object) As Boolean Implements IActionBase.IsAvailable
 
         Public Function Contexts() As IEnumerable(Of ActionContext.ActionContext)
             Return ActionContext.Handling.GetContextsForAction(Me)
         End Function
 
+        Public Sub SetProfile(profile As IExecutionProfile) Implements IActionBase.SetProfile
+            _profile = profile
+        End Sub
+
+        Public Function ExecutionProfile() As IExecutionProfile Implements IActionBase.ExecutionProfile
+            Return _profile
+        End Function
     End Class
 
     Public MustInherit Class ActionLinkBase(Of TContext)
@@ -33,20 +42,20 @@ Namespace ActionLink
             Return True
         End Function
 
-        Public Overrides Function IsAvailable(user As IPrincipal) As Boolean
-            Return IsActionAvailable(user)
+        Public Overrides Function IsAvailable(profile As IExecutionProfile) As Boolean
+            Return IsActionAvailable(profile)
         End Function
 
-        Public Overrides Function IsAvailable(user As IPrincipal, o As Object) As Boolean
-            Return IsActionAvailable(user, CType(o, TContext))
+        Public Overrides Function IsAvailable(profile As IExecutionProfile, o As Object) As Boolean
+            Return IsActionAvailable(profile, CType(o, TContext))
         End Function
 
 
-        Public Overridable Function IsActionAvailable(user As IPrincipal) As Boolean
+        Public Overridable Function IsActionAvailable(profile As IExecutionProfile) As Boolean
             Return True
         End Function
 
-        Public Overridable Function IsActionAvailable(user As IPrincipal, entity As TContext) As Boolean
+        Public Overridable Function IsActionAvailable(profile As IExecutionProfile, entity As TContext) As Boolean
             Return True
         End Function
 

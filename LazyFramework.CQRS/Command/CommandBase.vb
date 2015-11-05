@@ -1,4 +1,5 @@
 ﻿Imports System.Security.Principal
+Imports LazyFramework.CQRS.ExecutionProfile
 
 Namespace Command
     Public MustInherit Class CommandBase
@@ -63,19 +64,19 @@ Namespace Command
                 FillEntityList()
                 IsResolved = True
             End If
-            Return IsAvailable(User, InnerEntity)
+            Return IsAvailable(_profile, InnerEntity)
         End Function
 
         <System.ComponentModel.EditorBrowsable(ComponentModel.EditorBrowsableState.Never)>
-        Public Overrides Function IsAvailable(user As IPrincipal, o As Object) As Boolean
-            SetUser(user)
+        Public Overrides Function IsAvailable(user As IExecutionProfile, o As Object) As Boolean
+            SetProfile(user)
             SetInnerEntity(o)
             Return True
         End Function
 
         <System.ComponentModel.EditorBrowsable(ComponentModel.EditorBrowsableState.Never)>
-        Public Overrides Function IsAvailable(user As IPrincipal) As Boolean
-            SetUser(user)
+        Public Overrides Function IsAvailable(user As IExecutionProfile) As Boolean
+            SetProfile(user)
             Return True
         End Function
         
@@ -100,22 +101,22 @@ Namespace Command
         End Function
 
         <System.ComponentModel.EditorBrowsable(ComponentModel.EditorBrowsableState.Never)>
-        Public Overrides Function IsAvailable(user As IPrincipal, o As Object) As Boolean
-            Return IsActionAvailable(user, CType(o, TEntity))
+        Public Overrides Function IsAvailable(profile As IExecutionProfile, o As Object) As Boolean
+            Return IsActionAvailable(profile, CType(o, TEntity))
         End Function
 
         <System.ComponentModel.EditorBrowsable(ComponentModel.EditorBrowsableState.Never)>
-        Public Overrides Function IsAvailable(user As IPrincipal) As Boolean
-            Return IsActionAvailable(user)
+        Public Overrides Function IsAvailable(profile As IExecutionProfile) As Boolean
+            Return IsActionAvailable(profile)
         End Function
         
         <System.ComponentModel.EditorBrowsable(ComponentModel.EditorBrowsableState.Never)>
-        Public Overridable Function IsActionAvailable(user As IPrincipal) As Boolean
+        Public Overridable Function IsActionAvailable(profile As IExecutionProfile) As Boolean
             Return True
         End Function
 
         <System.ComponentModel.EditorBrowsable(ComponentModel.EditorBrowsableState.Never)>
-        Public Overridable Function IsActionAvailable(user As IPrincipal, entity As TEntity) As Boolean
+        Public Overridable Function IsActionAvailable(profile As IExecutionProfile, entity As TEntity) As Boolean
             Return True
         End Function
 
