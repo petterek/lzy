@@ -81,7 +81,9 @@ Namespace Command
 
             If AllHandlers.ContainsKey(command.GetType) Then
 
-                command.SetProfile(LazyFramework.ClassFactory.GetTypeInstance(Of LazyFramework.CQRS.ExecutionProfile.IExecutionProfileProvider).GetExecutionProfile)
+                If command.ExecutionProfile Is Nothing then
+                    command.SetProfile(LazyFramework.ClassFactory.GetTypeInstance(Of LazyFramework.CQRS.ExecutionProfile.IExecutionProfileProvider).GetExecutionProfile)
+                End If
                 PipeLine.Execute(Of IAmACommand, Object)(Function()
                                                              If Not CanUserRunCommand(CType(command, CommandBase)) Then
                                                                  EventHub.Publish(New NoAccess(command))

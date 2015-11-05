@@ -94,7 +94,9 @@ Namespace Query
 
         Public Shared Function ExecuteQuery(q As IAmAQuery) As Object
             
-            q.SetProfile(LazyFramework.ClassFactory.GetTypeInstance(Of LazyFramework.CQRS.ExecutionProfile.IExecutionProfileProvider).GetExecutionProfile)
+            If q.ExecutionProfile Is Nothing Then
+                q.SetProfile(LazyFramework.ClassFactory.GetTypeInstance(Of LazyFramework.CQRS.ExecutionProfile.IExecutionProfileProvider).GetExecutionProfile)
+            End If
             
             If Not ActionSecurity.Current.UserCanRunThisAction(q.ExecutionProfile, q) Then
                 Dim actionSecurityAuthorizationFaildException As ActionSecurityAuthorizationFaildException = New ActionSecurityAuthorizationFaildException(q, q.ExecutionProfile.User)
