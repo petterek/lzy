@@ -201,7 +201,7 @@ Public Class Store
 
                     If pi.AllowNull Then
                         If Not f.FieldType.IsAssignableFrom(GetType(Nullable)) Then
-                            Throw new InvalidCastException("Cannot map non nullable field:"& f.Name & " to nullable parameter:" & pi.Name)
+                            Throw New InvalidCastException("Cannot map non nullable field:" & f.Name & " to nullable parameter:" & pi.Name)
                         End If
                     End If
 
@@ -209,11 +209,7 @@ Public Class Store
                     If value IsNot Nothing Then
                         p.Value = value
                     Else
-                        If pi.AllowNull Then
-                            p.Value = DBNull.Value
-                        Else
-                            Throw New ParameterNotNullableException(pi.Name)
-                        End If
+                        p.Value = DBNull.Value
                     End If
                 End If
             End If
