@@ -200,7 +200,7 @@ Public Class Store
                 Else
 
                     If pi.AllowNull Then
-                        If Not f.FieldType.IsAssignableFrom(GetType(Nullable)) Then
+                        If Not (f.FieldType Is gettype(String) orelse  f.FieldType.IsAssignableFrom(GetType(Nullable)))   Then
                             Throw New InvalidCastException("Cannot map non nullable field:" & f.Name & " to nullable parameter:" & pi.Name)
                         End If
                     End If
