@@ -358,5 +358,27 @@ Imports NUnit.Framework
     End Sub
 
 
+    <Test> Public sub NonInitializedinerfaceIsFoundFromApplication
+
+        Dim instance As IFindMe = Nothing
+
+        LazyFramework.ClassFactory.TryInstantiateType(Of IFindMe)(instance)
+
+        Assert.IsInstanceOf(Of ToBeFound)(instance)
+
+
+    End sub
+
+    Public Interface IFindMe
+
+    End Interface
+
+    Public Class ToBeFound
+        Implements IFindMe
+    End Class
 
 End Class
+
+
+
+
