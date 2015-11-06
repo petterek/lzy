@@ -151,6 +151,10 @@
       <Project>{d72ca321-6426-4493-bcc5-961284f1c51a}</Project>
       <Name>LazyFramework</Name>
     </ProjectReference>
+    <ProjectReference Include="..\LazyFramework.ClassFactory\LazyFramework.ClassFactory.vbproj">
+      <Project>{919aa000-9d90-4c9d-b585-8afbf55a5304}</Project>
+      <Name>LazyFramework.ClassFactory</Name>
+    </ProjectReference>
     <ProjectReference Include="..\LazyFramework.EventHandling\LazyFramework.EventHandling.vbproj">
       <Project>{ef6603ed-7f45-4bc4-bee0-ff7193cc8cfe}</Project>
       <Name>LazyFramework.EventHandling</Name>

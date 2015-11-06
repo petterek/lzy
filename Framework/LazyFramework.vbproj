@@ -109,17 +109,11 @@
   <ItemGroup>
     <Compile Include="BaseClasses\CompareFunctions.vb" />
     <Compile Include="BaseClasses\Exceptions.vb" />
-    <Compile Include="ClassFactory\ClassFactory.vb" />
-    <Compile Include="ClassFactory\ISessionAware.vb" />
-    <Compile Include="ClassFactory\NotConfiguredException.vb" />
+    <Compile Include="NotConfiguredException.vb" />
     <Compile Include="Pipeline\Base.vb" />
     <Compile Include="Pipeline\IPipelineStep.vb" />
     <Compile Include="Pipeline\IPipeline.vb" />
     <Compile Include="Reflection.vb" />
-    <Compile Include="ClassFactory\SessionInstance.vb" />
-    <Compile Include="ClassFactory\SessionNotCreatedException.vb" />
-    <Compile Include="ClassFactory\TypeInfo.vb" />
-    <Compile Include="Events\Events.vb" />
     <Compile Include="Runtime\Constants.vb" />
     <Compile Include="Runtime\Context.vb" />
     <Compile Include="Runtime\ExecutionContext.vb" />
@@ -129,10 +123,8 @@
     <Compile Include="Runtime\TestContext.vb" />
     <Compile Include="Runtime\Web.vb" />
     <Compile Include="Runtime\WinThread.vb" />
-    <Compile Include="Utils\AllreadyMappedException.vb" />
     <Compile Include="Utils\BrokenRule.vb" />
     <Compile Include="Utils\ChangedValues.vb" />
-    <Compile Include="Utils\Configuration.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -151,7 +143,6 @@
     <Compile Include="Utils\Config\Reader.vb" />
     <Compile Include="Utils\FileExtension.vb" />
     <Compile Include="Utils\FindHandlers.vb" />
-    <Compile Include="Utils\ILazyFrameworkConfiguration.vb" />
     <Compile Include="Utils\Json\ArrayBuilder.vb" />
     <Compile Include="Utils\Json\Builder.vb" />
     <Compile Include="Utils\Json\DateParser.vb" />
@@ -169,7 +160,6 @@
     <Compile Include="Utils\Json\TokenAcceptors.vb" />
     <Compile Include="Utils\Json\UnExpectedTokenException.vb" />
     <Compile Include="Utils\Json\Writer.vb" />
-    <Compile Include="Utils\PluginValidator.vb" />
     <Compile Include="Utils\ResponseThread.vb" />
     <Compile Include="Utils\Timing.vb" />
     <Compile Include="Utils\TypeValidation\TypeValidation.vb" />

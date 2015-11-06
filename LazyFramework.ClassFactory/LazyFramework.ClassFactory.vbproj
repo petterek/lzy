@@ -6,7 +6,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{919AA000-9D90-4C9D-B585-8AFBF55A5304}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>LazyFramework.ClassFactory</RootNamespace>
+    <RootNamespace>LazyFramework</RootNamespace>
     <AssemblyName>LazyFramework.ClassFactory</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>Windows</MyType>
@@ -63,7 +63,8 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.vb" />
+    <Compile Include="ClassFactory.vb" />
+    <Compile Include="ISessionAware.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -79,6 +80,9 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="SessionInstance.vb" />
+    <Compile Include="SessionNotCreatedException.vb" />
+    <Compile Include="TypeInfo.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">
@@ -98,6 +102,12 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Framework\LazyFramework.vbproj">
+      <Project>{d72ca321-6426-4493-bcc5-961284f1c51a}</Project>
+      <Name>LazyFramework</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

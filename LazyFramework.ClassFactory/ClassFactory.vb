@@ -119,10 +119,57 @@ Public Class ClassFactory
         Else
             'See if there is any implementations of this interface in the ApplicationPool
             'If only 1 exist then return this one, if more existes then throw exception.
-            
+
             Throw New NotConfiguredException(GetType(T).ToString)
         End If
     End Function
+
+    Private Shared Sub RegisterInterfaceMapping(Of T)(list As Type)
+        ProcessStore(GetType(T)) = New ClassFactory.TypeInfo(Of T) With {.CurrentType = list}
+        For Each inter In GetType(T).GetInterfaces
+            ProcessStore(inter) = New ClassFactory.TypeInfo(Of T) With {.CurrentType = list}
+        Next
+    End Sub
+
+    Public Shared Function TryInstantiateType(Of T)(ByRef ret As T) As Boolean
+        Dim type As Type = Nothing
+        If TryFindType(Of T)(type) Then
+            ret = CType(Activator.CreateInstance(type), T)
+            Return True
+        Else
+            Return False
+        End If
+    End Function
+
+    Public Shared Function FindType(Of T)() As Type
+
+        If Not LazyFramework.ClassFactory.ContainsKey(Of T) Then
+            Dim list = LazyFramework.Reflection.FindAllClassesOfTypeInApplication(GetType(T))
+            If list.Count = 0 Then
+                Throw New TypeNotFoundException(Of T)
+            End If
+            If list.Count > 1 Then
+                Throw New ToManyInstancesConfiguredForInterface(Of T)
+            End If
+            RegisterInterfaceMapping(Of T)(list(0))
+        End If
+
+        Return ProcessStore((GetType(T))).CurrentType
+
+    End Function
+
+    Public Shared Function TryFindType(Of T)(ByRef res As Type) As Boolean
+        Dim ret As Type
+        Try
+            ret = FindType(Of T)()
+        Catch ex As Exception
+            res = Nothing
+            Return False
+        End Try
+        res = ret
+        Return True
+    End Function
+
 
     Public Shared Function GetTypeInstance(Of T)(key As String) As T
         Dim list As Dictionary(Of String, TypeInfo(Of T))
@@ -174,15 +221,13 @@ Public Class ClassFactory
             Throw New NotSupportedException("Type parameter T must be an Interface")
         End If
 
-        ProcessStore(GetType(T)) = New TypeInfo(Of T) With {.CurrentType = GetType(TConfigedType)}
-        For Each inter In type.GetInterfaces
-            ProcessStore(inter) = New TypeInfo(Of T) With {.CurrentType = GetType(TConfigedType)}
-        Next
+        RegisterInterfaceMapping(Of T)(GetType(TConfigedType))
 
         If LogToDebug Then
             Debug.WriteLine("Type set: " & GetType(T).ToString)
         End If
     End Sub
+
 
     Public Shared Sub SetTypeInstance(Of T)(instance As T)
         Dim type As Type = GetType(T)
@@ -194,7 +239,7 @@ Public Class ClassFactory
             Throw New AllreadyMappedException(GetType(T).ToString)
         End If
         ProcessStore(GetType(T)) = New TypeInfo(Of T) With {.CurrentType = instance.GetType, .CurrentInstance = instance, .PersistInstance = True}
-        
+
         For Each inter In type.GetInterfaces
             If ProcessStore.ContainsKey(inter) Then
                 Throw New AllreadyMappedException(GetType(T).ToString)
@@ -215,6 +260,14 @@ Public Class ClassFactory
             Debug.WriteLine("Type set: " & GetType(T).ToString)
         End If
     End Sub
+
+    Public Class AllreadyMappedException
+        Inherits Exception
+
+        Public Sub New(s As String)
+            MyBase.New(s)
+        End Sub
+    End Class
 
     Public Shared Sub SetTypeInstance(Of T)(ByVal key As String, ByVal instance As T)
         If Not ProcessStore.ContainsKey(GetType(Dictionary(Of String, TypeInfo(Of T)))) Then
@@ -251,6 +304,7 @@ Public Class ClassFactory
 
         Return ProcessStore.ContainsKey(GetType(TKey))
     End Function
+
 
     Public Shared Function ContainsKey(Of TKey)(name As String) As Boolean
 
@@ -333,7 +387,7 @@ Public Class ClassFactory
         If Session Is Nothing Then
             Throw New SessionNotCreatedException
         End If
-        
+
         Session.SetInstance(GetType(T), New TypeInfo(Of T) With {.CurrentType = GetType(TConfigedType), .PersistInstance = persist})
     End Sub
 
@@ -363,5 +417,5 @@ Public Class ClassFactory
     End Sub
 
 
-    
+
 End Class

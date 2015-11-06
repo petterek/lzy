@@ -2,6 +2,7 @@ param([bool]$force = $false,[string]$configuration = "Debug", $output = "..\nuge
 
 $projects = @(
     @{Path = '.\Framework\'; Project = 'LazyFramework'}
+    @{Path = '.\LazyFramework.ClassFactory\'; Project = 'LazyFramework.ClassFactory'}
    ,@{Path = '.\LazyFramework.Logging\'; Project = 'LazyFramework.Logging'}
    ,@{Path = '.\Lazyframework.Data\'; Project = 'LazyFramework.Data'}
    ,@{Path = '.\SqlServer\'; Project = 'LazyFramework.MSSqlServer'}

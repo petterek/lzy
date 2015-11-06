@@ -54,7 +54,7 @@ Imports NUnit.Framework
             LazyFramework.ClassFactory.SessionComplete()
         End Using
 
-        Assert.Throws(Of LazyFramework.ClassFactory.NotConfiguredException)(Sub() LazyFramework.ClassFactory.GetTypeInstance(Of ITest)())
+        Assert.Throws(Of LazyFramework.NotConfiguredException)(Sub() LazyFramework.ClassFactory.GetTypeInstance(Of ITest)())
 
 
     End Sub

@@ -4,13 +4,9 @@
         Private ReadOnly _allMessages As New ThreadMessageCollection
 
         Public Sub New()
-            If LazyFrameworkConfiguration.Current IsNot Nothing Then
-                Timer.DoLog = LazyFrameworkConfiguration.Current.EnableTiming
-                'Logging.Logger.LogLevel = LazyFrameworkConfiguration.Current.LogLevel
-            Else
-                Timer.DoLog = False
-                'Logging.Logger.LogLevel = 0
-            End If
+            Timer.DoLog = False
+            'Logging.Logger.LogLevel = 0
+
         End Sub
 
         Public ReadOnly Property HasErrors() As Boolean
@@ -27,57 +23,50 @@
 
         Public ReadOnly Property Info() As IList(Of ThreadMessage)
             Get
-                Return _AllMessages.FindAll(Function(e) (e IsNot Nothing) AndAlso e.Severity = ThreadMessageSeverityEnum.Info)
+                Return _allMessages.FindAll(Function(e) (e IsNot Nothing) AndAlso e.Severity = ThreadMessageSeverityEnum.Info)
             End Get
         End Property
 
         Public ReadOnly Property Warings() As IList(Of ThreadMessage)
             Get
-                Return _AllMessages.FindAll(Function(e) (e IsNot Nothing) AndAlso e.Severity = ThreadMessageSeverityEnum.Warning)
+                Return _allMessages.FindAll(Function(e) (e IsNot Nothing) AndAlso e.Severity = ThreadMessageSeverityEnum.Warning)
             End Get
         End Property
 
         Public ReadOnly Property Errors() As IList(Of ThreadMessage)
             Get
-                Return _AllMessages.FindAll(Function(e) (e IsNot Nothing) AndAlso e.Severity = ThreadMessageSeverityEnum.Error)
+                Return _allMessages.FindAll(Function(e) (e IsNot Nothing) AndAlso e.Severity = ThreadMessageSeverityEnum.Error)
             End Get
         End Property
 
         Public ReadOnly Property AllMessages() As IEnumerable(Of ThreadMessage)
             Get
-                Return _AllMessages
+                Return _allMessages
             End Get
         End Property
 
         Public Sub Add(ByVal br As ThreadMessage)
-            _AllMessages.Add(br)
+            _allMessages.Add(br)
         End Sub
 
 
         Public ReadOnly Property Timer As Timing
-            Get                
+            Get
                 If Not ThreadHasKey(Timerforthread) Then
                     ThreadStore.Add(Timerforthread, New Timing)
                 End If
                 Return CType(ThreadStore(Timerforthread), Timing)
             End Get
         End Property
-
-        'Private _Logger As Logging.Logger
-        'Public ReadOnly Property Logger As Logging.Logger
-        '    Get
-        '        Return _Logger
-        '    End Get
-        'End Property
-
+        
 
         Public Sub Clear()
-            _AllMessages.Clear()
+            _allMessages.Clear()
             ThreadStore.Remove(Timerforthread)
         End Sub
 
         Public Sub ClearMessages()
-            _AllMessages.Clear()
+            _allMessages.Clear()
         End Sub
 
         Private Const ResponseThreadSlot As String = "01F7441D-FCA0-48A5-AE29-CBD6E5F27C9C"
@@ -99,7 +88,7 @@
                 SetThreadValue(ResponseThreadSlot, value)
             End Set
         End Property
-        
+
         Private Const MyStoreName As String = "FC2ED2E8-47BA-4374-80C4-CD51ADE709E5"
 
         Public Shared Function GetThreadValue(Of TT)(ByVal name As String) As TT
@@ -121,13 +110,13 @@
         Private Shared Function ThreadStore() As IDictionary(Of String, Object)
 
             If Runtime.Context.Current Is Nothing Then
-                Throw New ClassFactory.NotConfiguredException("Please set LazyFramework.Runtime.Context.Current to a valid context")
+                Throw New NotConfiguredException("Please set LazyFramework.Runtime.Context.Current to a valid context")
             End If
 
             Return Runtime.Context.Current.Storage
 
         End Function
-        
+
         Public Overrides Function ToString() As String
             Dim ret As String = ""
             For Each s In AllMessages

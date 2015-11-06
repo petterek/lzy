@@ -54,3 +54,21 @@ Partial Class ClassFactory
         End Function
     End Class
 End Class
+
+
+Partial Class ClassFactory
+    Public Class TypeNotFoundException(Of T)
+        Inherits Exception
+        Public Type As T
+        Public Sub New
+            MyBase.New(GetType(T).FullName & vbCrLf &  "Configure this in your application")
+        End Sub
+
+    End Class
+
+    Public Class ToManyInstancesConfiguredForInterface (Of T)
+        Inherits TypeNotFoundException(Of T)
+        
+    End Class
+
+End Class

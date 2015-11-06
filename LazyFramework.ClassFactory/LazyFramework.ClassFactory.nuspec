@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+  For more info on this file format visit http://docs.nuget.org/docs/reference/nuspec-reference.
+-->
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>$id$</id>
+    <title>Simple factory</title>
+    <version>$version$</version>
+    <authors></authors>
+    <owners>PEtter Ekrann</owners>
+    <description>Basic classfactory for application development</description>
+    <language>en-US</language>
+    <projectUrl>https://github.com/petterek/lzy</projectUrl>
+    <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
+    <releaseNotes></releaseNotes>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <tags>Classfactory Framework Development</tags>
+  </metadata>
+</package>

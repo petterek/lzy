@@ -12,13 +12,7 @@ Imports NUnit.Framework
     <SetUp> Public Sub SetUp()
         Runtime.Context.Current = New Runtime.WinThread
         LazyFramework.ClassFactory.Clear()
-
-        Dim lazyFrameworkConfiguration As LazyFrameworkConfiguration = New LazyFrameworkConfiguration
-        LazyFramework.ClassFactory.SetTypeInstance(Of ILazyFrameworkConfiguration)(lazyFrameworkConfiguration)
-
-        lazyFrameworkConfiguration.LogLevel = 100
-        lazyFrameworkConfiguration.EnableTiming = True
-
+        
 
         _MemoryLogger = New LazyFramework.Logging.MemoryWriter
         Log.AddWriter(Of Object)(_MemoryLogger)

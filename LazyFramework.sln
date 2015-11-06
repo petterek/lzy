@@ -29,6 +29,8 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "LazyFramework.Data", "Lazyf
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Lazyframework.Webhooks", "Lazyframework.Webhooks\Lazyframework.Webhooks.vbproj", "{8D83ED21-F150-414C-9E50-31EFAABF0062}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "LazyFramework.ClassFactory", "LazyFramework.ClassFactory\LazyFramework.ClassFactory.vbproj", "{919AA000-9D90-4C9D-B585-8AFBF55A5304}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -90,6 +92,12 @@ Global
 		{8D83ED21-F150-414C-9E50-31EFAABF0062}.DebugPersonalarkiv|Any CPU.Build.0 = Debug|Any CPU
 		{8D83ED21-F150-414C-9E50-31EFAABF0062}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8D83ED21-F150-414C-9E50-31EFAABF0062}.Release|Any CPU.Build.0 = Release|Any CPU
+		{919AA000-9D90-4C9D-B585-8AFBF55A5304}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{919AA000-9D90-4C9D-B585-8AFBF55A5304}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{919AA000-9D90-4C9D-B585-8AFBF55A5304}.DebugPersonalarkiv|Any CPU.ActiveCfg = Debug|Any CPU
+		{919AA000-9D90-4C9D-B585-8AFBF55A5304}.DebugPersonalarkiv|Any CPU.Build.0 = Debug|Any CPU
+		{919AA000-9D90-4C9D-B585-8AFBF55A5304}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{919AA000-9D90-4C9D-B585-8AFBF55A5304}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
