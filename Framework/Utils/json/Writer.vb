@@ -57,6 +57,7 @@ Namespace Utils.Json
             Else
                 WriteObject(result, o)
             End If
+            result.Flush()
         End Sub
 
 
