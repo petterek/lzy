@@ -60,7 +60,7 @@ Namespace Utils.Json
         End Sub
 
 
-        Public Shared Sub WriteObject(result As StreamWriter, o As Object)
+        Private Shared Sub WriteObject(result As StreamWriter, o As Object)
             Dim first As Boolean = True
             result.Write("{"c)
 
