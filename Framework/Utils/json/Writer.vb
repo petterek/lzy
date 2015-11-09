@@ -24,6 +24,8 @@ Namespace Utils.Json
                                End Sub}
         }
 
+        Public Shared AddTypeInfoForObjects As Boolean
+
         Public Delegate Sub Writer(writer As StreamWriter, value As Object)
 
         Public Shared Function ObjectToString(o As Object) As String
@@ -66,6 +68,10 @@ Namespace Utils.Json
             result.Write("{"c)
 
             Dim allProps As New System.Collections.Concurrent.ConcurrentStack(Of String)
+            
+            If AddTypeInfoForObjects
+                allProps.Push("""$type$"":""" & o.GetType.Name & """")
+            End If
             
             o.GetType().GetMembers(system.Reflection.BindingFlags.Public Or system.Reflection.BindingFlags.Instance).Where(Function(v) v.MemberType = system.Reflection.MemberTypes.Field Or v.MemberType = system.Reflection.MemberTypes.Property).AsParallel.ForAll(
                 Sub(m As system.Reflection.MemberInfo)
@@ -134,6 +140,8 @@ Namespace Utils.Json
         Private Shared ReadOnly ToEscape As Integer() = {&H22, &H2, &H5C}
         Private Shared Translate As New Dictionary(Of Integer, String) From {
             {&H9, "\t"}, {&HA, "\n"}, {&HC, "\f"}, {&HD, "\r"}}
+
+        
         Private Shared Sub Writetext(writer As StreamWriter, value As Object)
             writer.Write(Chr(&H22))
             For Each c In value.ToString
