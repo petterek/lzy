@@ -3,6 +3,7 @@
 Namespace Utils.Json
     Public Class Writer
         
+        Public Delegate Function GetTypeInfo(t As Type) As String
 
         Public Shared Formatters As New Dictionary(Of Type, Writer) From {
             {GetType(Integer), Sub(w, val) w.write(val.ToString)},
@@ -25,6 +26,12 @@ Namespace Utils.Json
         }
 
         Public Shared AddTypeInfoForObjects As Boolean
+        Public Shared TypeInfoWriter As GetTypeInfo = AddressOf DefaultTypeInfoWriter
+        
+        Public Shared Function DefaultTypeInfoWriter(t As Type) As String
+            Return t.FullName
+        End Function
+        
 
         Public Delegate Sub Writer(writer As StreamWriter, value As Object)
 
@@ -70,7 +77,7 @@ Namespace Utils.Json
             Dim allProps As New System.Collections.Concurrent.ConcurrentStack(Of String)
             
             If AddTypeInfoForObjects
-                allProps.Push("""$type$"":""" & o.GetType.Name & """")
+                allProps.Push("""$type$"":""" & TypeInfoWriter(o.GetType) & """")
             End If
             
             o.GetType().GetMembers(system.Reflection.BindingFlags.Public Or system.Reflection.BindingFlags.Instance).Where(Function(v) v.MemberType = system.Reflection.MemberTypes.Field Or v.MemberType = system.Reflection.MemberTypes.Property).AsParallel.ForAll(
