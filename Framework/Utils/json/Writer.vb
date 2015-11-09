@@ -42,7 +42,7 @@ Namespace Utils.Json
             Return New JSonConfig
         End Function
 
-        Private Shared Sub ObjectToString(result As StreamWriter, o As Object)
+        Public Shared Sub ObjectToString(result As StreamWriter, o As Object)
             If o Is Nothing Then
                 result.Write("null")
                 Return

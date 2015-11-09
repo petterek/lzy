@@ -191,6 +191,18 @@ End Module
     End Sub
 
 
+
+    <Test> Public sub WriteIEumerableAsArray
+        Dim list As New Stack(Of String)
+        list.Push("A")
+        list.Push("B")
+        list.Push("C")
+
+
+        Assert.AreEqual("[""C"",""B"",""A""]", Utils.Json.Writer.ObjectToString(list))
+
+    End sub
+
 End Class
 
 
