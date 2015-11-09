@@ -12,7 +12,7 @@ Namespace Transform
             'Hmmmm skal vi ha logikk her som sjekker om det er noe factory, og hvis det ikke er det bare returnere det den fikk inn. 
             'Egentlig er det jo bare commands som trenger dette. Queries bør jo gjøre dette selv.. Kanskje. 
 
-            If TypeOf result Is IList Then
+            If TypeOf result Is IEnumerable Then
                 Dim ret As New Concurrent.ConcurrentQueue(Of Object)
                 Dim res As Object
 
@@ -31,7 +31,7 @@ Namespace Transform
                     Dim cm = Runtime.Context.Current.ChickenMode
                     Dim Errors As New Concurrent.ConcurrentBag(Of Exception)
 
-                    CType(result, IList).
+                    CType(result, IEnumerable).
                         Cast(Of Object).
                         AsParallel.ForAll(Sub(o As Object)
                                               Try

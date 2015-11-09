@@ -361,6 +361,7 @@ Imports NUnit.Framework
     <Test> Public sub NonInitializedinerfaceIsFoundFromApplication
 
         Dim instance As IFindMe = Nothing
+        LazyFramework.ClassFactory.SetTypeInstance(of IFindMe, ToBeFound)
 
         LazyFramework.ClassFactory.TryInstantiateType(Of IFindMe)(instance)
 
@@ -375,6 +376,12 @@ Imports NUnit.Framework
 
     Public Class ToBeFound
         Implements IFindMe
+        
+    End Class
+
+    Public Class ShouldNotBeFound
+        Implements IFindMe
+
     End Class
 
 End Class
