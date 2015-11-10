@@ -13,7 +13,18 @@ Public Class Reflection
         Return AllTypes.FindAll(Function(type) t.IsAssignableFrom(type))
 
     End Function
+    Public Shared Function FindTypeFromGuid(guid As Guid) As Type
+        Dim ret As Type = Nothing
+        If AllTypes.Count > 0 Then
+            _guidmap.TryGetValue(guid,ret)
+        End If
+        Return ret
+    End Function
+
+
     Private Shared _allTypes As List(Of Type)
+    Private Shared _guidmap As New Dictionary(Of Guid, Type)
+
     Private Shared ReadOnly _PadLock As New Object
     Private Shared ReadOnly Property AllTypes() As List(Of Type)
         Get
@@ -78,6 +89,7 @@ Public Class Reflection
                                     Try
                                         If type.IsClass AndAlso Not type.IsAbstract Then
                                             allTypesTemp.Add(type)
+                                            _guidmap.Add(type.GUID, type)
                                         End If
                                     Catch ex As Exception
                                         Throw New ApplicationException("Add type" & type.FullName, ex)
@@ -112,13 +124,14 @@ Public Class Reflection
 
 
 
+
     ''' <summary>
     ''' Finds the private field named _Name or Public field Name  if existes in the object 
     ''' </summary>
     ''' <param name="currType"></param>
     ''' <param name="name"></param>
     ''' <returns></returns>
-    Public shared Function SearchForFieldInfo(currType As Type, name As String) As FieldInfo
+    Public Shared Function SearchForFieldInfo(currType As Type, name As String) As FieldInfo
         Dim fieldInfo As FieldInfo = Nothing
 
         While fieldInfo Is Nothing AndAlso currType IsNot Nothing
