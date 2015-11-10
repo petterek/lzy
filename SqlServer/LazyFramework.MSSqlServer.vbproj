@@ -107,6 +107,10 @@
       <Name>LazyFramework</Name>
       <Private>False</Private>
     </ProjectReference>
+    <ProjectReference Include="..\LazyFramework.ClassFactory\LazyFramework.ClassFactory.vbproj">
+      <Project>{919aa000-9d90-4c9d-b585-8afbf55a5304}</Project>
+      <Name>LazyFramework.ClassFactory</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Lazyframework.Data\LazyFramework.Data.vbproj">
       <Project>{05175b67-f72a-4618-b050-87d1057156a2}</Project>
       <Name>LazyFramework.Data</Name>

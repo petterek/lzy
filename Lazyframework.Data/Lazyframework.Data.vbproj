@@ -59,6 +59,7 @@
   <ItemGroup>
     <Compile Include="CommandInfo.vb" />
     <Compile Include="CommandInfoCommandTypeEnum.vb" />
+    <Compile Include="IConnectionInfoProvider.vb" />
     <Compile Include="DataFiller.vb" />
     <Compile Include="DataModificationPluginBase.vb" />
     <Compile Include="DataModificationPluginContext.vb" />
