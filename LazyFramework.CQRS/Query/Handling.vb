@@ -154,7 +154,8 @@ Namespace Query
                     Logging.Log.Error(q, ex)
                     Throw ex.InnerException
                 Catch ex As AggregateException
-
+                    Logging.Log.Error(q, ex)
+                    Throw
                 Catch ex As Exception
                     Logging.Log.Error(q, ex)
                     Throw

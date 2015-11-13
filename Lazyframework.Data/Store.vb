@@ -22,28 +22,29 @@ Public Class Store
         ExecReader(connectionInfo, command, data, CommandBehavior.SingleResult Or CommandBehavior.SingleRow, AddressOf ReadOne, GetType(T))
     End Sub
 
+
+
     Public Shared Sub Exec(connectionInfo As ServerConnectionInfo, command As CommandInfo, data As Object)
-        ExecReader(connectionInfo, command, New FillStatus(Of Object)(data), CommandBehavior.SingleResult Or CommandBehavior.SingleRow, AddressOf ReadOne, data.GetType)
+        If GetType(IList).IsAssignableFrom(data.GetType) Then
+            Debug.Print("SOMETHING IS A GENBERIC LIST")
+
+        Else
+            ExecReader(connectionInfo, command, New FillStatus(Of Object)(data), CommandBehavior.SingleResult Or CommandBehavior.SingleRow, AddressOf ReadOne, data.GetType)
+        End If
+
     End Sub
 
     Public Shared Sub Exec(connectionInfo As ServerConnectionInfo, command As CommandInfo)
         ExecReader(connectionInfo, command, New FillStatus(Of Object)(Nothing), CommandBehavior.SingleResult, Nothing, Nothing)
     End Sub
 
-
     Public Shared Sub GetStream(Of T As {New, WillDisposeThoseForU})(connectionInfo As ServerConnectionInfo, command As CommandInfo, data As T)
         ExecReaderWithStream(connectionInfo, command, New FillStatus(Of T)(data), CommandBehavior.SingleResult Or CommandBehavior.SingleRow, AddressOf ReadOne(Of T), data.GetType)
     End Sub
-
-
     Public Shared Sub ExecAsync(connectionInfo As ServerConnectionInfo, ByVal command As CommandInfo)
-
-
         Dim t = New System.Threading.Thread(Sub(e) Exec(connectionInfo, command))
         t.Start()
-
     End Sub
-
     Public Shared Function ExecScalar(connectionInfo As ServerConnectionInfo, command As CommandInfo) As Object
         Dim provider = connectionInfo.GetProvider
         Dim sw As New Stopwatch
@@ -200,7 +201,7 @@ Public Class Store
                 Else
 
                     If pi.AllowNull Then
-                        If Not (f.FieldType Is gettype(String) orelse  f.FieldType.IsAssignableFrom(GetType(Nullable)))   Then
+                        If Not (f.FieldType Is GetType(String) OrElse f.FieldType.IsAssignableFrom(GetType(Nullable))) Then
                             Throw New InvalidCastException("Cannot map non nullable field:" & f.Name & " to nullable parameter:" & pi.Name)
                         End If
                     End If

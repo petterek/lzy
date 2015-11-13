@@ -12,7 +12,7 @@ Imports NUnit.Framework
     <SetUp> Public Sub SetUp()
         Runtime.Context.Current = New Runtime.WinThread
         LazyFramework.ClassFactory.Clear()
-        
+
 
         _MemoryLogger = New LazyFramework.Logging.MemoryWriter
         Log.AddWriter(Of Object)(_MemoryLogger)
@@ -37,6 +37,28 @@ Imports NUnit.Framework
         Dim ret As New DataObject
         Store.Exec(Connection, cmd, ret)
         Assert.AreEqual("Sigurd Brekkesen", ret.Name)
+
+        Debug.Print(LazyFramework.Utils.ResponseThread.Current.Timer.Timings.Count.ToString)
+        For Each t In LazyFramework.Utils.ResponseThread.Current.Timer.Timings
+            Debug.Print(t.Key & t.Value.List(0))
+        Next
+
+
+    End Sub
+
+    
+    <Test> Public Sub FillGenericListObject()
+
+        Dim cmd As New Data.CommandInfo
+
+        cmd.CommandText = "select * from Hrunit where id = @Id"
+        cmd.TypeOfCommand = Data.CommandTypeEnum.Read
+        cmd.Parameters.Add("Id", DbType.Int32, False, 27)
+
+        Dim ret As New DataObjectList
+
+        Store.Exec(Connection, cmd, ret)
+        Assert.AreNotEqual(0, ret.Count)
 
         Debug.Print(LazyFramework.Utils.ResponseThread.Current.Timer.Timings.Count.ToString)
         For Each t In LazyFramework.Utils.ResponseThread.Current.Timer.Timings
