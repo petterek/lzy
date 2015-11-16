@@ -39,12 +39,12 @@ Namespace Validation
 
 
 
-        Public Shared Sub ValidateAction(action As IAmAnAction)
+        Public Shared Sub ValidateAction(profile As ExecutionProfile.IExecutionProfile, action As IAmAnAction)
             Dim t = action.GetType
             While t IsNot Nothing
                 If AllValidators.ContainsKey(t) Then
                     For Each Validator In AllValidators(t)
-                        Validator.InternalValidate(action)
+                        Validator.InternalValidate(profile,action)
                     Next                    
                 End If
                 t = t.BaseType

@@ -13,16 +13,7 @@ Namespace Command
         Private Shared _handlers As ActionHandlerMapper
         Private Shared _commadList As Dictionary(Of String, Type)
 
-
-        Private Shared ReadOnly Property PipeLine As CommandPipeLine
-            Get
-                Static pipe As New CommandPipeLine
-                Return pipe
-            End Get
-        End Property
-
-
-
+        
         ''' <summary>
         ''' 
         ''' </summary>
@@ -77,86 +68,61 @@ Namespace Command
         ''' </summary>
         ''' <param name="command"></param>
         ''' <remarks>Any command can have only 1 handler. An exception will be thrown if there is found more than one for any given command. </remarks>
-        Public Shared Sub ExecuteCommand(command As IAmACommand)
+        Public Shared Sub ExecuteCommand(profile As ExecutionProfile.IExecutionProfile, command As IAmACommand)
 
             If AllHandlers.ContainsKey(command.GetType) Then
 
-                If command.ExecutionProfile Is Nothing then
-                    command.SetProfile(LazyFramework.ClassFactory.GetTypeInstance(Of LazyFramework.CQRS.ExecutionProfile.IExecutionProfileProvider).GetExecutionProfile)
+                EntityResolver.Handling.ResolveEntity(profile, command)
+
+                If Not Availability.Handler.CommandIsAvailable(profile,command) Then
+                    EventHub.Publish(New NoAccess(command))
+                    Throw New ActionIsNotAvailableException(command, profile.User)
                 End If
-                PipeLine.Execute(Of IAmACommand, Object)(Function()
-                                                             If Not CanUserRunCommand(CType(command, CommandBase)) Then
-                                                                 EventHub.Publish(New NoAccess(command))
-                                                                 Throw New ActionSecurityAuthorizationFaildException(command, command.ExecutionProfile.User)
-                                                             End If
 
-                                                             Validation.Handling.ValidateAction(command)
+                If Not CanUserRunCommand(profile, CType(command, CommandBase)) Then
+                    EventHub.Publish(New NoAccess(command))
+                    Throw New ActionSecurityAuthorizationFaildException(command, profile.User)
+                End If
 
-                                                             Try
-                                                                 Dim temp = AllHandlers(command.GetType)(0).Invoke(Nothing, {command})
-                                                                 If temp IsNot Nothing Then
-                                                                     command.SetResult(Transform.Handling.TransformResult(command, temp))
-                                                                 End If
+                Validation.Handling.ValidateAction(profile, command)
 
-                                                                 'If TypeOf (command) Is ActionBase Then
-                                                                 '    DirectCast(command, ActionBase).OnActionComplete()
-                                                                 'End If
+                Try
+                    Dim temp = AllHandlers(command.GetType)(0).Invoke(Nothing, {command})
+                    If temp IsNot Nothing Then
+                        command.SetResult(Transform.Handling.TransformResult(profile, command, temp))
+                    End If
 
-                                                             Catch ex As TargetInvocationException
-                                                                 Logging.Log.Error(command, ex)
-                                                                 Throw ex.InnerException
-                                                             Catch ex As Exception
-                                                                 Logging.Log.Error(command, ex)
-                                                                 Throw
-                                                             End Try
-                                                             Return Nothing
-                                                         End Function,command)
+                Catch ex As TargetInvocationException
+                    Logging.Log.Error(command, ex)
+                    Throw ex.InnerException
+                Catch ex As Exception
+                    Logging.Log.Error(command, ex)
+                    Throw
+                End Try
             Else
-                Dim notImplementedException = New NotImplementedException(command.ActionName)
-                Logging.Log.Error(command, notImplementedException)
-                Throw notImplementedException
+                Dim implementedException = New NotImplementedException(command.ActionName)
+                Logging.Log.Error(command, implementedException)
+                Throw implementedException
             End If
 
             command.ActionComplete()
 
-            Log.Write(command,LogLevelEnum.System)
+            Log.Write(command, LogLevelEnum.System)
         End Sub
 
-        Public Shared Function IsCommandAvailable(cmd As CommandBase) As Boolean
-            Return cmd.IsAvailable()
+        Public Shared Function IsCommandAvailable(profile As ExecutionProfile.IExecutionProfile, cmd As CommandBase) As Boolean
+            Return Availability.Handler.CommandIsAvailable(profile, cmd)
         End Function
 
-        Public Shared Function CanUserRunCommand(cmd As CommandBase) As Boolean
+        Public Shared Function CanUserRunCommand(profile As ExecutionProfile.IExecutionProfile, cmd As CommandBase) As Boolean
             If cmd.GetInnerEntity Is Nothing Then
-                Return ActionSecurity.Current.UserCanRunThisAction(cmd.ExecutionProfile, cmd)
+                Return ActionSecurity.Current.UserCanRunThisAction(profile, cmd)
             Else
-                Return ActionSecurity.Current.UserCanRunThisAction(cmd.ExecutionProfile, cmd, cmd.GetInnerEntity)
+                Return ActionSecurity.Current.UserCanRunThisAction(profile, cmd, cmd.GetInnerEntity)
             End If
         End Function
 
 
     End Class
 
-    Friend Class CommandPipeLine
-        Inherits Pipeline.Base
-
-        Public Sub New()
-            Me.AddPreExecuteStep(New IsCommandAvailableStep)
-        End Sub
-
-    End Class
-
-    Friend Class IsCommandAvailableStep
-        Implements IPipelineStep
-        
-        Public Sub ExecuteStep(Of TContext)(context As TContext) Implements IPipelineStep.ExecuteStep
-            If TypeOf (context) Is CommandBase Then
-                Dim command = DirectCast(context,IAmACommand)
-                If Not command.IsAvailable Then
-                    EventHub.Publish(New NoAccess(command))
-                    Throw New ActionIsNotAvailableException(command, command.ExecutionProfile.User)
-                End If
-            End If
-        End Sub
-    End Class
 End Namespace

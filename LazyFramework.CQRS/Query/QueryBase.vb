@@ -6,17 +6,6 @@ Namespace Query
         Inherits ActionBase
         Implements IAmAQuery
         
-        Public Overrides Function IsAvailable() As Boolean
-            Return True
-        End Function
-
-        Public Overrides Function IsAvailable(profile As IExecutionProfile) As Boolean
-            Return True
-        End Function
-
-        Public Overrides Function IsAvailable(profile As IExecutionProfile, o As Object) As Boolean
-            Return True
-        End Function
     End Class
 
 
@@ -28,15 +17,7 @@ Namespace Query
     ''' <remarks></remarks>
     Public MustInherit Class QueryBase(Of TResultEntity)
         Inherits QueryBase
-
-        Public Overrides Function IsAvailable(profile As IExecutionProfile, o As Object) As Boolean
-            Return IsActionAvailable(profile, CType(o, TResultEntity))
-        End Function
-        Public Overrides Function IsAvailable(profile As IExecutionProfile) As Boolean
-            Return IsActionAvailable(profile)
-        End Function
-
-
+        
 
         Public Overridable Function IsActionAvailable(profile As IExecutionProfile) As Boolean
             Return True

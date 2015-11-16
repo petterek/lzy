@@ -23,7 +23,7 @@ Namespace Cqrs
 
 
             Dim executeQuery As Object = Nothing
-            Assert.DoesNotThrow(Sub() executeQuery = LazyFramework.CQRS.Query.Handling.ExecuteQuery(p))
+            Assert.DoesNotThrow(Sub() executeQuery = LazyFramework.CQRS.Query.Handling.ExecuteQuery(New TestExecutionProfileProvider().GetExecutionProfile,p))
 
             Assert.IsNotNull(executeQuery)
 

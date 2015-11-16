@@ -6,7 +6,7 @@ Imports LazyFramework.CQRS.Security
 Namespace Transform
     Public Class Handling
 
-        Public Shared Function TransformResult(ByVal action As IAmAnAction, ByVal result As Object, Optional ByVal transformer As ITransformEntityToDto = Nothing) As Object
+        Public Shared Function TransformResult(profile As ExecutionProfile.IExecutionProfile, ByVal action As IAmAnAction, ByVal result As Object, Optional ByVal transformer As ITransformEntityToDto = Nothing) As Object
             Dim transformerFactory As ITransformerFactory = EntityTransformerProvider.GetFactory(action)
 
             'Hmmmm skal vi ha logikk her som sjekker om det er noe factory, og hvis det ikke er det bare returnere det den fikk inn. 
@@ -19,7 +19,7 @@ Namespace Transform
 
                 If Runtime.Context.Current.ChickenMode Then
                     For Each e In CType(result, IList)
-                        res = TransformAndAddAction(action, If(transformer Is Nothing, transformerFactory.GetTransformer(action, e), transformer), e)
+                        res = TransformAndAddAction(profile, action, If(transformer Is Nothing, transformerFactory.GetTransformer(action, e), transformer), e)
                         If res IsNot Nothing Then
                             ret.Enqueue(res)
                         End If
@@ -36,7 +36,7 @@ Namespace Transform
                         AsParallel.ForAll(Sub(o As Object)
                                               Try
                                                   Using New Runtime.SpawnThreadContext(user, s, cm)
-                                                      Dim temp = TransformAndAddAction(action, If(transformer Is Nothing, transformerFactory.GetTransformer(action, o), transformer), o)
+                                                      Dim temp = TransformAndAddAction(profile,action, If(transformer Is Nothing, transformerFactory.GetTransformer(action, o), transformer), o)
                                                       If temp IsNot Nothing Then
                                                           ret.Enqueue(temp)
                                                       End If
@@ -64,11 +64,11 @@ Namespace Transform
                     Return retList
                 End If
             Else
-                Return TransformAndAddAction(action, If(transformer Is Nothing, transformerFactory.GetTransformer(action, result), transformer), result)
+                Return TransformAndAddAction(profile, action, If(transformer Is Nothing, transformerFactory.GetTransformer(action, result), transformer), result)
             End If
         End Function
 
-        Public Shared Function TransformAndAddAction(ByVal action As IAmAnAction, ByVal transformer As ITransformEntityToDto, e As Object) As Object
+        Public Shared Function TransformAndAddAction(profile As ExecutionProfile.IExecutionProfile, ByVal action As IAmAnAction, ByVal transformer As ITransformEntityToDto, e As Object) As Object
             Dim securityContext As Object
             If transformer Is Nothing Then Return Nothing
 
@@ -78,13 +78,13 @@ Namespace Transform
                 securityContext = e
             End If
 
-            If Not ActionSecurity.Current.EntityIsAvailableForUser(action.ExecutionProfile, action, securityContext) Then Return Nothing
+            If Not ActionSecurity.Current.EntityIsAvailableForUser(profile, action, securityContext) Then Return Nothing
 
             Dim transformEntity As Object = transformer.TransformEntity(e)
             If transformEntity Is Nothing Then Return Nothing
 
             If TypeOf (transformEntity) Is ISupportActionList Then
-                CType(transformEntity, ISupportActionList).Actions.AddRange(ActionSecurity.Current.GetActionList(action.ExecutionProfile, action, e))
+                CType(transformEntity, ISupportActionList).Actions.AddRange(ActionSecurity.Current.GetActionList(profile, action, e))
             End If
             If TypeOf transformEntity Is ActionContext.ActionContext Then
 

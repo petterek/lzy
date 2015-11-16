@@ -58,7 +58,7 @@ Public Class ActionInfo
         If AllActions.ContainsKey(entityType) Then
             For Each t In _actionsForType(entityType)
                 Dim createInstance As IActionBase = CType(Activator.CreateInstance(t), IActionBase)
-                If createInstance.IsAvailable(profile) Then
+                If Availability.Handler.ActionIsAvailable(profile,createInstance) Then
                     ret.Add(createInstance)
                 End If
             Next
@@ -93,17 +93,18 @@ Public Class ActionInfo
         Return ret
     End Function
 
-    Private Shared Function CheckAvailability(ByVal entity As Object, ByVal createInstance As IActionBase, profile As IExecutionProfile) As Boolean
+    Private Shared Function CheckAvailability(ByVal entity As Object, ByVal action As IActionBase, profile As IExecutionProfile) As Boolean
 
-        If createInstance.IsAvailable(profile, entity) Then
-            If TypeOf (createInstance) Is CommandBase Then
-                CType(createInstance, CommandBase).SetInnerEntity(entity)
+        If Availability.Handler.ActionIsAvailable(profile,action, entity) Then
+            If TypeOf (action) Is CommandBase Then
+                CType(action, CommandBase).SetInnerEntity(entity)
             End If
-            If Not ActionSecurity.Current.UserCanRunThisAction(profile, createInstance, If(TypeOf (entity) Is IProvideSecurityContext, DirectCast(entity, IProvideSecurityContext).Context, entity)) Then
+            If Not ActionSecurity.Current.UserCanRunThisAction(profile, action, If(TypeOf (entity) Is IProvideSecurityContext, DirectCast(entity, IProvideSecurityContext).Context, entity)) Then
                 Return False
             End If
             Return True
         End If
         Return False
     End Function
+    
 End Class

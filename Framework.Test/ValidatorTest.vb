@@ -6,10 +6,10 @@ Imports LazyFramework.CQRS.ExecutionProfile
 <TestFixture> Public Class ValidatorTest
 
     <Test> Public Sub ValidatorsIsCalled()
-        Assert.Throws(Of LazyFramework.CQRS.Validation.ValidationException)(Sub() LazyFramework.CQRS.Validation.Handling.ValidateAction(New ToValidate))
+        Assert.Throws(Of LazyFramework.CQRS.Validation.ValidationException)(Sub() LazyFramework.CQRS.Validation.Handling.ValidateAction(nothing,New ToValidate))
 
         Try
-            LazyFramework.CQRS.Validation.Handling.ValidateAction(New ToValidate)
+            LazyFramework.CQRS.Validation.Handling.ValidateAction(Nothing, New ToValidate)
         Catch ex As LazyFramework.CQRS.Validation.ValidationException
             Assert.AreEqual(2, ex.ExceptionList.Count)
         End Try
@@ -20,20 +20,8 @@ End Class
 
 Public Class ToValidate
     Inherits LazyFramework.CQRS.ActionBase
-    
     Property Id As Integer
-
-    Public Overrides Function IsAvailable(profile As IExecutionProfile, o As Object) As Boolean
-        Return True
-    End Function
-
-    Public Overrides Function IsAvailable(profile As IExecutionProfile) As Boolean
-        Return True
-    End Function
-
-    Public Overloads Overrides Function IsAvailable() As Boolean
-        Return True
-    End Function
+    
 End Class
 
 

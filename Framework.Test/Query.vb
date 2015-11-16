@@ -48,7 +48,7 @@ End Class
 
         Dim res As Object
 
-        res = LazyFramework.CQRS.Query.Handling.ExecuteQuery(q)
+        res = LazyFramework.CQRS.Query.Handling.ExecuteQuery(New TestExecutionProfileProvider().GetExecutionProfile,q)
 
         Assert.IsInstanceOf(Of QueryResultDto)(res)
 
@@ -58,7 +58,7 @@ End Class
     <Test> Public Sub ListIsConvertedCorrectly()
 
         Dim q As New TestQuery2 With {.Id = 1, .Startdate = Now}
-        Dim res = LazyFramework.CQRS.Query.Handling.ExecuteQuery(q)
+        Dim res = LazyFramework.CQRS.Query.Handling.ExecuteQuery(New TestExecutionProfileProvider().GetExecutionProfile,q)
 
         Assert.IsInstanceOf(Of QueryResultDto)(CType(res, IEnumerable)(0))
 
@@ -68,7 +68,7 @@ End Class
 
     <Test> Public Sub ContextSetupIsFound
         Dim q As New TestQuery With {.Id = 1}
-        Dim res = LazyFramework.CQRS.Query.Handling.ExecuteQuery(q)
+        Dim res = LazyFramework.CQRS.Query.Handling.ExecuteQuery(New TestExecutionProfileProvider().GetExecutionProfile,q)
 
         Assert.AreEqual(100, q.Id)
 

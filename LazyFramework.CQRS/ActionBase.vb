@@ -22,11 +22,6 @@ Public MustInherit Class ActionBase
     End Sub
 
     <System.ComponentModel.EditorBrowsable(ComponentModel.EditorBrowsableState.Never)>
-    Public Sub SetProfile(u As IExecutionProfile) Implements IActionBase.SetProfile
-        _profile = u
-    End Sub
-
-    <System.ComponentModel.EditorBrowsable(ComponentModel.EditorBrowsableState.Never)>
     Public Function EndTimeStamp() As Long Implements IAmAnAction.EndTimeStamp
         Return _EndTimeStamp
     End Function
@@ -45,21 +40,11 @@ Public MustInherit Class ActionBase
     Public Function TimeStamp() As Long Implements IAmAnAction.TimeStamp
         Return _TimeStamp
     End Function
-    
-
-    <System.ComponentModel.EditorBrowsable(ComponentModel.EditorBrowsableState.Never)> Public MustOverride Function IsAvailable(user As IExecutionProfile, o As Object) As Boolean Implements IAmAnAction.IsAvailable
-    <System.ComponentModel.EditorBrowsable(ComponentModel.EditorBrowsableState.Never)> Public MustOverride Function IsAvailable(user As IExecutionProfile) As Boolean Implements IActionBase.IsAvailable
-    <System.ComponentModel.EditorBrowsable(ComponentModel.EditorBrowsableState.Never)> Public MustOverride Function IsAvailable() As Boolean Implements IActionBase.IsAvailable
 
     Public Function Contexts() As IEnumerable(Of ActionContext.ActionContext)
         Return ActionContext.Handling.GetContextsForAction(Me)
     End Function
 
-
-    'Public Overridable Sub OnActionBegin()
-    'End Sub
-    'Public Overridable Sub OnActionComplete()
-    'End Sub
 
     Private _hsts As Long
     Public Sub HandlerStart() Implements IAmAnAction.HandlerStart
@@ -70,7 +55,7 @@ Public MustInherit Class ActionBase
         Return _hsts
     End Function
     
-    <System.ComponentModel.EditorBrowsable(ComponentModel.EditorBrowsableState.Never)> Public Function ExecutionProfile() As IExecutionProfile Implements IAmAnAction.ExecutionProfile
-        Return _profile
-    End Function
+    '<System.ComponentModel.EditorBrowsable(ComponentModel.EditorBrowsableState.Never)> Public Function ExecutionProfile() As IExecutionProfile Implements IAmAnAction.ExecutionProfile
+    '    Return _profile
+    'End Function
 End Class

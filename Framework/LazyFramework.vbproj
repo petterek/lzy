@@ -111,8 +111,8 @@
     <Compile Include="BaseClasses\Exceptions.vb" />
     <Compile Include="NotConfiguredException.vb" />
     <Compile Include="Pipeline\Base.vb" />
-    <Compile Include="Pipeline\IPipelineStep.vb" />
     <Compile Include="Pipeline\IPipeline.vb" />
+    <Compile Include="Pipeline\IPipelineStep.vb" />
     <Compile Include="Reflection.vb" />
     <Compile Include="Runtime\Constants.vb" />
     <Compile Include="Runtime\Context.vb" />

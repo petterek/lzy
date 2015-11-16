@@ -40,26 +40,14 @@ Public Class SomeOtherActionBase(Of T)
     Public Function ActionName() As String Implements IActionBase.ActionName
         Return "m.m"
     End Function
+    
+    'Public Sub SetProfile(profile As IExecutionProfile) Implements IActionBase.SetProfile
+    '    _profile = profile
+    'End Sub
 
-    Public Function IsAvailable(profile As IExecutionProfile, o As Object) As Boolean Implements IActionBase.IsAvailable
-        Return True
-    End Function
-
-    Public Function IsAvailable(profile As IExecutionProfile) As Boolean Implements IActionBase.IsAvailable
-        Return True
-    End Function
-
-    Public Function IsAvailable() As Boolean Implements IActionBase.IsAvailable
-        Return True
-    End Function
-
-    Public Sub SetProfile(profile As IExecutionProfile) Implements IActionBase.SetProfile
-        _profile = profile
-    End Sub
-
-    Public Function ExecutionProfile() As IExecutionProfile Implements IActionBase.ExecutionProfile
-        Return _profile
-    End Function
+    'Public Function ExecutionProfile() As IExecutionProfile Implements IActionBase.ExecutionProfile
+    '    Return _profile
+    'End Function
 End Class
 
 Public Class MenuAction

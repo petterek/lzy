@@ -1,6 +1,7 @@
 ﻿
 Imports System.Security.Principal
 Imports LazyFramework.CQRS
+Imports LazyFramework.CQRS.Availability
 Imports LazyFramework.CQRS.Command
 Imports LazyFramework.CQRS.ExecutionProfile
 Imports LazyFramework.CQRS.Security
@@ -23,7 +24,7 @@ Namespace Cqrs
 
         <Test> Public Sub CommandIsLogged()
 
-            Handling.ExecuteCommand(New TestCommand)
+            Handling.ExecuteCommand(New TestExecutionProfileProvider().GetExecutionProfile, New TestCommand)
             'Assert.IsTrue(_TestLogger.LogIsCalled)
 
         End Sub
@@ -31,8 +32,9 @@ Namespace Cqrs
 
         <Test> Public Sub CommandIsRunned()
 
-            Handling.ExecuteCommand(New TestCommand)
-            Handling.ExecuteCommand(New AnotherCommand)
+            Dim testExecutionProfileProvider = New TestExecutionProfileProvider()
+            Handling.ExecuteCommand(testExecutionProfileProvider.GetExecutionProfile, New TestCommand)
+            Handling.ExecuteCommand(testExecutionProfileProvider.GetExecutionProfile, New AnotherCommand)
             Assert.IsTrue(HandleCommands.Found)
 
         End Sub
@@ -40,13 +42,13 @@ Namespace Cqrs
 
         <Test> Public Sub ExecptionIsHandledCorrectly()
 
-            Assert.Throws(Of InnerException)(Sub() Handling.ExecuteCommand(New ExceptionIsThrownCommand))
+            Assert.Throws(Of InnerException)(Sub() Handling.ExecuteCommand(New TestExecutionProfileProvider().GetExecutionProfile, New ExceptionIsThrownCommand))
 
         End Sub
 
         <Test> Public Sub ByRefparemSubIsCalled()
             Dim byrefCommand As ByrefCommand = New ByrefCommand
-            Handling.ExecuteCommand(byrefCommand)
+            Handling.ExecuteCommand(New TestExecutionProfileProvider().GetExecutionProfile, byrefCommand)
 
             Assert.IsTrue(byrefCommand.Called)
 
@@ -70,10 +72,43 @@ Namespace Cqrs
 
         End Sub
 
+        <Test> Public Sub NotAvailableCommandIsStopped()
+
+            Assert.Throws(Of ActionIsNotAvailableException)(Sub() Handling.ExecuteCommand(New TestExecutionProfileProvider().GetExecutionProfile, New ThisCommandIsNotAvailableIfIdIs0 With {.Id = 0}))
+            
+        End Sub
+
+        <Test> Public Sub CommandAvailabilityIsCalled
+
+            Assert.DoesNotThrow(Sub() Handling.ExecuteCommand(New TestExecutionProfileProvider().GetExecutionProfile, New ThisCommandIsNotAvailableIfIdIs0 With {.Id= 1}))
+            
+        End Sub
 
 
     End Class
 
+
+    Public Class CommandAvaialability
+        Inherits LazyFramework.CQRS.Availability.CommandAvailability(Of ThisCommandIsNotAvailableIfIdIs0, Entity)
+
+        Public Overrides Function IsAvailable(profile As IExecutionProfile, commad As ThisCommandIsNotAvailableIfIdIs0) As Boolean
+            Return commad.Id <> 0
+        End Function
+
+        Public Overrides Function IsAvailable(profile As IExecutionProfile, commad As ThisCommandIsNotAvailableIfIdIs0, entity As Entity) As Boolean
+            Return False
+        End Function
+    End Class
+
+    Public Class ThisCommandIsNotAvailableIfIdIs0
+        Inherits BaseCommand(Of Entity)
+
+
+        Public Property Id As Integer
+
+    End Class
+
+    
 
     Public Class Entity
         Public Property A As Integer
@@ -141,7 +176,9 @@ Namespace Cqrs
 
         Public Shared Found As Boolean = False
 
+        Public shared sub Handle(cmd As ThisCommandIsNotAvailableIfIdIs0)
 
+        End sub
 
         Public Shared Sub Handle(cmd As CalculateKm)
 

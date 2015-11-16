@@ -9,12 +9,13 @@ Imports LazyFramework.CQRS.ExecutionProfile
     ''' <remarks></remarks>
     Public Interface IActionBase
         
-        Sub SetProfile(profile As iExecutionProfile)
-        Function ExecutionProfile As IExecutionProfile
         Function ActionName() As String
-        Function IsAvailable() As Boolean
-        Function IsAvailable(profile As IExecutionProfile) As Boolean
-        Function IsAvailable(profile As IExecutionProfile, o As Object) As Boolean
+        
+        'Sub SetProfile(profile As iExecutionProfile)
+        'Function ExecutionProfile As IExecutionProfile
+        'Function IsAvailable() As Boolean
+        'Function IsAvailable(profile As IExecutionProfile) As Boolean
+        'Function IsAvailable(profile As IExecutionProfile, o As Object) As Boolean
 
 
     End Interface

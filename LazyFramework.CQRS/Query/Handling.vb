@@ -31,22 +31,11 @@ Namespace Query
 
         Public Property User As String Implements IMonitorData.User
     End Class
-
-    <Extension> Public Module Extensions
-
-        <Extension> Public Function Execute(Of T)(obj As IAmAQuery) As T
-
-            Return CType(Handling.ExecuteQuery(obj), T)
-
-        End Function
-
-    End Module
-
+    
     Public Class Handling
 
         Private Shared ReadOnly PadLock As New Object
-        
-
+    
 
         Private Shared _queryList As Dictionary(Of String, Type)
         Public Shared ReadOnly Property QueryList As Dictionary(Of String, Type)
@@ -97,19 +86,16 @@ Namespace Query
 
 
 
-        Public Shared Function ExecuteQuery(q As IAmAQuery) As Object
+        Public Shared Function ExecuteQuery(profile As ExecutionProfile.IExecutionProfile, q As IAmAQuery) As Object
             
-            If q.ExecutionProfile Is Nothing Then
-                q.SetProfile(LazyFramework.ClassFactory.GetTypeInstance(Of LazyFramework.CQRS.ExecutionProfile.IExecutionProfileProvider).GetExecutionProfile)
-            End If
             
-            If Not ActionSecurity.Current.UserCanRunThisAction(q.ExecutionProfile, q) Then
-                Dim actionSecurityAuthorizationFaildException As ActionSecurityAuthorizationFaildException = New ActionSecurityAuthorizationFaildException(q, q.ExecutionProfile.User)
+            If Not ActionSecurity.Current.UserCanRunThisAction(Profile, q) Then
+                Dim actionSecurityAuthorizationFaildException As ActionSecurityAuthorizationFaildException = New ActionSecurityAuthorizationFaildException(q, Profile.User)
                 Logging.Log.Error(q,actionSecurityAuthorizationFaildException )
                 Throw actionSecurityAuthorizationFaildException
             End If
 
-            Validation.Handling.ValidateAction(q)
+            Validation.Handling.ValidateAction(profile,q)
             Dim handler As MethodInfo = Nothing
 
             'Standard queryhandling. 1->1 mapping 
@@ -127,7 +113,7 @@ Namespace Query
 
                     Dim transformResult As Object = Nothing
                     If invoke IsNot Nothing Then
-                        transformResult = Transform.Handling.TransformResult(q, invoke)
+                        transformResult = Transform.Handling.TransformResult(profile,q, invoke)
                     End If
 
                     q.ActionComplete()
@@ -144,7 +130,7 @@ Namespace Query
                         mon.HandlerName = Handlers(q.GetType)(0).Name
                         mon.ActionName = q.GetType().FullName
                         mon.Params = q
-                        mon.User() = q.ExecutionProfile.User.Identity.Name
+                        mon.User() = Profile.User.Identity.Name
                         Monitor.Handling.AddToQueue(mon)
                     End If
 
