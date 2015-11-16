@@ -136,8 +136,8 @@ Namespace Query
                         ctx.EndSession
                     End If
 
-                    Dim info As Monitor.MonitorMaxTimeAttribute = CType(Attribute.GetCustomAttribute(q.GetType, GetType(Monitor.MonitorMaxTimeAttribute)), MonitorMaxTimeAttribute)
-                    If info Is Nothing OrElse New TimeSpan(q.EndTimeStamp - q.HandlerStartTimeStamp).Milliseconds >= info.MaxTimeInMs Then
+                    Dim info = CType(Attribute.GetCustomAttribute(q.GetType, GetType(Monitor.MonitorMaxTimeAttribute)), MonitorMaxTimeAttribute)
+                    If info Isnot Nothing AndAlso New TimeSpan(q.EndTimeStamp - q.HandlerStartTimeStamp).Milliseconds >= info.MaxTimeInMs Then
                         Dim mon As New QueryMonitorData
                         mon.StartTime = q.HandlerStartTimeStamp
                         mon.EndTime = q.EndTimeStamp

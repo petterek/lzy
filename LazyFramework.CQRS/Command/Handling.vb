@@ -10,7 +10,7 @@ Namespace Command
         Implements IPublishEvent
 
         Private Shared ReadOnly PadLock As New Object
-        Private Shared _handlers As Dictionary(Of Type, List(Of MethodInfo))
+        Private Shared _handlers As ActionHandlerMapper
         Private Shared _commadList As Dictionary(Of String, Type)
 
 
@@ -57,13 +57,13 @@ Namespace Command
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Private Shared ReadOnly Property AllHandlers() As Dictionary(Of Type, List(Of MethodInfo))
+        Private Shared ReadOnly Property AllHandlers() As ActionHandlerMapper
             Get
                 If _handlers Is Nothing Then
-                    Dim temp As Dictionary(Of Type, List(Of MethodInfo)) = Nothing
+                    Dim temp As ActionHandlerMapper = Nothing
                     SyncLock PadLock
                         If _handlers Is Nothing Then
-                            temp = FindHandlers.FindAllHandlerDelegates(Of IHandleCommand, IAmACommand)(False)
+                            temp = FindHandlers.FindAllHandlerDelegates(Of IHandleCommand, Object)(False)
                         End If
                         _handlers = temp
                     End SyncLock
