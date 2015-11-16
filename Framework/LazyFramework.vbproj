@@ -123,6 +123,7 @@
     <Compile Include="Runtime\TestContext.vb" />
     <Compile Include="Runtime\Web.vb" />
     <Compile Include="Runtime\WinThread.vb" />
+    <Compile Include="Utils\ActionHandlerMapper.vb" />
     <Compile Include="Utils\BrokenRule.vb" />
     <Compile Include="Utils\ChangedValues.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
@@ -200,9 +201,7 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Utils\TestHelpers\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>
     <PostBuildEvent>

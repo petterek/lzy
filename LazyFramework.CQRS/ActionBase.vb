@@ -1,4 +1,5 @@
-﻿Imports System.Security.Principal
+﻿
+Imports System.Security.Principal
 Imports LazyFramework.CQRS
 Imports LazyFramework.CQRS.ExecutionProfile
 
@@ -73,4 +74,3 @@ Public MustInherit Class ActionBase
         Return _profile
     End Function
 End Class
-

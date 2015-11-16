@@ -3,6 +3,7 @@ Imports NUnit.Framework
 Imports System.Security.Principal
 Imports LazyFramework.CQRS.ExecutionProfile
 Imports LazyFramework.CQRS.Security
+Imports LazyFramework.Test.Cqrs
 
 <TestFixture> Public Class ActioninfoTest
 
@@ -19,7 +20,7 @@ Imports LazyFramework.CQRS.Security
 
     <Test> Public Sub ActionsIsFoundForEntity()
 
-        Assert.AreEqual(2, CQRS.ActionInfo.GetAvailableActionsForEntity(Nothing, New ActionEntity).Count)
+        Assert.AreEqual(2, LazyFramework.CQRS.ActionInfo.GetAvailableActionsForEntity(Nothing, New ActionEntity).Count)
         'Ikke en god test, men det får holde for nå..
         Assert.IsInstanceOf(Of AcionForActionEntity)(ActionInfo.GetAvailableActionsForEntity(Nothing, New ActionEntity)(1))
 

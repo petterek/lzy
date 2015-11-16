@@ -7,12 +7,12 @@ Namespace Utils
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Shared Function FindAllHandlerDelegates(Of THolder, TParamType)(allowMulti As Boolean) As Dictionary(Of Type, List(Of MethodInfo))
-            Dim ret As New Dictionary(Of Type, List(Of MethodInfo))
+        Public Shared Function FindAllHandlerDelegates(Of THolder, TParamType)(allowMulti As Boolean) As ActionHandlerMapper
+            Dim ret As New ActionHandlerMapper
             Dim handlerHolders = Reflection.FindAllClassesOfTypeInApplication(GetType(THolder))
 
             For Each t As Type In handlerHolders
-                Dim methodInfos As MethodInfo() = t.GetMethods(BindingFlags.Public Or BindingFlags.Static Or BindingFlags.Instance)
+                Dim methodInfos As MethodInfo() = t.GetMethods(BindingFlags.Public Or BindingFlags.Static)
                 For Each func In methodInfos 'Finner alle funksjoner som er ligger på denne
                     If func.GetParameters.Count = 1 Then
                         Dim param = func.GetParameters(0)

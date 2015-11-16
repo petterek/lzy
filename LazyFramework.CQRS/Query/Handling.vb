@@ -45,7 +45,7 @@ Namespace Query
     Public Class Handling
 
         Private Shared ReadOnly PadLock As New Object
-        Private Shared _handlers As Dictionary(Of Type, List(Of MethodInfo))
+        
 
 
         Private Shared _queryList As Dictionary(Of String, Type)
@@ -72,18 +72,19 @@ Namespace Query
 
 
 
+        Private Shared _handlers As ActionHandlerMapper
         ''' <summary>
         ''' 
         ''' </summary>
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Private Shared ReadOnly Property Handlers() As Dictionary(Of Type, List(Of MethodInfo))
+        Private Shared ReadOnly Property Handlers() As ActionHandlerMapper
             Get
                 If _handlers Is Nothing Then
                     SyncLock PadLock
                         If _handlers Is Nothing Then
-                            Dim temp As Dictionary(Of Type, List(Of MethodInfo)) = FindHandlers.FindAllHandlerDelegates(Of IHandleQuery, IAmAQuery)(False)
+                            Dim temp As ActionHandlerMapper = FindHandlers.FindAllHandlerDelegates(Of IHandleQuery, Object)(False)
                             _handlers = temp
                         End If
                     End SyncLock
@@ -91,6 +92,10 @@ Namespace Query
                 Return _handlers
             End Get
         End Property
+
+        
+
+
 
         Public Shared Function ExecuteQuery(q As IAmAQuery) As Object
             
@@ -105,9 +110,10 @@ Namespace Query
             End If
 
             Validation.Handling.ValidateAction(q)
+            Dim handler As MethodInfo = Nothing
 
-            'Standard queryhandling. 1->1 mapping
-            If Handlers.ContainsKey(q.GetType) Then
+            'Standard queryhandling. 1->1 mapping 
+            If Handlers.TryFindHandler(q.GetType,handler) Then
                 Try
                     Dim ctx = ExecutionContext.GetContextForAction(q)
                     If ctx IsNot Nothing Then
@@ -115,7 +121,7 @@ Namespace Query
                     End If
 
                     q.HandlerStart()
-                    Dim invoke As Object = Handlers(q.GetType)(0).Invoke(Nothing, {q})
+                    Dim invoke As Object = handler.Invoke(Nothing, {q})
 
                     EventHub.Publish(New QueryExecuted(q))
 
@@ -123,10 +129,6 @@ Namespace Query
                     If invoke IsNot Nothing Then
                         transformResult = Transform.Handling.TransformResult(q, invoke)
                     End If
-
-                    'If TypeOf (q) Is ActionBase Then
-                    '    DirectCast(q, ActionBase).OnActionComplete()
-                    'End If
 
                     q.ActionComplete()
 
@@ -146,10 +148,7 @@ Namespace Query
                         Monitor.Handling.AddToQueue(mon)
                     End If
 
-                    
-
                     Return transformResult
-
                 Catch ex As TargetInvocationException
                     Logging.Log.Error(q, ex)
                     Throw ex.InnerException
@@ -160,27 +159,6 @@ Namespace Query
                     Logging.Log.Error(q, ex)
                     Throw
                 End Try
-
-                'Else
-                'If MultiHandlers.ContainsKey(q.GetType) Then
-                '    Dim handler = MultiHandlers(q.GetType)
-                '    Dim target As Global.LazyFramework.CQRS.Query.IParalellQuery = CType(handler.CreateInstance, IParalellQuery)
-                '    target.InnerQuery = q
-
-                '    Dim p = Runtime.Context.Current.CurrentUser
-                '    Dim s = Runtime.Context.Current.Storage
-
-                '    handler.Methods.AsParallel.ForAll(Sub(m)
-                '                                          Threading.Thread.CurrentPrincipal = p
-                '                                          Dim ldss As LocalDataStoreSlot = Thread.GetNamedDataSlot(Runtime.Constants.StoreName)
-                '                                          Thread.SetData(ldss, s)
-                '                                          m.Invoke(target, {})
-                '                                          Thread.CurrentPrincipal = Nothing
-                '                                          Thread.FreeNamedDataSlot(Runtime.Constants.StoreName)
-                '                                      End Sub)
-                '    Return target.InnerResult
-                'End If
-                'EventHub.Publish(New HandlerNotFound(q))
             End If
 
             Throw New NotSupportedException("Query handler not found")

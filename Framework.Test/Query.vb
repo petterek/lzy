@@ -5,9 +5,10 @@ Imports LazyFramework.Test
 Imports System.Security.Principal
 Imports LazyFramework.CQRS.ExecutionProfile
 Imports LazyFramework.CQRS.Security
+Imports LazyFramework.Test.Cqrs
 
 Public Class DebugLogger
-    Implements CQRS.Monitor.IMonitorWriter
+    Implements LazyFramework.CQRS.Monitor.IMonitorWriter
 
 
     Public Sub Write(list As IEnumerable(Of Monitor.IMonitorData)) Implements Monitor.IMonitorWriter.Write
@@ -47,7 +48,7 @@ End Class
 
         Dim res As Object
 
-        res = CQRS.Query.Handling.ExecuteQuery(q)
+        res = LazyFramework.CQRS.Query.Handling.ExecuteQuery(q)
 
         Assert.IsInstanceOf(Of QueryResultDto)(res)
 
@@ -57,7 +58,7 @@ End Class
     <Test> Public Sub ListIsConvertedCorrectly()
 
         Dim q As New TestQuery2 With {.Id = 1, .Startdate = Now}
-        Dim res = CQRS.Query.Handling.ExecuteQuery(q)
+        Dim res = LazyFramework.CQRS.Query.Handling.ExecuteQuery(q)
 
         Assert.IsInstanceOf(Of QueryResultDto)(CType(res, IEnumerable)(0))
 
@@ -67,7 +68,7 @@ End Class
 
     <Test> Public Sub ContextSetupIsFound
         Dim q As New TestQuery With {.Id = 1}
-        Dim res = CQRS.Query.Handling.ExecuteQuery(q)
+        Dim res = LazyFramework.CQRS.Query.Handling.ExecuteQuery(q)
 
         Assert.AreEqual(100, q.Id)
 
@@ -137,18 +138,18 @@ End Class
 
 
 Public Class ValidateTestQuery
-    Inherits CQRS.Validation.ValidateActionBase(Of TestQuery)
+    Inherits LazyFramework.CQRS.Validation.ValidateActionBase(Of TestQuery)
 
 
 End Class
 
 Public Class ValidateTestQuery3
-    Inherits CQRS.Validation.ValidateActionBase(Of TestQuery3)
+    Inherits LazyFramework.CQRS.Validation.ValidateActionBase(Of TestQuery3)
 
 End Class
 
 <Monitor.MonitorMaxTime(0)> Public Class TestQuery
-    Inherits CQRS.Query.QueryBase
+    Inherits LazyFramework.CQRS.Query.QueryBase
 
     Public Id As Integer
 
@@ -168,7 +169,7 @@ Public Class TestQuery3
 End Class
 
 Public Class QueryHandler
-    Implements CQRS.Query.IHandleQuery
+    Implements LazyFramework.CQRS.Query.IHandleQuery
 
     Public Shared Function Dummy(q As TestQuery) As QueryResult
         Return New QueryResult With {.Id = 1, .Name = "Espen", .SomeDate = New Date(1986, 7, 24)}

@@ -79,7 +79,8 @@
   <ItemGroup>
     <Compile Include="ActioninfoTest.vb" />
     <Compile Include="ClassFactory.vb" />
-    <Compile Include="CommandHub.vb" />
+    <Compile Include="Cqrs\ActionHandlerTest.vb" />
+    <Compile Include="Cqrs\CommandHub.vb" />
     <Compile Include="CreateCustomer.vb" />
     <Compile Include="FileExtensionTest.vb" />
     <Compile Include="LoggerTest.vb" />

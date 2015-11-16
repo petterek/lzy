@@ -6,11 +6,11 @@ Imports LazyFramework.CQRS.ExecutionProfile
 <TestFixture> Public Class ValidatorTest
 
     <Test> Public Sub ValidatorsIsCalled()
-        Assert.Throws(Of CQRS.Validation.ValidationException)(Sub() CQRS.Validation.Handling.ValidateAction(New ToValidate))
+        Assert.Throws(Of LazyFramework.CQRS.Validation.ValidationException)(Sub() LazyFramework.CQRS.Validation.Handling.ValidateAction(New ToValidate))
 
         Try
-            CQRS.Validation.Handling.ValidateAction(New ToValidate)
-        Catch ex As CQRS.Validation.ValidationException
+            LazyFramework.CQRS.Validation.Handling.ValidateAction(New ToValidate)
+        Catch ex As LazyFramework.CQRS.Validation.ValidationException
             Assert.AreEqual(2, ex.ExceptionList.Count)
         End Try
 
@@ -19,7 +19,7 @@ Imports LazyFramework.CQRS.ExecutionProfile
 End Class
 
 Public Class ToValidate
-    Inherits CQRS.ActionBase
+    Inherits LazyFramework.CQRS.ActionBase
     
     Property Id As Integer
 
@@ -38,7 +38,7 @@ End Class
 
 
 Public Class ToValidateValidator
-    Inherits CQRS.Validation.ValidateActionBase(Of ToValidate)
+    Inherits LazyFramework.CQRS.Validation.ValidateActionBase(Of ToValidate)
 
     Public Sub CheckId(action As ToValidate)
         If action.Id = 0 Then

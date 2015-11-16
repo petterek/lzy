@@ -74,7 +74,7 @@ Public Class HandleCustomerEvents
 End Class
 
 Public Class CommandHandler
-    Implements CQRS.Command.IHandleCOmmand, EventHandling.IPublishEvent
+    Implements LazyFramework.CQRS.Command.IHandleCOmmand, EventHandling.IPublishEvent
 
     <ThreadStatic> Public Shared CustomerRepository As New Dictionary(Of Guid, Customer)
 
@@ -124,6 +124,6 @@ Public Class Persistdata
         Return LogLevelEnum.Verbose
     End Function
 
-    Public Property EventList As New List(Of CQRS.Command.IAmACommand)
+    Public Property EventList As New List(Of LazyFramework.CQRS.Command.IAmACommand)
 
 End Class
