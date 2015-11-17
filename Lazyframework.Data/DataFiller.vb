@@ -13,14 +13,7 @@ Public Class DataFiller
         Private ReadOnly _fieldInfo As FieldInfo
         Private ReadOnly _setter As Action(Of Object, Object)
 
-        Private Shared Function CreateSetter(fieldInfo As FieldInfo) As Action(Of Object, Object)
-            Dim targetType = fieldInfo.DeclaringType
-            Dim exTarget = Expression.Parameter(GetType(Object), "t")
-            Dim exValue = Expression.Parameter(GetType(Object), "p")
-
-            Dim exBody As Expression = Expression.Assign(Expression.Field(Expression.Convert(exTarget, targetType), fieldInfo), Expression.Convert(exValue, fieldInfo.FieldType))
-            Return Expression.Lambda(Of Action(Of Object, Object))(exBody, exTarget, exValue).Compile()
-        End Function
+        
 
 
         Public Sub New(ByVal reader As Object, ByVal col As Integer, ByVal fieldInfo As FieldInfo, ByVal name As String, ByVal mapByName As Boolean)
@@ -41,7 +34,7 @@ Public Class DataFiller
                 End If
             End If
 
-            _setter = CreateSetter(fieldInfo)
+            _setter = Reflection.CreateSetter(fieldInfo)
         End Sub
 
         Private ReadOnly _getValue As GetValueDelegate

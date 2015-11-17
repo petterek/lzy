@@ -1,3 +1,5 @@
+Imports System.Reflection
+
 Namespace Utils.Json
     Public Class TokenAcceptors
         Public Const ListStart = "["c
@@ -90,21 +92,35 @@ Namespace Utils.Json
         End Sub
 
         Private Shared Sub CreateAttributeValue(ByVal nextChar As IReader, ByVal result As Object, ByVal name As String)
+            Dim fType As Type
 
-            Dim fInfo = result.GetType().GetField(name)
+            Dim fInfo As MemberInfo = Reflection.SearchForSetterInfo(result.GetType, name)
+            If fInfo IsNot Nothing Then
+                fType = CType(fInfo, PropertyInfo).PropertyType
+            Else 
+                fInfo = Reflection.SearchForFieldInfo(result.GetType,name)
+                If fInfo IsNot Nothing Then
+                    fType = CType(fInfo,FieldInfo).FieldType
+                End If
+            End If
+
             Dim value As Object
 
             If fInfo Is Nothing Then
+                'Or just ignore this.. 
+                'Must implement Unknown Attribute Parse To Dev Null
                 Throw New UnknownAttributeException(name)
             End If
-
-            If fInfo.FieldType.IsValueType Or fInfo.FieldType Is GetType(String) Then
-                value = TypeParserMapper(fInfo.FieldType).Parse(nextChar)
+            
+            If fType.IsValueType Or fType Is GetType(String) Then
+                value = TypeParserMapper(fType).Parse(nextChar)
             Else
-                value = Reader.StringToObject(nextChar, fInfo.FieldType)
+                value = Reader.StringToObject(nextChar, fType)
             End If
 
-            fInfo.SetValue(result, value)
+            SetterCache.GetInfo(fInfo).Setter()(result,value)
+
+            'fInfo.SetValue(result, value)
         End Sub
 
         Public Shared Sub BufferLegalCharacters(nextChar As IReader, leagal As String)

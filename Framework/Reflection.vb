@@ -1,4 +1,5 @@
 Imports System.IO
+Imports System.Linq.Expressions
 Imports System.Reflection
 
 Public Class Reflection
@@ -16,12 +17,46 @@ Public Class Reflection
     Public Shared Function FindTypeFromGuid(guid As Guid) As Type
         Dim ret As Type = Nothing
         If AllTypes.Count > 0 Then
-            _guidmap.TryGetValue(guid,ret)
+            _guidmap.TryGetValue(guid, ret)
         End If
 
 
 
         Return ret
+    End Function
+
+    Public Shared Function CreateSetter(type As Type, name As String) As Action(Of Object, Object)
+        Dim mInfo As MemberInfo
+        mInfo = SearchForSetterInfo(type, name)
+        If mInfo Is Nothing Then
+            mInfo = SearchForFieldInfo(type, name)
+        End If
+
+        If mInfo IsNot Nothing Then
+            Return CreateSetter(mInfo)
+        Else
+            Return Nothing
+        End If
+    End Function
+
+    Public Shared Function CreateSetter(memberInfo As MemberInfo) As Action(Of Object, Object)
+        Dim targetType = memberInfo.DeclaringType
+        Dim exTarget = Expression.Parameter(GetType(Object), "t")
+        Dim exValue = Expression.Parameter(GetType(Object), "p")
+        Dim res As Action(Of Object, Object)
+
+        Dim exBody As Expression
+        If TypeOf (memberInfo) Is FieldInfo Then
+            exBody = Expression.Assign(Expression.Field(Expression.Convert(exTarget, targetType), DirectCast(memberInfo, FieldInfo)), Expression.Convert(exValue, DirectCast(memberInfo, FieldInfo).FieldType))
+        ElseIf TypeOf (memberInfo) Is PropertyInfo Then
+            exBody = Expression.Assign(Expression.Property(Expression.Convert(exTarget, targetType), CType(memberInfo, PropertyInfo)), Expression.Convert(exValue, CType(memberInfo, PropertyInfo).PropertyType))
+        Else
+            Throw New NotSupportedException
+        End If
+
+        res = Expression.Lambda(Of Action(Of Object, Object))(exBody, exTarget, exValue).Compile()
+
+        Return res
     End Function
 
 
@@ -147,5 +182,21 @@ Public Class Reflection
 
         Return fieldInfo
     End Function
+
+    Public Shared Function SearchForSetterInfo(currType As Type, name As String) As PropertyInfo
+        Dim propertyInfo As PropertyInfo = Nothing
+        While propertyInfo Is Nothing AndAlso currType IsNot Nothing
+            propertyInfo = currType.GetProperty(name, BindingFlags.IgnoreCase Or BindingFlags.NonPublic Or BindingFlags.Instance)
+            If propertyInfo IsNot Nothing Then
+                If propertyInfo.CanWrite Then
+                    Return propertyInfo
+                End If
+            End If
+            currType = currType.BaseType
+        End While
+
+        Return Nothing
+    End Function
+
 
 End Class

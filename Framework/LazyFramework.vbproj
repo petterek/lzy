@@ -157,6 +157,7 @@
     <Compile Include="Utils\Json\ObjectBuilder.vb" />
     <Compile Include="Utils\Json\Reader.vb" />
     <Compile Include="Utils\Json\ReadStream.vb" />
+    <Compile Include="Utils\Json\SetterCache.vb" />
     <Compile Include="Utils\Json\StringParser.vb" />
     <Compile Include="Utils\Json\TokenAcceptors.vb" />
     <Compile Include="Utils\Json\UnExpectedTokenException.vb" />
