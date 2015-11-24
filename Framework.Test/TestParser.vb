@@ -10,7 +10,7 @@ Imports NUnit.Framework
 
     <Test> Public Sub ParseTextWithEscapeObject()
         Dim p = Utils.Json.Reader.StringToObject(Of Person)("{""Navn"":""Petter\nGjermund\\ \""Han er skikkelig tøff\"" ""}")
-        Assert.AreEqual("Petter" & vbCrLf & "Gjermund\ ""Han er skikkelig tøff"" "  , p.Navn)
+        Assert.AreEqual("Petter" & vbCrLf & "Gjermund\ ""Han er skikkelig tøff"" ", p.Navn)
         'Assert.AreEqual(43, p.Alder)
     End Sub
 
@@ -93,46 +93,53 @@ Imports NUnit.Framework
 
     End Sub
 
-    <Test> Public sub EmptyObjectIsRead()
-        
-        Assert.DoesNotThrow(Sub() Newtonsoft.Json.JsonConvert.DeserializeObject(of Test)("{}"))
-        Assert.DoesNotThrow(Sub() LazyFramework.Utils.Json.Reader.StringToObject(of Test)("{}"))
+    <Test> Public Sub EmptyObjectIsRead()
 
-    End sub
+        Assert.DoesNotThrow(Sub() Newtonsoft.Json.JsonConvert.DeserializeObject(Of Test)("{}"))
+        Assert.DoesNotThrow(Sub() LazyFramework.Utils.Json.Reader.StringToObject(Of Test)("{}"))
 
-    <test> public sub LongValueIsParsed
-        
+    End Sub
+
+    <Test> Public Sub LongValueIsParsed()
+
         Dim v As ClassWithLong
         Assert.DoesNotThrow(Sub() v = Reader.StringToObject(Of ClassWithLong)("{""Value"":1446212820320}"))
-        Assert.AreEqual(1446212820320,v.Value)
+        Assert.AreEqual(1446212820320, v.Value)
 
 
     End Sub
 
-    <test> public sub LongValueIsParsedToProperty
-        
+    <Test> Public Sub LongValueIsParsedToProperty()
+
         Dim v As ClassWithLongProperty
         Assert.DoesNotThrow(Sub() v = Reader.StringToObject(Of ClassWithLongProperty)("{""Value"":1446212820320}"))
-        Assert.AreEqual(1446212820320,v.Value)
+        Assert.AreEqual(1446212820320, v.Value)
 
+    End Sub
+
+    <Test> Public Sub ValueInStrinIsIgnoredWhenFieldDoesNotExist()
+        Dim v As ClassWithLongProperty
+        Assert.DoesNotThrow(Sub() v = Reader.StringToObject(Of ClassWithLongProperty)("{""Value"":1446212820320,""ValueTwo"":124}"))
+        Assert.AreEqual(1446212820320, v.Value)
 
     End Sub
 
     Public Class ClassWithLongProperty
         Public Property Value As Long
+        'Public Property ValueTwo As Long
     End Class
 
 
-    <test> Public sub GenericObjectAsDictionary
-        
+    <Test> Public Sub GenericObjectAsDictionary()
+
         Dim toTest = "{""Integer"" : 1,""Double"":2.1,""String"":""A string""}"
-        Dim res =    Newtonsoft.Json.JsonConvert.DeserializeObject(of Dictionary(Of String,Object))(toTest)
+        Dim res = Newtonsoft.Json.JsonConvert.DeserializeObject(Of Dictionary(Of String, Object))(toTest)
 
 
-        Assert.AreEqual(1,res("Integer"))
-        Assert.AreEqual(2.1,res("Double"))
-        Assert.AreEqual("A string",res("String"))
+        Assert.AreEqual(1, res("Integer"))
+        Assert.AreEqual(2.1, res("Double"))
+        Assert.AreEqual("A string", res("String"))
         Assert.IsInstanceOf(Of Int64)(res("Integer"))
         Assert.IsInstanceOf(Of Double)(res("Double"))
-    End sub
+    End Sub
 End Class

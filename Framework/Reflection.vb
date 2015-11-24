@@ -186,7 +186,7 @@ Public Class Reflection
     Public Shared Function SearchForSetterInfo(currType As Type, name As String) As PropertyInfo
         Dim propertyInfo As PropertyInfo = Nothing
         While propertyInfo Is Nothing AndAlso currType IsNot Nothing
-            propertyInfo = currType.GetProperty(name, BindingFlags.IgnoreCase Or BindingFlags.NonPublic Or BindingFlags.Instance)
+            propertyInfo = currType.GetProperty(name, BindingFlags.IgnoreCase Or BindingFlags.Public Or BindingFlags.Instance)
             If propertyInfo IsNot Nothing Then
                 If propertyInfo.CanWrite Then
                     Return propertyInfo
