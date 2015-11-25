@@ -12,10 +12,6 @@
         End Function
 
         Public MustOverride Function GetTransformer(action As TAction, ent As TEntity) As ITransformEntityToDto
-
-
-        Public Overridable Function SortingFunc() As Comparison(Of Object) Implements ISortingFunction.SortingFunc
-            Return Nothing
-        End Function
+        
     End Class
 End Namespace

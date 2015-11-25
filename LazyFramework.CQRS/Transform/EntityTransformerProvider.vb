@@ -67,11 +67,7 @@ Namespace Transform
 
                 Public Property Action As IAmAnAction Implements ITransformEntityToDto.Action
             End Class
-
-
-            Public Function SortingFunc() As Comparison(Of Object) Implements ISortingFunction.SortingFunc
-                Return Nothing
-            End Function
+            
         End Class
 
     End Class

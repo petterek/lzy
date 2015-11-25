@@ -8,14 +8,12 @@
 **.suo
 **.ncrunchsolution
 **.ncrunchproject
+**.v2.ncrunchproject
 **.cache
 /.project
-<<<<<<< HEAD
 /nuget
 **bin/
 **obj/
-=======
 bin/
 obj/
->>>>>>> Version-1
 .vs/

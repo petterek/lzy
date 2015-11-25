@@ -49,19 +49,8 @@ Namespace Transform
                     If Errors.Count > 0 Then
                         Throw Errors(0)
                     End If
-
-                    Dim retList = ret.ToList
-                    If transformerFactory.SortingFunc IsNot Nothing Then
-                        retList.Sort(transformerFactory.SortingFunc)
-                    Else
-                        If transformer IsNot Nothing AndAlso TypeOf (transformer) Is ISortingFunction AndAlso CType(transformer, ISortingFunction).SortingFunc IsNot Nothing Then
-                            retList.Sort(CType(transformer, ISortingFunction).SortingFunc)
-                        End If
-                    End If
-
-
-
-                    Return retList
+                    
+                    Return ret.ToList
                 End If
             Else
                 Return TransformAndAddAction(profile, action, If(transformer Is Nothing, transformerFactory.GetTransformer(action, result), transformer), result)

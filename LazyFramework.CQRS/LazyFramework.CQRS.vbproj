@@ -118,8 +118,10 @@
     <Compile Include="Query\QueryBase.vb" />
     <Compile Include="Query\QueryExecuted.vb" />
     <Compile Include="Query\QueryLogEvent.vb" />
+    <Compile Include="Sorting\Handler.vb" />
     <Compile Include="Transform\EntityTransformerProvider.vb" />
     <Compile Include="Transform\Handling.vb" />
+    <Compile Include="Sorting\ISortResult.vb" />
     <Compile Include="Transform\ITransformEntityToDto.vb" />
     <Compile Include="Transform\ITransformerFactory.vb" />
     <Compile Include="Transform\TransformerBase.vb" />

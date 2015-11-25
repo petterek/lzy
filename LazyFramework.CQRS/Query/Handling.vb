@@ -31,11 +31,11 @@ Namespace Query
 
         Public Property User As String Implements IMonitorData.User
     End Class
-    
+
     Public Class Handling
 
         Private Shared ReadOnly PadLock As New Object
-    
+
 
         Private Shared _queryList As Dictionary(Of String, Type)
         Public Shared ReadOnly Property QueryList As Dictionary(Of String, Type)
@@ -82,24 +82,24 @@ Namespace Query
             End Get
         End Property
 
-        
+
 
 
 
         Public Shared Function ExecuteQuery(profile As ExecutionProfile.IExecutionProfile, q As IAmAQuery) As Object
-            
-            
-            If Not ActionSecurity.Current.UserCanRunThisAction(Profile, q) Then
-                Dim actionSecurityAuthorizationFaildException As ActionSecurityAuthorizationFaildException = New ActionSecurityAuthorizationFaildException(q, Profile.User)
-                Logging.Log.Error(q,actionSecurityAuthorizationFaildException )
+
+
+            If Not ActionSecurity.Current.UserCanRunThisAction(profile, q) Then
+                Dim actionSecurityAuthorizationFaildException As ActionSecurityAuthorizationFaildException = New ActionSecurityAuthorizationFaildException(q, profile.User)
+                Logging.Log.Error(q, actionSecurityAuthorizationFaildException)
                 Throw actionSecurityAuthorizationFaildException
             End If
 
-            Validation.Handling.ValidateAction(profile,q)
+            Validation.Handling.ValidateAction(profile, q)
             Dim handler As MethodInfo = Nothing
 
             'Standard queryhandling. 1->1 mapping 
-            If Handlers.TryFindHandler(q.GetType,handler) Then
+            If Handlers.TryFindHandler(q.GetType, handler) Then
                 Try
                     Dim ctx = ExecutionContext.GetContextForAction(q)
                     If ctx IsNot Nothing Then
@@ -111,30 +111,30 @@ Namespace Query
 
                     EventHub.Publish(New QueryExecuted(q))
 
-                    Dim transformResult As Object = Nothing
-                    If invoke IsNot Nothing Then
-                        transformResult = Transform.Handling.TransformResult(profile,q, invoke)
-                    End If
+
+                    invoke = Transform.Handling.TransformResult(profile, q, invoke)
+                    Sorting.Handler.SortResult(q, invoke)
 
                     q.ActionComplete()
 
                     If ctx IsNot Nothing Then
-                        ctx.EndSession
+                        ctx.EndSession()
                     End If
 
                     Dim info = CType(Attribute.GetCustomAttribute(q.GetType, GetType(Monitor.MonitorMaxTimeAttribute)), MonitorMaxTimeAttribute)
-                    If info Isnot Nothing AndAlso New TimeSpan(q.EndTimeStamp - q.HandlerStartTimeStamp).Milliseconds >= info.MaxTimeInMs Then
+                    If info IsNot Nothing AndAlso New TimeSpan(q.EndTimeStamp - q.HandlerStartTimeStamp).Milliseconds >= info.MaxTimeInMs Then
                         Dim mon As New QueryMonitorData
                         mon.StartTime = q.HandlerStartTimeStamp
                         mon.EndTime = q.EndTimeStamp
                         mon.HandlerName = Handlers(q.GetType)(0).Name
                         mon.ActionName = q.GetType().FullName
                         mon.Params = q
-                        mon.User() = Profile.User.Identity.Name
+                        mon.User() = profile.User.Identity.Name
                         Monitor.Handling.AddToQueue(mon)
                     End If
 
-                    Return transformResult
+                    Return invoke
+
                 Catch ex As TargetInvocationException
                     Logging.Log.Error(q, ex)
                     Throw ex.InnerException

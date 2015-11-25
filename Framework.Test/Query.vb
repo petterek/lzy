@@ -55,13 +55,14 @@ End Class
     End Sub
 
 
-    <Test> Public Sub ListIsConvertedCorrectly()
+    <Test> Public Sub ListIsConvertedCorrectlyAndSorted()
 
         Dim q As New TestQuery2 With {.Id = 1, .Startdate = Now}
         Dim res = LazyFramework.CQRS.Query.Handling.ExecuteQuery(New TestExecutionProfileProvider().GetExecutionProfile,q)
 
         Assert.IsInstanceOf(Of QueryResultDto)(CType(res, IEnumerable)(0))
 
+        Assert.AreEqual(4,ctype(CType(res, IEnumerable)(0),QueryResultDto).Id)
     End Sub
 
 
@@ -177,12 +178,20 @@ Public Class QueryHandler
 
     Public Shared Function Dummy2(q As TestQuery2) As List(Of QueryResult)
 
-        Return New List(Of QueryResult) From {New QueryResult With {.Id = 1, .Name = "Espen", .SomeDate = New Date(1986, 7, 24)}}
-
+        Return New List(Of QueryResult) From {
+            New QueryResult With {.Id = 1, .Name = "Espen", .SomeDate = New Date(1986, 7, 24)},
+            New QueryResult With {.Id = 4, .Name = "Først", .SomeDate = New Date(1986, 7, 22)}}
     End Function
 
 End Class
 
+Public Class SortResult
+    Inherits LazyFramework.CQRS.Sorting.SortResultBase(Of TestQuery2, QueryResultDto)
+
+    Public Overrides Function Compare(x As QueryResultDto, y As QueryResultDto) As Integer
+        Return y.Id - x.Id 
+    End Function
+End Class
 
 Public Class QueryResult
     Public Id As Integer
