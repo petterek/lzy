@@ -12,7 +12,7 @@ Namespace Utils
             Dim handlerHolders = Reflection.FindAllClassesOfTypeInApplication(GetType(THolder))
 
             For Each t As Type In handlerHolders
-                Dim methodInfos As MethodInfo() = t.GetMethods(BindingFlags.Public Or BindingFlags.Static)
+                Dim methodInfos As MethodInfo() = t.GetMethods(BindingFlags.Public Or BindingFlags.Instance Or BindingFlags.Static)
                 For Each func In methodInfos 'Finner alle funksjoner som er ligger på denne
                     If func.GetParameters.Count = 1 Then
                         Dim param = func.GetParameters(0)
