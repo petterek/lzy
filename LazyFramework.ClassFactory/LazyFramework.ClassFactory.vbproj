@@ -63,6 +63,7 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AmbigiousConstructorException.vb" />
     <Compile Include="ClassFactory.vb" />
     <Compile Include="ISessionAware.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
@@ -83,6 +84,7 @@
     <Compile Include="SessionInstance.vb" />
     <Compile Include="SessionNotCreatedException.vb" />
     <Compile Include="TypeInfo.vb" />
+    <Compile Include="UnableToCreteInstanceException.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">

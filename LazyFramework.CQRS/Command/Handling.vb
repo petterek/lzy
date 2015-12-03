@@ -63,6 +63,11 @@ Namespace Command
             End Get
         End Property
 
+
+        Private shared ReadOnly instanceLock As New Object
+        Private Shared ReadOnly TypeInstanceCache As new Dictionary(Of Type, Object)
+
+
         ''' <summary>
         ''' Executes a command by finding the mapping to the type of command passed in. 
         ''' </summary>
@@ -87,7 +92,17 @@ Namespace Command
                 Validation.Handling.ValidateAction(profile, command)
 
                 Try
-                    Dim temp = AllHandlers(command.GetType)(0).Invoke(Nothing, {command})
+                    Dim methodInfo  = AllHandlers(command.GetType)(0)
+
+                    If not TypeInstanceCache.ContainsKey(methodInfo.DeclaringType) Then
+                        SyncLock instanceLock
+                            If not TypeInstanceCache.ContainsKey(methodInfo.DeclaringType) Then
+                                TypeInstanceCache(methodInfo.DeclaringType) = ClassFactory.Construct(methodInfo.DeclaringType)
+                            End If
+                        End SyncLock
+                    End If
+
+                    Dim temp = methodInfo.Invoke(TypeInstanceCache(methodInfo.DeclaringType), {command})
                     If temp IsNot Nothing Then
                         command.SetResult(Transform.Handling.TransformResult(profile, command, temp))
                     End If

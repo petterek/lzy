@@ -148,7 +148,7 @@ Imports NUnit.Framework
 
     End Sub
 
-    <Test> public Sub vetikkehelt()
+    <Test> Public Sub vetikkehelt()
         Using New LazyFramework.ClassFactory.SessionInstance
             Dim sub1 = Substitute.For(Of ITest)()
             sub1.TestValue.Returns(Function()
@@ -189,7 +189,7 @@ Imports NUnit.Framework
     End Sub
 
     <Test> Public Sub AskForKeyInFactoryDoesNotFailWhenSessionIsNotSet()
-        Assert.DoesNotThrow(Sub() LazyFramework.ClassFactory.ContainsKey(Of Object)())
+        Assert.DoesNotThrow(Sub() LazyFramework.ClassFactory.ContainsKey(GetType(Object)))
     End Sub
 
 
@@ -219,7 +219,7 @@ Imports NUnit.Framework
             Return "Session"
         End Function
 
-        
+
     End Class
 
     Public Interface ITest
@@ -255,7 +255,7 @@ Imports NUnit.Framework
 
         End While
         Assert.AreEqual(2, toChange)
-        
+
 
     End Sub
 
@@ -265,7 +265,7 @@ Imports NUnit.Framework
     End Interface
 
 
-    <test>
+    <Test>
     Public Sub InsertMultipleTypesOfInterfaceWithKeys()
 
         LazyFramework.ClassFactory.SetTypeInstance(Of ITest)("bla", New SessionAwareTest)
@@ -280,7 +280,7 @@ Imports NUnit.Framework
     <Test> Public Sub InsertTypesWithKey()
         LazyFramework.ClassFactory.SetTypeInstance(Of ITest)("bla", GetType(SessionAwareTest))
         LazyFramework.ClassFactory.SetTypeInstance(Of ITest)("ukebla", GetType(NoneSessionsAwareTest))
-        
+
         Assert.IsInstanceOf(Of SessionAwareTest)(LazyFramework.ClassFactory.GetTypeInstance(Of ITest)("bla"))
         Assert.IsInstanceOf(Of NoneSessionsAwareTest)(LazyFramework.ClassFactory.GetTypeInstance(Of ITest)("ukebla"))
 
@@ -336,7 +336,7 @@ Imports NUnit.Framework
         Using New Utils.InlineTimer("Activator", timings)
             Dim first = Activator.CreateInstance(ty)
         End Using
-        
+
         Using New Utils.InlineTimer("ActivatorMany", timings)
             For x = 0 To 1000
                 firs.Add(CType(Activator.CreateInstance(ty), TestType))
@@ -357,18 +357,45 @@ Imports NUnit.Framework
 
     End Sub
 
+    <Test> Public Sub CreateClassWithParamsInConstructor()
+        LazyFramework.ClassFactory.SetTypeInstance(Of IFindMe,ToBeFound)
 
-    <Test> Public sub NonInitializedinerfaceIsFoundFromApplication
+        Dim a = LazyFramework.ClassFactory.Construct(Of ToCreate)
+        
+        Assert.IsInstanceOf(Of IFindMe)(a.SomeInterface)
+
+
+    End Sub
+    
+    <Test> Public Sub NonInitializedinerfaceIsFoundFromApplication()
 
         Dim instance As IFindMe = Nothing
-        LazyFramework.ClassFactory.SetTypeInstance(of IFindMe, ToBeFound)
+        LazyFramework.ClassFactory.SetTypeInstance(Of IFindMe, ToBeFound)()
 
         LazyFramework.ClassFactory.TryInstantiateType(Of IFindMe)(instance)
 
         Assert.IsInstanceOf(Of ToBeFound)(instance)
 
 
-    End sub
+    End Sub
+
+
+
+
+
+    Public Class ToCreate
+        Private ReadOnly _someInterface As IFindMe
+
+        Public Sub New(someInterface As IFindMe)
+            _someInterface = someInterface
+        End Sub
+
+        Public ReadOnly Property SomeInterface As IFindMe
+            Get
+                Return _someInterface
+            End Get
+        End Property
+    End Class
 
     Public Interface IFindMe
 
@@ -376,7 +403,7 @@ Imports NUnit.Framework
 
     Public Class ToBeFound
         Implements IFindMe
-        
+
     End Class
 
     Public Class ShouldNotBeFound

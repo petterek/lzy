@@ -69,9 +69,10 @@ End Class
 
     <Test> Public Sub ContextSetupIsFound
         Dim q As New TestQuery With {.Id = 1}
-        Dim res = LazyFramework.CQRS.Query.Handling.ExecuteQuery(New TestExecutionProfileProvider().GetExecutionProfile,q)
+        Dim res As QueryResultDto = CType(LazyFramework.CQRS.Query.Handling.ExecuteQuery(New TestExecutionProfileProvider().GetExecutionProfile,q), QueryResultDto)
 
-        Assert.AreEqual(100, q.Id)
+        Assert.AreEqual(1, res.Id)
+        StringAssert.StartsWith("jhjhhjk", res.NameAndDate)
 
 
     End Sub
@@ -172,11 +173,18 @@ End Class
 Public Class QueryHandler
     Implements LazyFramework.CQRS.Query.IHandleQuery
 
-    Public Shared Function Dummy(q As TestQuery) As QueryResult
-        Return New QueryResult With {.Id = 1, .Name = "Espen", .SomeDate = New Date(1986, 7, 24)}
+    Private ReadOnly _someExternalInjection As SomeInfoClass
+
+    Public sub New(someExternalInjection As SomeInfoClass)
+        _someExternalInjection = someExternalInjection
+        _someExternalInjection.A = "jhjhhjk"
+    End sub
+
+    Public Function Dummy(q As TestQuery) As QueryResult
+        Return New QueryResult With {.Id = 1, .Name = _someExternalInjection.A, .SomeDate = New Date(1986, 7, 24)}
     End Function
 
-    Public Shared Function Dummy2(q As TestQuery2) As List(Of QueryResult)
+    Public  Function Dummy2(q As TestQuery2) As List(Of QueryResult)
 
         Return New List(Of QueryResult) From {
             New QueryResult With {.Id = 1, .Name = "Espen", .SomeDate = New Date(1986, 7, 24)},

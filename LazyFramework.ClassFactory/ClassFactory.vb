@@ -1,4 +1,5 @@
 ﻿
+Imports System.Runtime.CompilerServices
 Imports LazyFramework.Utils
 
 ''' <summary>
@@ -51,17 +52,17 @@ Public Class ClassFactory
                     If Not type.IsInterface Then
                         Throw New NotSupportedException("Type parameter T must be an Interface")
                     End If
-                    ProcessStore(type) = New TypeInfo(Of T) With {.DefaultType = dType, .CurrentType = dType}
+                    ProcessStore(type) = New TypeInfo With {.DefaultType = dType, .CurrentType = dType}
                 End If
             End SyncLock
         End If
         'Sjekker først om det er satt en type for denne sessionen. Dette tar høyde både for web og winthreads
-        If Session IsNot Nothing AndAlso Session.ContainsKey(Of T)() Then
+        If Session IsNot Nothing AndAlso Session.ContainsKey(type) Then
             ti = Session.GetInstance(type)
             'Vi returnerer instance fra sessionstore
             If ti.PersistInstance Then
                 If ti.CurrentInstance Is Nothing Then
-                    ti.CurrentInstance = CType(ti, TypeInfo(Of T)).CreateInstance
+                    ti.CurrentInstance = CType(ti, TypeInfo).CreateInstance
                 End If
                 If LogToDebug Then
                     Debug.Print("You asked for:" & GetType(T).ToString & " You got:" & ti.CurrentInstance.GetType.ToString)
@@ -83,7 +84,7 @@ Public Class ClassFactory
 
         If ti.CurrentInstance IsNot Nothing Then Return CType(ti.CurrentInstance, T)
 
-        Return CType(ti, TypeInfo(Of T)).CreateInstance
+        Return CType(ti.CreateInstance, T)
     End Function
 
     ''' <summary>
@@ -91,77 +92,92 @@ Public Class ClassFactory
     ''' </summary>
     ''' <typeparam name="T"></typeparam>
     ''' <returns></returns>
-    Public Shared Function GetTypeInstance(Of T)() As T
+
+    Private Shared Function GetTypeInstance(type As Type) As Object
         Dim ti As ITypeInfo = Nothing
 
-
-        If Session IsNot Nothing AndAlso Session.ContainsKey(Of T)() Then
-            ti = Session.GetInstance(GetType(T))
-        ElseIf ProcessStore.ContainsKey(GetType(T)) Then
-            ti = ProcessStore((GetType(T)))
+        If Session IsNot Nothing AndAlso Session.ContainsKey(type) Then
+            ti = Session.GetInstance(type)
+        ElseIf ProcessStore.ContainsKey(type) Then
+            ti = ProcessStore(type)
         End If
 
         If ti Is Nothing Then
-            Throw New NotConfiguredException(GetType(T).ToString)
+            Throw New NotConfiguredException(type.ToString)
         End If
-
-        Dim tiSpesific = CType(ti, TypeInfo(Of T))
 
         If ti.CurrentType IsNot Nothing Then
             If ti.PersistInstance Then
                 If ti.CurrentInstance Is Nothing Then
-                    ti.CurrentInstance = tiSpesific.CreateInstance()
+                    ti.CurrentInstance = ti.CreateInstance()
                 End If
-                Return CType(ti.CurrentInstance, T)
+                Return ti.CurrentInstance
             Else
-                Return tiSpesific.CreateInstance()
+                Return ti.CreateInstance
             End If
         Else
             'See if there is any implementations of this interface in the ApplicationPool
             'If only 1 exist then return this one, if more existes then throw exception.
 
-            Throw New NotConfiguredException(GetType(T).ToString)
+            Throw New NotConfiguredException(type.ToString)
         End If
     End Function
 
-    Private Shared Sub RegisterInterfaceMapping(Of T)(list As Type)
-        ProcessStore(GetType(T)) = New ClassFactory.TypeInfo(Of T) With {.CurrentType = list}
-        For Each inter In GetType(T).GetInterfaces
-            ProcessStore(inter) = New ClassFactory.TypeInfo(Of T) With {.CurrentType = list}
+    Public Shared Function GetTypeInstance(Of T)() As T
+        Return CType(GetTypeInstance(GetType(T)), T)
+    End Function
+
+    Private Shared Sub RegisterInterfaceMapping(T As Type, list As Type)
+        ProcessStore(T) = New ClassFactory.TypeInfo With {.CurrentType = list}
+        For Each inter In T.GetInterfaces
+            ProcessStore(inter) = New ClassFactory.TypeInfo With {.CurrentType = list}
         Next
     End Sub
 
     Public Shared Function TryInstantiateType(Of T)(ByRef ret As T) As Boolean
         Dim type As Type = Nothing
-        If TryFindType(Of T)(type) Then
-            ret = CType(Activator.CreateInstance(type), T)
+        If TryFindType(GetType(T),type) Then
+            ret = CType(Construct(type), T)
             Return True
         Else
             Return False
         End If
     End Function
 
-    Public Shared Function FindType(Of T)() As Type
+    Private Shared Function TryInstantiateType(t As Type, ByRef ret As Object) As Boolean
+        Dim foundType As Type = Nothing
+        If TryFindType(t,foundtype) Then
+            ret = Construct(foundType)
+            Return True
+        Else
+            Return False
+        End If
+    End Function
 
-        If Not LazyFramework.ClassFactory.ContainsKey(Of T) Then
-            Dim list = LazyFramework.Reflection.FindAllClassesOfTypeInApplication(GetType(T))
+
+
+
+    Public Shared Function FindType(t As Type) As Type
+
+        If Not LazyFramework.ClassFactory.ContainsKey(t) Then
+            Dim list = LazyFramework.Reflection.FindAllClassesOfTypeInApplication(t)
             If list.Count = 0 Then
-                Throw New TypeNotFoundException(Of T)
+                Throw New TypeNotFoundException(t)
             End If
             If list.Count > 1 Then
-                Throw New ToManyInstancesConfiguredForInterface(Of T)
+                Throw New ToManyInstancesConfiguredForInterface(t)
             End If
-            RegisterInterfaceMapping(Of T)(list(0))
+            RegisterInterfaceMapping(t, list(0))
         End If
 
-        Return ProcessStore((GetType(T))).CurrentType
+        Return ProcessStore(t).CurrentType
 
     End Function
 
-    Public Shared Function TryFindType(Of T)(ByRef res As Type) As Boolean
+    Public Shared Function TryFindType( T As Type,ByRef res As Type) As Boolean
         Dim ret As Type
         Try
-            ret = FindType(Of T)()
+            ret = FindType(T)
         Catch ex As Exception
             res = Nothing
             Return False
@@ -170,29 +186,60 @@ Public Class ClassFactory
         Return True
     End Function
 
+    Public Shared Function Construct(Of T)() As T
+
+        Return CType(Construct(GetType(T)), T)
+
+    End Function
+
+    Public Shared Function Construct(type As Type) As Object
+        If type.IsInterface Then
+            Dim created As Object = Nothing
+            If TryInstantiateType(type, created) Then
+                Return created
+            Else
+                Throw new UnableToCreteInstanceException(type)
+            End If
+        End If
+
+        Dim constructors = type.GetConstructors()
+        If constructors.Count > 1 Then
+            Throw New AmbigiousConstructorException(type)
+        End If
+
+        Dim c = constructors(0)
+        Dim params As New List(Of Object)
+        For Each p In c.GetParameters
+            params.Add(Construct(p.ParameterType))
+        Next
+
+        Return Activator.CreateInstance(type, params.ToArray)
+
+    End Function
+
 
     Public Shared Function GetTypeInstance(Of T)(key As String) As T
-        Dim list As Dictionary(Of String, TypeInfo(Of T))
+        Dim list As Dictionary(Of String, TypeInfo)
         Dim ti As ITypeInfo = Nothing
 
-        If Session IsNot Nothing AndAlso Session.ContainsKey(Of Dictionary(Of String, TypeInfo(Of T)))() Then
-            ti = Session.GetInstance(GetType(Dictionary(Of String, TypeInfo(Of T))))
-        ElseIf ProcessStore.ContainsKey(GetType(Dictionary(Of String, TypeInfo(Of T)))) Then
-            ti = ProcessStore((GetType(Dictionary(Of String, TypeInfo(Of T)))))
+        If Session IsNot Nothing AndAlso Session.ContainsKey(GetType(Dictionary(Of String, TypeInfo))) Then
+            ti = Session.GetInstance(GetType(Dictionary(Of String, TypeInfo)))
+        ElseIf ProcessStore.ContainsKey(GetType(Dictionary(Of String, TypeInfo))) Then
+            ti = ProcessStore((GetType(Dictionary(Of String, TypeInfo))))
         End If
 
         If ti Is Nothing Then
             Throw New NotConfiguredException(GetType(T).ToString)
         End If
 
-        list = CType(ti.CurrentInstance, Dictionary(Of String, TypeInfo(Of T)))
+        list = CType(ti.CurrentInstance, Dictionary(Of String, TypeInfo))
         If Not list.ContainsKey(key) Then
             Throw New NotConfiguredException(key)
         End If
         If list(key).PersistInstance Then
             Return CType(list(key).CurrentInstance, T)
         Else
-            Return list(key).CreateInstance
+            Return CType(list(key).CreateInstance, T)
         End If
 
     End Function
@@ -202,7 +249,7 @@ Public Class ClassFactory
         If ProcessStore.ContainsKey(tp) Then
             Dim ti As ITypeInfo = ProcessStore(tp)
             If ti.DefaultType IsNot Nothing Then
-                Return CType(ti, TypeInfo(Of TT)).CreateDefaultInstance 'CType(Activator.CreateInstance(ti.DefaultType), TT)
+                Return CType(ti.CreateDefaultInstance, TT) 'CType(Activator.CreateInstance(ti.DefaultType), TT)
             End If
         End If
         Throw New NotSupportedException("Default type is not register for type")
@@ -221,7 +268,7 @@ Public Class ClassFactory
             Throw New NotSupportedException("Type parameter T must be an Interface")
         End If
 
-        RegisterInterfaceMapping(Of T)(GetType(TConfigedType))
+        RegisterInterfaceMapping(type, GetType(TConfigedType))
 
         If LogToDebug Then
             Debug.WriteLine("Type set: " & GetType(T).ToString)
@@ -238,16 +285,14 @@ Public Class ClassFactory
         If ProcessStore.ContainsKey(GetType(T)) Then
             Throw New AllreadyMappedException(GetType(T).ToString)
         End If
-        ProcessStore(GetType(T)) = New TypeInfo(Of T) With {.CurrentType = instance.GetType, .CurrentInstance = instance, .PersistInstance = True}
+        ProcessStore(GetType(T)) = New TypeInfo With {.CurrentType = instance.GetType, .CurrentInstance = instance, .PersistInstance = True}
 
         For Each inter In type.GetInterfaces
             If ProcessStore.ContainsKey(inter) Then
                 Throw New AllreadyMappedException(GetType(T).ToString)
             End If
 
-            Dim genType As System.Type = GetType(TypeInfo(Of T)).GetGenericTypeDefinition().MakeGenericType(inter)
-
-            Dim insert = Activator.CreateInstance(genType)
+            Dim insert = New TypeInfo
             CType(insert, ITypeInfo).CurrentInstance = instance
             CType(insert, ITypeInfo).CurrentType = instance.GetType
             CType(insert, ITypeInfo).PersistInstance = True
@@ -270,13 +315,13 @@ Public Class ClassFactory
     End Class
 
     Public Shared Sub SetTypeInstance(Of T)(ByVal key As String, ByVal instance As T)
-        If Not ProcessStore.ContainsKey(GetType(Dictionary(Of String, TypeInfo(Of T)))) Then
-            ProcessStore(GetType(Dictionary(Of String, TypeInfo(Of T)))) = New TypeInfo(Of T) With {.CurrentType = GetType(Dictionary(Of String, TypeInfo(Of T))), .CurrentInstance = New Dictionary(Of String, TypeInfo(Of T)), .PersistInstance = True}
+        If Not ProcessStore.ContainsKey(GetType(Dictionary(Of String, TypeInfo))) Then
+            ProcessStore(GetType(Dictionary(Of String, TypeInfo))) = New TypeInfo With {.CurrentType = GetType(Dictionary(Of String, TypeInfo)), .CurrentInstance = New Dictionary(Of String, TypeInfo), .PersistInstance = True}
         End If
 
-        Dim list As Dictionary(Of String, TypeInfo(Of T)) = CType(ProcessStore(GetType(Dictionary(Of String, TypeInfo(Of T)))).CurrentInstance, Dictionary(Of String, TypeInfo(Of T)))
+        Dim list As Dictionary(Of String, TypeInfo) = CType(ProcessStore(GetType(Dictionary(Of String, TypeInfo))).CurrentInstance, Dictionary(Of String, TypeInfo))
         If Not list.ContainsKey(key) Then
-            list.Add(key, New TypeInfo(Of T) With {.CurrentInstance = instance, .PersistInstance = True, .CurrentType = instance.GetType})
+            list.Add(key, New TypeInfo With {.CurrentInstance = instance, .PersistInstance = True, .CurrentType = instance.GetType})
         Else
             list(key).CurrentInstance = instance
         End If
@@ -284,13 +329,13 @@ Public Class ClassFactory
 
     Public Shared Sub SetTypeInstance(Of TType)(key As String, instanceType As Type)
 
-        If Not ProcessStore.ContainsKey(GetType(Dictionary(Of String, TypeInfo(Of TType)))) Then
-            ProcessStore(GetType(Dictionary(Of String, TypeInfo(Of TType)))) = New TypeInfo(Of TType) With {.CurrentType = GetType(Dictionary(Of String, TypeInfo(Of TType))), .CurrentInstance = New Dictionary(Of String, TypeInfo(Of TType)), .PersistInstance = True}
+        If Not ProcessStore.ContainsKey(GetType(Dictionary(Of String, TypeInfo))) Then
+            ProcessStore(GetType(Dictionary(Of String, TypeInfo))) = New TypeInfo With {.CurrentType = GetType(Dictionary(Of String, TypeInfo)), .CurrentInstance = New Dictionary(Of String, TypeInfo), .PersistInstance = True}
         End If
-        Dim list As Dictionary(Of String, TypeInfo(Of TType)) = CType(ProcessStore(GetType(Dictionary(Of String, TypeInfo(Of TType)))).CurrentInstance, Dictionary(Of String, TypeInfo(Of TType)))
+        Dim list As Dictionary(Of String, TypeInfo) = CType(ProcessStore(GetType(Dictionary(Of String, TypeInfo))).CurrentInstance, Dictionary(Of String, TypeInfo))
 
         If Not list.ContainsKey(key) Then
-            list.Add(key, New TypeInfo(Of TType) With {.PersistInstance = False, .CurrentType = instanceType})
+            list.Add(key, New TypeInfo With {.PersistInstance = False, .CurrentType = instanceType})
         Else
             list(key).CurrentType = instanceType
         End If
@@ -298,11 +343,11 @@ Public Class ClassFactory
     End Sub
 
 
-    Public Shared Function ContainsKey(Of TKey)() As Boolean
+    Public Shared Function ContainsKey(t As Type) As Boolean
 
-        If Session IsNot Nothing AndAlso Session.ContainsKey(Of TKey)() Then Return True
+        If Session IsNot Nothing AndAlso Session.ContainsKey(t) Then Return True
 
-        Return ProcessStore.ContainsKey(GetType(TKey))
+        Return ProcessStore.ContainsKey(t)
     End Function
 
 
@@ -345,18 +390,18 @@ Public Class ClassFactory
             Throw New SessionNotCreatedException
         End If
 
-        Session.SetInstance(GetType(T), New TypeInfo(Of T) With {.CurrentType = instance.GetType, .PersistInstance = True, .CurrentInstance = instance})
+        Session.SetInstance(GetType(T), New TypeInfo With {.CurrentType = instance.GetType, .PersistInstance = True, .CurrentInstance = instance})
     End Sub
 
     Public Shared Sub SetTypeInstanceForSession(Of T)(ByVal key As String, ByVal instance As T)
-        If Not Session.ContainsKey(Of Dictionary(Of String, TypeInfo(Of T)))() Then
-            Session.SetInstance(GetType(Dictionary(Of String, TypeInfo(Of T))), New TypeInfo(Of T) With {.CurrentType = GetType(Dictionary(Of String, TypeInfo(Of T))), .CurrentInstance = New Dictionary(Of String, TypeInfo(Of T)), .PersistInstance = True})
+        If Not Session.ContainsKey(GetType(Dictionary(Of String, TypeInfo))) Then
+            Session.SetInstance(GetType(Dictionary(Of String, TypeInfo)), New TypeInfo With {.CurrentType = GetType(Dictionary(Of String, TypeInfo)), .CurrentInstance = New Dictionary(Of String, TypeInfo), .PersistInstance = True})
         End If
 
-        Dim list As Dictionary(Of String, TypeInfo(Of T)) = CType(Session.GetInstance(GetType(Dictionary(Of String, TypeInfo(Of T)))).CurrentInstance, Dictionary(Of String, TypeInfo(Of T)))
+        Dim list As Dictionary(Of String, TypeInfo) = CType(Session.GetInstance(GetType(Dictionary(Of String, TypeInfo))).CurrentInstance, Dictionary(Of String, TypeInfo))
 
         If Not list.ContainsKey(key) Then
-            list.Add(key, New TypeInfo(Of T) With {.CurrentInstance = instance, .PersistInstance = True, .CurrentType = instance.GetType})
+            list.Add(key, New TypeInfo With {.CurrentInstance = instance, .PersistInstance = True, .CurrentType = instance.GetType})
         Else
             list(key).CurrentInstance = instance
         End If
@@ -388,13 +433,13 @@ Public Class ClassFactory
             Throw New SessionNotCreatedException
         End If
 
-        Session.SetInstance(GetType(T), New TypeInfo(Of T) With {.CurrentType = GetType(TConfigedType), .PersistInstance = persist})
+        Session.SetInstance(GetType(T), New TypeInfo With {.CurrentType = GetType(TConfigedType), .PersistInstance = persist})
     End Sub
 
     Public Shared Function RemoveTypeInstanceForSession(Of TT)() As Boolean
         If Session Is Nothing Then Return True
 
-        If Session.ContainsKey(Of TT)() Then
+        If Session.ContainsKey(GetType(TT)) Then
             Return Session.Remove(GetType(TT))
         End If
 
@@ -419,3 +464,11 @@ Public Class ClassFactory
 
 
 End Class
+
+Public Module Extensions
+    <extension>Public sub AsSingleton(types As List(Of Type))
+        types.ForEach(Sub(e)
+
+                      End Sub)
+    End sub
+End Module

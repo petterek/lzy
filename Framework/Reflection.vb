@@ -1,6 +1,7 @@
 Imports System.IO
 Imports System.Linq.Expressions
 Imports System.Reflection
+Imports System.Runtime.CompilerServices
 
 Public Class Reflection
     ''' <summary>
@@ -64,7 +65,8 @@ Public Class Reflection
     Private Shared _guidmap As New Dictionary(Of Guid, Type)
 
     Private Shared ReadOnly _PadLock As New Object
-    Private Shared ReadOnly Property AllTypes() As List(Of Type)
+
+    Public Shared ReadOnly Property AllTypes() As List(Of Type)
         Get
             Dim a As Assembly
             Dim f As FileInfo
@@ -86,8 +88,6 @@ Public Class Reflection
                                 loaded.Add(a)
                             End If
                         Next
-
-
                         Try
                             Dim fileInfos As FileInfo() = New DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory).GetFiles("*.dll", SearchOption.AllDirectories)
 
@@ -116,8 +116,6 @@ Public Class Reflection
                         Catch ex As Exception
                             Throw New ApplicationException("DLL Loading", ex)
                         End Try
-
-
                         For Each assembly In loaded
                             Try
                                 Dim getTypes As Type()
@@ -145,15 +143,8 @@ Public Class Reflection
                                 Throw
                             End Try
                         Next
-
-
-
-
-
                         _allTypes = allTypesTemp
-
                     End If
-
                 End SyncLock
             End If
             Return _allTypes
@@ -200,3 +191,25 @@ Public Class Reflection
 
 
 End Class
+
+
+Public Module Extensions
+    <Extension> Public Function NameEndsWith(toSearch As List(Of Type), search As String) As List(Of Type)
+        Return toSearch.FindAll(Function(e) e.Name.EndsWith(search))
+    End Function
+
+    <Extension> Public Function NameStartsWith(toSearch As List(Of Type), search As String) As List(Of Type)
+        Return toSearch.FindAll(Function(e) e.Name.StartsWith(search))
+    End Function
+
+    <Extension> Public Function InNamespace(toSearch As List(Of Type), search As String) As List(Of Type)
+        Return toSearch.FindAll(Function(e) e.FullName.Contains(search & "."))
+    End Function
+
+    <Extension> Public Function IsAssignableFrom(Of T)(toSearch As List(Of Type)) As List(Of Type)
+        Dim type = GetType(T)
+        Return toSearch.FindAll(Function(e) type.IsAssignableFrom(e))
+    End Function
+
+
+End Module

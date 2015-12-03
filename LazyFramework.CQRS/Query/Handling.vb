@@ -84,6 +84,8 @@ Namespace Query
 
 
 
+        Private Shared ReadOnly InstanceLock As New Object
+        Private Shared ReadOnly TypeInstanceCache As New Dictionary(Of Type, Object)
 
 
         Public Shared Function ExecuteQuery(profile As ExecutionProfile.IExecutionProfile, q As IAmAQuery) As Object
@@ -107,7 +109,15 @@ Namespace Query
                     End If
 
                     q.HandlerStart()
-                    Dim invoke As Object = handler.Invoke(Nothing, {q})
+
+                    If not TypeInstanceCache.ContainsKey(handler.DeclaringType) Then
+                        SyncLock instanceLock
+                            If not TypeInstanceCache.ContainsKey(handler.DeclaringType) Then
+                                TypeInstanceCache(handler.DeclaringType) = ClassFactory.Construct(handler.DeclaringType)
+                            End If
+                        End SyncLock
+                    End If
+                    Dim invoke As Object = handler.Invoke(TypeInstanceCache(handler.DeclaringType), {q})
 
                     EventHub.Publish(New QueryExecuted(q))
 

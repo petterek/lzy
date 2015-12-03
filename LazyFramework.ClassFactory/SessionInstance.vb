@@ -45,9 +45,9 @@ Partial Class ClassFactory
         Private _store As Dictionary(Of Type, ITypeInfo)
 
 
-        Public Function ContainsKey(Of TKey)() As Boolean
-            If _store.ContainsKey(GetType(TKey)) Then Return True
-            If Parent IsNot Nothing Then Return Parent.ContainsKey(Of TKey)()
+        Public Function ContainsKey(t As Type) As Boolean
+            If _store.ContainsKey(t) Then Return True
+            If Parent IsNot Nothing Then Return Parent.ContainsKey(t)
             Return False
         End Function
 

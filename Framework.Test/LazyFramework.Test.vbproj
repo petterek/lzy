@@ -104,6 +104,7 @@
     <Compile Include="PipelineTest.vb" />
     <Compile Include="PubSub.vb" />
     <Compile Include="Query.vb" />
+    <Compile Include="Reflection.vb" />
     <Compile Include="ResponseThread.vb" />
     <Compile Include="SpawnThread.vb" />
     <Compile Include="TestParser.vb" />
