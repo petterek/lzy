@@ -54,7 +54,8 @@ Namespace Command
                     Dim temp As ActionHandlerMapper = Nothing
                     SyncLock PadLock
                         If _handlers Is Nothing Then
-                            temp = FindHandlers.FindAllHandlerDelegates(Of IHandleCommand, Object)(False)
+                            temp = FindHandlers.FindAllHandlerDelegates(Reflection.AllTypes.IsAssignableFrom(Of IHandleCommand).union(Reflection.AllTypes.NameEndsWith("CommandHandler")),GetType(IAmACommand), False)
+                            'temp = FindHandlers.FindAllHandlerDelegates(Of IHandleCommand, Object)(False)
                         End If
                         _handlers = temp
                     End SyncLock

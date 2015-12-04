@@ -1,4 +1,5 @@
-﻿Imports System.Reflection
+﻿Imports System.Linq
+Imports System.Reflection
 Imports System.Security.Principal
 Imports System.Threading
 Imports LazyFramework.Utils
@@ -25,7 +26,7 @@ Public Class EventHub
             If _handlers Is Nothing Then
                 SyncLock PadLock
                     If _handlers Is Nothing Then
-                        _handlers = FindHandlers.FindAllHandlerDelegates(Of IHandleEvent, IAmAnEvent)(True)
+                        _handlers = FindHandlers.FindAllHandlerDelegates(Reflection.AllTypes.IsAssignableFrom(Of IHandleEvent).union(Reflection.AllTypes.NameEndsWith("EventHandler")),GetType(IAmAnEvent), True)
                     End If
                 End SyncLock
             End If

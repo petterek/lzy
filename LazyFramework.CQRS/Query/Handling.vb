@@ -73,7 +73,8 @@ Namespace Query
                 If _handlers Is Nothing Then
                     SyncLock PadLock
                         If _handlers Is Nothing Then
-                            Dim temp As ActionHandlerMapper = FindHandlers.FindAllHandlerDelegates(Of IHandleQuery, Object)(False)
+                            Dim list = LazyFramework.Reflection.AllTypes.IsAssignableFrom(Of IHandleQuery).Union(Reflection.AllTypes.NameEndsWith("QueryHandler"))
+                            Dim temp As ActionHandlerMapper = FindHandlers.FindAllHandlerDelegates(list,GetType(IAmAQuery),False)
                             _handlers = temp
                         End If
                     End SyncLock

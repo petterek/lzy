@@ -7,11 +7,10 @@ Namespace Utils
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Shared Function FindAllHandlerDelegates(Of THolder, TParamType)(allowMulti As Boolean) As ActionHandlerMapper
+        Public Shared Function FindAllHandlerDelegates(toScan As IEnumerable(Of Type), paramType As Type, allowMulti As Boolean) As ActionHandlerMapper
             Dim ret As New ActionHandlerMapper
-            Dim handlerHolders = Reflection.FindAllClassesOfTypeInApplication(GetType(THolder))
-
-            For Each t As Type In handlerHolders
+            
+            For Each t As Type In toScan
                 Dim methodInfos As MethodInfo() = t.GetMethods(BindingFlags.Public Or BindingFlags.Instance Or BindingFlags.Static)
                 For Each func In methodInfos 'Finner alle funksjoner som er ligger på denne
                     If func.GetParameters.Count = 1 Then
@@ -21,7 +20,7 @@ Namespace Utils
                             parameterType = parameterType.GetElementType
                         End If
 
-                        If GetType(TParamType).IsAssignableFrom(parameterType) Then
+                        If paramType.IsAssignableFrom(parameterType) Then
                             If Not ret.ContainsKey(parameterType) Then
                                 ret.Add(parameterType, New List(Of MethodInfo))
                             End If
