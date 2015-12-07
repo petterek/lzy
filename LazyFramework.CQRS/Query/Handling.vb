@@ -6,37 +6,10 @@ Imports LazyFramework.CQRS.Security
 Imports LazyFramework.EventHandling
 
 Namespace Query
-
-
-    Public Class QueryMonitorData
-        Implements IMonitorData
-
-        Public Property HandlerName As String Implements IMonitorData.Name
-        Public ActionName As String
-
-        Public Sub New()
-            StartTime = Now.Ticks
-        End Sub
-
-        Public Params As Object
-
-        Public ReadOnly Property Took() As Long Implements IMonitorData.Took
-            Get
-                Return New TimeSpan(EndTime - StartTime).Milliseconds
-            End Get
-        End Property
-
-        Public Property EndTime As Long Implements IMonitorData.EndTime
-        Public Property StartTime As Long Implements IMonitorData.StartTime
-
-        Public Property User As String Implements IMonitorData.User
-    End Class
-
     Public Class Handling
 
         Private Shared ReadOnly PadLock As New Object
-
-
+        
         Private Shared _queryList As Dictionary(Of String, Type)
         Public Shared ReadOnly Property QueryList As Dictionary(Of String, Type)
             Get
@@ -60,6 +33,17 @@ Namespace Query
         End Property
 
 
+        Public Shared HandlerClassFilter As Reflection.ClassFilter = Function( list As List(Of Type))
+                                                              return list.IsAssignableFrom(Of IHandleQuery).Union(list.NameEndsWith("QueryHandler")).ToList
+                                                          End Function  
+
+       Public Shared HandlerFunctionFilter As Reflection.MethodFilter = Function(list As List(Of MethodInfo))
+                                                                            Return list.NameEndsWith("Handler").IsFunction().SignatureIs(GetType(Object))
+                                                                        End Function
+
+                                                                            
+
+       
 
         Private Shared _handlers As ActionHandlerMapper
         ''' <summary>
@@ -73,9 +57,7 @@ Namespace Query
                 If _handlers Is Nothing Then
                     SyncLock PadLock
                         If _handlers Is Nothing Then
-                            Dim list = LazyFramework.Reflection.AllTypes.IsAssignableFrom(Of IHandleQuery).Union(Reflection.AllTypes.NameEndsWith("QueryHandler"))
-                            Dim temp As ActionHandlerMapper = FindHandlers.FindAllHandlerDelegates(list,GetType(IAmAQuery),False)
-                            _handlers = temp
+                            _handlers = New ActionHandlerMapper( HandlerFunctionFilter( HandlerClassFilter(Reflection.AllTypes).AllMethods),False)
                         End If
                     End SyncLock
                 End If

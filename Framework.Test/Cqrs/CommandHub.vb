@@ -35,7 +35,7 @@ Namespace Cqrs
             Dim testExecutionProfileProvider = New TestExecutionProfileProvider()
             Handling.ExecuteCommand(testExecutionProfileProvider.GetExecutionProfile, New TestCommand)
             Handling.ExecuteCommand(testExecutionProfileProvider.GetExecutionProfile, New AnotherCommand)
-            Assert.IsTrue(HandleCommands.Found)
+            Assert.IsTrue(CommandHandler.Found)
 
         End Sub
 
@@ -171,16 +171,16 @@ Namespace Cqrs
     End Class
 
 
-    Public Class HandleCommands
+    Public Class CommandHandler
         Implements IHandleCommand
 
         Public Shared Found As Boolean = False
 
-        Public shared sub Handle(cmd As ThisCommandIsNotAvailableIfIdIs0)
+        Public shared sub CommandHandler(cmd As ThisCommandIsNotAvailableIfIdIs0)
 
         End sub
 
-        Public Shared Sub Handle(cmd As CalculateKm)
+        Public Shared Sub CommandHandler(cmd As CalculateKm)
 
             Dim res As Single
 
@@ -191,7 +191,7 @@ Namespace Cqrs
 
         End Sub
 
-        Public Shared Sub Handle(command As TestCommand)
+        Public Shared Sub CommandHandler(command As TestCommand)
             Found = True
         End Sub
 
@@ -248,18 +248,18 @@ Namespace Cqrs
     Public Class Another
         Implements IHandleCommand
 
-        Public Shared Sub HandleSomethingElse(cmd As AnotherCommand)
+        Public Shared Sub HandleSomethingElseCommandHandler(cmd As AnotherCommand)
             Dim a = cmd.ActionName
         End Sub
 
 
         Public Shared IsCalled As Boolean = False
 
-        Public Shared Sub ParamIsByRef(ByRef cmd As ByrefCommand)
+        Public Shared Sub ParamIsByRefCommandHandler(ByRef cmd As ByrefCommand)
             cmd.Called = True
         End Sub
 
-        Public Shared Sub ExceptionIsThrown(cmd As ExceptionIsThrownCommand)
+        Public Shared Sub ExceptionIsThrownCommandHandler(cmd As ExceptionIsThrownCommand)
 
             Throw New InnerException
 

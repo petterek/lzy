@@ -45,7 +45,7 @@ Namespace Cqrs
 
             Public Shared IsCalled As Boolean
 
-            Public shared Function HandleQuery(param As IInterfacedQuery) As Object
+            Public shared Function HandleQueryHandler(param As IInterfacedQuery) As Object
                 
                 Return New Object
 

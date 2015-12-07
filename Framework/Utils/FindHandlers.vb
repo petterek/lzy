@@ -7,39 +7,39 @@ Namespace Utils
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Shared Function FindAllHandlerDelegates(toScan As IEnumerable(Of Type), paramType As Type, allowMulti As Boolean) As ActionHandlerMapper
-            Dim ret As New ActionHandlerMapper
+        'Public Shared Function FindAllHandlerDelegates(toScan As IEnumerable(Of Type), paramType As Type, allowMulti As Boolean) As ActionHandlerMapper
+        '    Dim ret As New ActionHandlerMapper
             
-            For Each t As Type In toScan
-                Dim methodInfos As MethodInfo() = t.GetMethods(BindingFlags.Public Or BindingFlags.Instance Or BindingFlags.Static)
-                For Each func In methodInfos 'Finner alle funksjoner som er ligger på denne
-                    If func.GetParameters.Count = 1 Then
-                        Dim param = func.GetParameters(0)
-                        Dim parameterType As Type = param.ParameterType
-                        If parameterType.IsByRef Then
-                            parameterType = parameterType.GetElementType
-                        End If
+        '    For Each t As Type In toScan
+        '        Dim methodInfos As MethodInfo() = t.GetMethods(BindingFlags.Public Or BindingFlags.Instance Or BindingFlags.Static)
+        '        For Each func In methodInfos 'Finner alle funksjoner som er ligger på denne
+        '            If func.GetParameters.Count = 1 Then
+        '                Dim param = func.GetParameters(0)
+        '                Dim parameterType As Type = param.ParameterType
+        '                If parameterType.IsByRef Then
+        '                    parameterType = parameterType.GetElementType
+        '                End If
 
-                        If paramType.IsAssignableFrom(parameterType) Then
-                            If Not ret.ContainsKey(parameterType) Then
-                                ret.Add(parameterType, New List(Of MethodInfo))
-                            End If
+        '                If paramType.IsAssignableFrom(parameterType) Then
+        '                    If Not ret.ContainsKey(parameterType) Then
+        '                        ret.Add(parameterType, New List(Of MethodInfo))
+        '                    End If
 
-                            If ret(parameterType).Count = 0 Then
-                                ret(parameterType).Add(func)
-                            Else
-                                If allowMulti Then
-                                    ret(parameterType).Add(func)
-                                Else
-                                    'Throw New AllreadyMappedException(parameterType.ToString)
-                                End If
-                            End If
-                        End If
-                    End If
-                Next
-            Next
-            Return ret
-        End Function
+        '                    If ret(parameterType).Count = 0 Then
+        '                        ret(parameterType).Add(func)
+        '                    Else
+        '                        If allowMulti Then
+        '                            ret(parameterType).Add(func)
+        '                        Else
+        '                            'Throw New AllreadyMappedException(parameterType.ToString)
+        '                        End If
+        '                    End If
+        '                End If
+        '            End If
+        '        Next
+        '    Next
+        '    Return ret
+        'End Function
         
         Public Shared Function FindAllMultiHandlers(Of THolder, T)() As Dictionary(Of Type, MethodList)
             Dim ret As New Dictionary(Of Type, MethodList)

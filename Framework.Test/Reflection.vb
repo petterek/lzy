@@ -7,6 +7,18 @@
     End Sub
 
 
+    <test> Public sub FindFunctionInClass
+        
+        Assert.AreEqual(1, LazyFramework.Reflection.AllTypes.
+                        NameEndsWith("WithFunctions").
+                        AllMethods().
+                        NameEndsWith("One").
+                        SignatureIs(GetType(Integer), GetType(string)).
+                        IsFunction.
+                        Count)
+
+    End sub
+
     Public Interface IMarker
     End Interface
 
@@ -14,5 +26,12 @@
         Implements IMarker
     End Class
 
+
+
+    Public Class ClassWithFunctions
+        Function One(a As Integer, b As String) As Boolean
+
+        End Function
+    End Class
 
 End Class

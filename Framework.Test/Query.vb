@@ -180,11 +180,11 @@ Public Class QueryHandler
         _someExternalInjection.A = "jhjhhjk"
     End sub
 
-    Public Function Dummy(q As TestQuery) As QueryResult
+    Public Function DummyQueryHandler(q As TestQuery) As QueryResult
         Return New QueryResult With {.Id = 1, .Name = _someExternalInjection.A, .SomeDate = New Date(1986, 7, 24)}
     End Function
 
-    Public  Function Dummy2(q As TestQuery2) As List(Of QueryResult)
+    Public  Function Dummy2QueryHandler(q As TestQuery2) As List(Of QueryResult)
 
         Return New List(Of QueryResult) From {
             New QueryResult With {.Id = 1, .Name = "Espen", .SomeDate = New Date(1986, 7, 24)},

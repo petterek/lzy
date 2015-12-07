@@ -26,7 +26,11 @@ Public Class EventHub
             If _handlers Is Nothing Then
                 SyncLock PadLock
                     If _handlers Is Nothing Then
-                        _handlers = FindHandlers.FindAllHandlerDelegates(Reflection.AllTypes.IsAssignableFrom(Of IHandleEvent).union(Reflection.AllTypes.NameEndsWith("EventHandler")),GetType(IAmAnEvent), True)
+                        _handlers = New ActionHandlerMapper(Reflection.AllTypes.IsAssignableFrom(Of IHandleEvent).
+                                                              Union(Reflection.AllTypes.NameEndsWith("EventHandler")).ToList().
+                                                              AllMethods.
+                                                              NameEndsWith("EventHandler").
+                                                              IsSub.SignatureIs(GetType(Object)), True)
                     End If
                 End SyncLock
             End If
@@ -127,7 +131,7 @@ Public Class EventHub
             w.Start(Nothing)
         End If
     End Sub
-    
+
 
     Private Class ThreadWrapper
         Private ReadOnly _M As MethodInfo

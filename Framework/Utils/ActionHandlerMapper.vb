@@ -4,6 +4,32 @@ Namespace Utils
     Public Class ActionHandlerMapper
         Inherits Dictionary(Of Type, List(Of MethodInfo))
 
+        Public Sub New(list As List(Of MethodInfo), allowMulti As Boolean)
+
+            For Each m In list
+                Dim parameterType As Type = m.GetParameters(0).ParameterType
+                If parameterType.IsByRef Then
+                    parameterType = parameterType.GetElementType
+                End If
+
+                If Not ContainsKey(parameterType) Then
+                    Add(parameterType, New List(Of MethodInfo))
+                End If
+
+                If Me(parameterType).Count = 0 Then
+                    Me(parameterType).Add(m)
+                Else
+                    If allowMulti Then
+                        Me(parameterType).Add(m)
+                    Else
+                        'Throw New AllreadyMappedException(parameterType.ToString)
+                    End If
+                End If
+
+            Next
+
+        End Sub
+
 
         Public Function TryFindHandler(t As Type, ByRef handler As MethodInfo) As Boolean
             Dim list = FindKeyForListAndCache(t)

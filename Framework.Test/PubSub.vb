@@ -15,9 +15,9 @@ Imports NUnit.Framework
             
         EventPublisher.PublishEvent()
 
-        Assert.IsNotNull(ClassThatHandlesEvent.Hmm)
-        Assert.AreEqual(ClassThatHandlesEvent.Hmm.Name, "Petter")
-        Assert.AreEqual(2, ClassThatHandlesEvent.Counter)
+        Assert.IsNotNull(ClassThatHandlesEventHandler.Hmm)
+        Assert.AreEqual(ClassThatHandlesEventHandler.Hmm.Name, "Petter")
+        Assert.AreEqual(2, ClassThatHandlesEventHandler.Counter)
 
     End Sub
 
@@ -58,18 +58,17 @@ Public Class AnotherHandler
 End Class
 
 
-Public Class ClassThatHandlesEvent
-    Implements IHandleEvent
-
+Public Class ClassThatHandlesEventHandler
+    
     Public Shared Hmm As PersonGotNewName
     Public Shared Counter As Integer = 0
 
-    Public Shared Sub Handlejhgkjhgjhghjg(param As PersonGotNewName)
+    Public Shared Sub NewNameEventHandler(param As PersonGotNewName)
         Hmm = param
         Counter += 1
     End Sub
 
-    Public Shared Sub HandlesToo(param As PersonGotNewName)
+    Public Shared Sub HandlesTooEventHandler(param As PersonGotNewName)
         Hmm = param
         Counter += 1
     End Sub

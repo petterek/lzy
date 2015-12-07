@@ -51,13 +51,15 @@ Namespace Command
         Private Shared ReadOnly Property AllHandlers() As ActionHandlerMapper
             Get
                 If _handlers Is Nothing Then
-                    Dim temp As ActionHandlerMapper = Nothing
                     SyncLock PadLock
                         If _handlers Is Nothing Then
-                            temp = FindHandlers.FindAllHandlerDelegates(Reflection.AllTypes.IsAssignableFrom(Of IHandleCommand).union(Reflection.AllTypes.NameEndsWith("CommandHandler")),GetType(IAmACommand), False)
-                            'temp = FindHandlers.FindAllHandlerDelegates(Of IHandleCommand, Object)(False)
+                           _handlers = New ActionHandlerMapper(
+                                Reflection.AllTypes.IsAssignableFrom(Of IHandleCommand).union(Reflection.AllTypes.NameEndsWith("CommandHandler")).ToList().
+                                AllMethods.
+                                NameEndsWith("Handler").
+                                IsSub.
+                                SignatureIs(GetType(Object)), False)
                         End If
-                        _handlers = temp
                     End SyncLock
                 End If
                 Return _handlers

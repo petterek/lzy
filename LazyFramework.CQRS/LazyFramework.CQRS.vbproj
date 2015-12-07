@@ -70,6 +70,7 @@
     <Compile Include="Availability\Handler.vb" />
     <Compile Include="Availability\ICommandAvilability.vb" />
     <Compile Include="EntityResolver\Handling.vb" />
+    <Compile Include="Query\QueryMonitorData.vb" />
     <Compile Include="Security\ActionSecurity.vb" />
     <Compile Include="Security\ActionSecurityAuthorizationFaildException.vb" />
     <Compile Include="ActionValidationBaseException.vb" />
