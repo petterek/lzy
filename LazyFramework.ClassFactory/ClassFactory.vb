@@ -212,9 +212,7 @@ Public Class ClassFactory
         For Each p In c.GetParameters
             params.Add(Construct(p.ParameterType))
         Next
-
-        Return Activator.CreateInstance(type, params.ToArray)
-
+        Return c.Invoke(params.ToArray)
     End Function
 
 
