@@ -109,6 +109,7 @@
   <ItemGroup>
     <Compile Include="BaseClasses\CompareFunctions.vb" />
     <Compile Include="BaseClasses\Exceptions.vb" />
+    <Compile Include="Extensions.vb" />
     <Compile Include="NotConfiguredException.vb" />
     <Compile Include="Pipeline\Base.vb" />
     <Compile Include="Pipeline\IPipeline.vb" />

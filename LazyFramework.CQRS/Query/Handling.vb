@@ -38,7 +38,7 @@ Namespace Query
                                                           End Function  
 
        Public Shared HandlerFunctionFilter As Reflection.MethodFilter = Function(list As List(Of MethodInfo))
-                                                                            Return list.NameEndsWith("Handler").IsFunction().SignatureIs(GetType(Object))
+                                                                            Return list.NameEndsWith("Handler").IsFunction().SignatureIs(GetType(Object)).ToList
                                                                         End Function
 
                                                                             
@@ -57,7 +57,7 @@ Namespace Query
                 If _handlers Is Nothing Then
                     SyncLock PadLock
                         If _handlers Is Nothing Then
-                            _handlers = New ActionHandlerMapper( HandlerFunctionFilter( HandlerClassFilter(Reflection.AllTypes).AllMethods),False)
+                            _handlers = New ActionHandlerMapper( HandlerFunctionFilter( HandlerClassFilter(Reflection.AllTypes).AllMethods.ToList),False)
                         End If
                     End SyncLock
                 End If

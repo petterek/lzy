@@ -74,12 +74,12 @@ $toBuild | % {
     
     $_.Project
     
-    $match = $_.Project + "\.\d+\.\d+\.\d+\.\d+\..*"
+    #$match = $_.Project + "\.\d+\.\d+\.\d+\.\d+\..*"
     
-    Get-ChildItem $output |  
-    Where-Object {$_.Name -match "$match"} | % {
-        del $_.FullName
-    }
+    #Get-ChildItem $output |  
+    #Where-Object {$_.Name -match "$match"} | % {
+    #   del $_.FullName
+    #}
           
 	$p = $_.Path + $_.Project + ".*proj"
     $p = (Get-Item $p).FullName

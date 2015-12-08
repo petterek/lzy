@@ -30,7 +30,7 @@ Public Class EventHub
                                                               Union(Reflection.AllTypes.NameEndsWith("EventHandler")).ToList().
                                                               AllMethods.
                                                               NameEndsWith("EventHandler").
-                                                              IsSub.SignatureIs(GetType(Object)), True)
+                                                              IsSub.SignatureIs(GetType(Object)).ToList, True)
                     End If
                 End SyncLock
             End If

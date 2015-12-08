@@ -58,7 +58,7 @@ Namespace Command
                                 AllMethods.
                                 NameEndsWith("Handler").
                                 IsSub.
-                                SignatureIs(GetType(Object)), False)
+                                SignatureIs(GetType(Object)).ToList, False)
                         End If
                     End SyncLock
                 End If

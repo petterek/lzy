@@ -1,7 +1,6 @@
 Imports System.IO
 Imports System.Linq.Expressions
 Imports System.Reflection
-Imports System.Runtime.CompilerServices
 
 Public Class Reflection
     ''' <summary>
@@ -194,70 +193,3 @@ Public Class Reflection
     Public Delegate Function MethodFilter(type As List(Of MethodInfo)) As List(Of MethodInfo)
 
 End Class
-
-
-Public Module Extensions
-    <Extension> Public Function NameEndsWith(toSearch As List(Of Type), search As String) As List(Of Type)
-        Return toSearch.FindAll(Function(e) e.Name.EndsWith(search))
-    End Function
-
-    <Extension> Public Function NameStartsWith(toSearch As List(Of Type), search As String) As List(Of Type)
-        Return toSearch.FindAll(Function(e) e.Name.StartsWith(search))
-    End Function
-
-    <Extension> Public Function InNamespace(toSearch As List(Of Type), search As String) As List(Of Type)
-        Return toSearch.FindAll(Function(e) e.FullName.Contains(search & "."))
-    End Function
-
-    <Extension> Public Function IsAssignableFrom(Of T)(toSearch As List(Of Type)) As List(Of Type)
-        Dim type = GetType(T)
-        Return toSearch.FindAll(Function(e) type.IsAssignableFrom(e))
-    End Function
-
-    <Extension> Public Function AllMethods(toSearch As List(Of Type)) As List(Of MethodInfo)
-        Dim ret = New List(Of MethodInfo)
-        toSearch.ForEach(Sub(t) ret.AddRange(t.GetMethods()))
-        Return ret
-    End Function
-
-    <Extension> Public Function NameEndsWith(toSearch As List(Of MethodInfo), search As String) As List(Of MethodInfo)
-        Return toSearch.FindAll(Function(func) func.Name.EndsWith(search))
-    End Function
-    <Extension> Public Function NameStartsWith(toSearch As List(Of MethodInfo), search As String) As List(Of MethodInfo)
-        Return toSearch.FindAll(Function(func) func.Name.StartsWith(search))
-    End Function
-    <Extension> Public Function SignatureIs(toSearch As List(Of MethodInfo), ParamArray types() As Type) As List(Of MethodInfo)
-        Return toSearch.FindAll(Function(func)
-                                    Dim params = func.GetParameters
-                                    If params.Length <> types.Length Then
-                                        Return False
-                                    End If
-                                    For x = 0 To params.Length - 1
-                                        Dim parameterType As Type  
-
-                                        parameterType =  params(x).ParameterType
-
-                                        If parameterType.IsByRef Then
-                                            parameterType = parameterType.GetElementType                                         
-                                        End If
-                                        
-                                        If Not types(x).IsAssignableFrom(parameterType) Then
-                                            Return False
-                                        End If
-                                    Next
-
-                                    Return True
-                                End Function)
-    End Function
-
-
-
-    <Extension> Public Function IsFunction(toSearch As List(Of MethodInfo)) As List(Of MethodInfo)
-        Return toSearch.FindAll(Function(func) func.ReturnType IsNot GetType(System.Void))
-    End Function
-
-    <Extension> Public Function IsSub(toSearch As List(Of MethodInfo)) As List(Of MethodInfo)
-        Return toSearch.FindAll(Function(func) func.ReturnType Is GetType(System.Void))
-    End Function
-
-End Module
