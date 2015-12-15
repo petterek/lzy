@@ -1,6 +1,7 @@
 Imports System.IO
 Imports System.Linq.Expressions
 Imports System.Reflection
+Imports System.Text.RegularExpressions
 
 Public Class Reflection
     ''' <summary>
@@ -79,7 +80,7 @@ Public Class Reflection
                     If _allTypes Is Nothing Then
                         Dim allTypesTemp = New List(Of Type)
                         Dim loaded As New List(Of Assembly)
-                        Dim toIgnore As New System.Text.RegularExpressions.Regex(TypeValidation.IgnoreAssemblies, Text.RegularExpressions.RegexOptions.Compiled Or Text.RegularExpressions.RegexOptions.IgnoreCase)
+                        Dim toIgnore As New Regex(IgnoreAssemblies, RegexOptions.Compiled Or RegexOptions.IgnoreCase)
 
                         For Each a In AppDomain.CurrentDomain.GetAssemblies()
                             allFiles.Add(a.FullName)
@@ -92,7 +93,7 @@ Public Class Reflection
 
                             For Each f In fileInfos
 
-                                If Not String.IsNullOrWhiteSpace(TypeValidation.IgnoreAssemblies) AndAlso toIgnore.IsMatch(f.FullName) Then Continue For
+                                If Not String.IsNullOrWhiteSpace(IgnoreAssemblies) AndAlso toIgnore.IsMatch(f.FullName) Then Continue For
 
                                 Dim dllIsLoaded As Boolean = False
 
@@ -118,7 +119,7 @@ Public Class Reflection
                         For Each assembly In loaded
                             Try
                                 Dim getTypes As Type()
-                                If Not String.IsNullOrWhiteSpace(TypeValidation.IgnoreAssemblies) AndAlso toIgnore.IsMatch(assembly.FullName) Then Continue For
+                                If Not String.IsNullOrWhiteSpace(IgnoreAssemblies) AndAlso toIgnore.IsMatch(assembly.FullName) Then Continue For
                                 getTypes = assembly.GetTypes
                                 For Each type In getTypes
                                     Try
@@ -192,4 +193,5 @@ Public Class Reflection
     Public Delegate Function ClassFilter(type As List(Of Type)) As List(Of Type)
     Public Delegate Function MethodFilter(type As List(Of MethodInfo)) As List(Of MethodInfo)
 
+    Public Shared IgnoreAssemblies As String = ""
 End Class

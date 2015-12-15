@@ -6,6 +6,7 @@ Imports System.Text.RegularExpressions
 Imports LazyFramework.Utils
 
 
+
 Public Class Store
 
 
@@ -22,12 +23,9 @@ Public Class Store
         ExecReader(connectionInfo, command, data, CommandBehavior.SingleResult Or CommandBehavior.SingleRow, AddressOf ReadOne, GetType(T))
     End Sub
 
-
-
     Public Shared Sub Exec(connectionInfo As ServerConnectionInfo, command As CommandInfo, data As Object)
         If GetType(IList).IsAssignableFrom(data.GetType) Then
             Debug.Print("SOMETHING IS A GENBERIC LIST")
-
         Else
             ExecReader(connectionInfo, command, New FillStatus(Of Object)(data), CommandBehavior.SingleResult Or CommandBehavior.SingleRow, AddressOf ReadOne, data.GetType)
         End If

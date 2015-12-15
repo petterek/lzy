@@ -73,8 +73,6 @@ Public Module Extensions
         Next
     End Function
 
-
-
     <Extension> Public Iterator Function IsFunction(toSearch As IEnumerable(Of MethodInfo)) As IEnumerable(Of MethodInfo)
         For Each m In toSearch
             If m.ReturnType IsNot GetType(System.Void) Then Yield m
@@ -82,8 +80,19 @@ Public Module Extensions
     End Function
 
     <Extension> Public Iterator Function IsSub(toSearch As IEnumerable(Of MethodInfo)) As IEnumerable(Of MethodInfo)
+
+        For Each m in toSearch.HasReturnTypeOf(GetType( System.void))
+            Yield m
+        Next
+      
+
+    End Function
+
+    <Extension> Public Iterator Function HasReturnTypeOf(toSearch As IEnumerable(Of MethodInfo), ty As Type) As IEnumerable(Of MethodInfo)
         For Each m In toSearch
-            If m.ReturnType Is GetType(System.Void) Then Yield m
+            If ty.IsAssignableFrom(m.ReturnType) Then
+                Yield m
+            End If
         Next
     End Function
 

@@ -52,8 +52,6 @@ Public Class TypeValidation
 
     Private Shared ReadOnly Locker As New Object
 
-    Public Shared IgnoreAssemblies As String = ""
-
     <Obsolete>Public Shared Function FindAllClassesOfTypeInApplication(ByVal t As Type, Optional ByVal skipSystem As Boolean = True, Optional ByVal forceLoad As Boolean = True) As List(Of Type)
         Return Reflection.FindAllClassesOfTypeInApplication(t,skipSystem,forceLoad)
     End Function

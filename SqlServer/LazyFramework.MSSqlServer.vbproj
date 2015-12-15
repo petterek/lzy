@@ -77,7 +77,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="ServerConnectionInfo.vb" />
-    <Compile Include="SqlServer.vb" />
+    <Compile Include="DataProvider.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">
