@@ -9,20 +9,14 @@ Namespace Utils.Json
 
         Public Overrides Function Parse(nextChar As IReader) As Object
             TokenAcceptors.WhiteSpace(nextChar)
-            TokenAcceptors.BufferLegalCharacters(nextChar, "TrueFals")
+            TokenAcceptors.BufferLegalCharacters(nextChar, "TtrueFfals")
             Dim bufferVal = nextChar.Buffer()
             
-
-            Select Case bufferVal
-                Case "True"
-                    Return True
-                Case "False"
-                    Return False
-                Case Else
-                    Throw New InvalidCastException(bufferVal & " is not a boolean. True/False")
-            End Select
-
-
+            Dim res As Boolean
+            if not Boolean.TryParse(bufferVal, res) Then
+                        Throw New InvalidCastException(bufferVal & " is not a boolean. True/False")
+            End If
+            Return res
         End Function
     End Class
 End NameSpace
