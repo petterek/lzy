@@ -133,6 +133,21 @@ Imports NUnit.Framework
     End Sub
 
 
+    <Test> Public sub ClassWithArrayDoesNotThrow
+
+        'empty array
+        Dim v = Reader.StringToObject(Of ClassWithArray)("{""Data"":[]}")
+        'empty array
+        v = Reader.StringToObject(Of ClassWithArray)("{""Data"":[""Value2""]}")
+
+        v = Reader.StringToObject(Of ClassWithArray)("{""Data"":null}")
+
+        v = Reader.StringToObject(Of ClassWithArray)("{""DataInt"":null}")
+
+        v = Reader.StringToObject(Of ClassWithArray)("{""DataInt"":[1,2,3]}")
+        
+    End sub
+
     Public Class ClassWithLongAndBooleanProperty
         Public Property Value As Long
         Public Property ValueTrue As Boolean
@@ -152,4 +167,11 @@ Imports NUnit.Framework
         Assert.IsInstanceOf(Of Int64)(res("Integer"))
         Assert.IsInstanceOf(Of Double)(res("Double"))
     End Sub
+
+
+    Public Class ClassWithArray
+        Public Data As String()
+        Public DataInt As Integer()
+    End Class
+
 End Class

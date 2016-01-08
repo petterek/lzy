@@ -10,18 +10,30 @@
 
 
         Public Overrides Function Parse(nextChar As IReader) As Object
-            TokenAcceptors.EatUntil(TokenAcceptors.ListStart, nextChar)
 
+            TokenAcceptors.BufferLegalCharacters(nextChar,"nul" )
+            Dim buffer = nextChar.Buffer
+            If buffer="null" then return nothing
+
+            TokenAcceptors.EatUntil(TokenAcceptors.ListStart, nextChar) 
+            
             Dim strategy As IParseStrategy
             If type.IsArray Then
                 strategy = New ArrayParserStrategy(type)
             Else
                 strategy = New ListParseStrategy(type)
             End If
+            
+            
+            
+
 
             Do
                 If strategy.InnerType.IsValueType Or strategy.InnerType = GetType(String) Then
-                    strategy.ItemList.Add(TokenAcceptors.TypeParserMapper(strategy.InnerType).Parse(nextChar))
+                    TokenAcceptors.WhiteSpace(nextChar)
+                    If nextChar.Peek <> TokenAcceptors.ListEnd Then
+                        strategy.ItemList.Add(TokenAcceptors.TypeParserMapper(strategy.InnerType).Parse(nextChar))
+                    End If
                 Else
                     Dim v As Object = Reader.StringToObject(nextChar, strategy.InnerType)
                     If v IsNot Nothing Then
