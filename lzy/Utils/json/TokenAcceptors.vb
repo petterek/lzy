@@ -58,8 +58,8 @@ Namespace Utils.Json
         End Sub
 
         Public Shared Sub Quote(nextChar As IReader)
-            If nextChar.Current <> Chr(34) Then
-                Throw New MissingTokenException(Chr(34))
+            If nextChar.Current <> ChrW(34) Then
+                Throw New MissingTokenException(ChrW(34))
             End If
             nextChar.Read() 'Dump quote
         End Sub
@@ -81,7 +81,7 @@ Namespace Utils.Json
         Public Shared Sub Attributes(ByVal result As Object, ByVal nextChar As IReader)
             WhiteSpace(nextChar)
             'Cleaning out whitespace, check for " to ensure not empty object
-            If nextChar.Current = Chr(34) Then
+            If nextChar.Current = ChrW(34) Then
                 Do
                     Dim name = Attribute(nextChar)
                     EatUntil(Qualifier, nextChar)
@@ -92,15 +92,15 @@ Namespace Utils.Json
         End Sub
 
         Private Shared Sub CreateAttributeValue(ByVal nextChar As IReader, ByVal result As Object, ByVal name As String)
-            Dim fType As Type
+            Dim fType As TypeInfo
 
             Dim fInfo As MemberInfo = Reflection.SearchForSetterInfo(result.GetType, name)
             If fInfo IsNot Nothing Then
-                fType = CType(fInfo, PropertyInfo).PropertyType
+                fType = CType(fInfo, PropertyInfo).PropertyType.GetTypeInfo
             Else 
                 fInfo = Reflection.SearchForFieldInfo(result.GetType,name)
                 If fInfo IsNot Nothing Then
-                    fType = CType(fInfo,FieldInfo).FieldType
+                    fType = CType(fInfo,FieldInfo).FieldType.GetTypeInfo
                 End If
             End If
 
@@ -109,20 +109,16 @@ Namespace Utils.Json
             If fInfo Is Nothing Then
                 'Or just ignore this.. 
                 'Must implement Unknown Attribute Parse To Dev Null
-                'Throw New UnknownAttributeException(name)
-                fType = GetType(UnknownFieldParser)
+                Throw New UnknownAttributeException(name)
             End If
             
-            If fType.IsValueType Or fType Is GetType(String) or fType Is GetType(UnknownFieldParser) Then
-                value = TypeParserMapper(fType).Parse(nextChar)
-            Else
-                value = Reader.StringToObject(nextChar, fType)
-            End If
+            'If fType.IsValueType Or fType. Is GetType(String) Then
+            '    value = TypeParserMapper(fType).Parse(nextChar)
+            'Else
+            '    value = Reader.StringToObject(nextChar, fType)
+            'End If
 
-            If fInfo IsNot Nothing Then
-                SetterCache.GetInfo(fInfo).Setter()(result,value)
-            End If
-            
+            SetterCache.GetInfo(fInfo).Setter()(result,value)
 
             'fInfo.SetValue(result, value)
         End Sub
@@ -142,9 +138,7 @@ Namespace Utils.Json
                                                                             {GetType(Int16), New IntegerParser},
                                                                             {GetType(Date), New DateParser},
                                                                             {GetType(Double), New DoubleParser},
-                                                                            {GetType(Guid), New GuidParser},
-                                                                            {GetType(Boolean), New BoolanParser},
-                                                                            {GetType(UnknownFieldParser), New UnknownFieldParser}
+                                                                            {GetType(Guid), New GuidParser}
                                                                         }
 
         Friend Shared Function CanFindValueSeparator(ByVal nextChar As IReader) As Boolean
@@ -157,7 +151,7 @@ Namespace Utils.Json
         End Function
     End Class
 
-    <Serializable> Friend Class UnknownAttributeException
+     Friend Class UnknownAttributeException
         Inherits Exception
         Public Sub New(ByVal name As String)
             MyBase.New(name)

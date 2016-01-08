@@ -146,6 +146,7 @@
     <Compile Include="Utils\FileExtension.vb" />
     <Compile Include="Utils\FindHandlers.vb" />
     <Compile Include="Utils\Json\ArrayBuilder.vb" />
+    <Compile Include="Utils\Json\BoolanParser.vb" />
     <Compile Include="Utils\Json\Builder.vb" />
     <Compile Include="Utils\Json\DateParser.vb" />
     <Compile Include="Utils\Json\DoubleParser.vb" />
@@ -162,6 +163,7 @@
     <Compile Include="Utils\Json\StringParser.vb" />
     <Compile Include="Utils\Json\TokenAcceptors.vb" />
     <Compile Include="Utils\Json\UnExpectedTokenException.vb" />
+    <Compile Include="Utils\Json\UnknownFieldParser.vb" />
     <Compile Include="Utils\Json\Writer.vb" />
     <Compile Include="Utils\ResponseThread.vb" />
     <Compile Include="Utils\Timing.vb" />

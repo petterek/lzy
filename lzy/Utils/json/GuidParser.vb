@@ -1,22 +1,19 @@
 Namespace Utils.Json
-    Public Class DateParser
+    Public Class GuidParser
         Inherits Builder
 
-        Public Sub New()
-            MyBase.New(GetType(Date))
-        End Sub
+        Public sub New
+            MyBase.New(GetType(Guid))
+        End sub
 
         Public Overrides Function Parse(nextChar As IReader) As Object
             TokenAcceptors.WhiteSpace(nextChar)
             TokenAcceptors.Quote(nextChar)
-            TokenAcceptors.BufferLegalCharacters(nextChar, "0123456789.:T+Z- ")
-
-            Dim bufferVal = nextChar.Buffer()
-
+            TokenAcceptors.BufferLegalCharacters(nextChar, "0123456789ABCDEF-{}")
+            Dim val = New Guid( nextChar.Buffer)
             TokenAcceptors.Quote(nextChar)
+            Return val 
 
-            Return Date.Parse(bufferVal)
-            
         End Function
     End Class
 End NameSpace

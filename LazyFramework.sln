@@ -1,35 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "LazyFramework.CQRS", "LazyFramework.CQRS\LazyFramework.CQRS.vbproj", "{478C54CA-00C8-4F36-B3C5-AE7291270F70}"
+EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "LazyFramework", "Framework\LazyFramework.vbproj", "{D72CA321-6426-4493-BCC5-961284F1C51A}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "LazyFramework.Test", "Framework.Test\LazyFramework.Test.vbproj", "{7244C152-0CAD-4A1F-B911-3BFECD923E1B}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{B6A318C8-C2A9-468B-886A-A8F0D37848D5}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{13670540-F037-44C1-BB09-C33A2CFCFBDB}"
-	ProjectSection(SolutionItems) = preProject
-		BuildNuget.ps1 = BuildNuget.ps1
-		README.md = README.md
-	EndProjectSection
-EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "LazyFramework.MSSqlServer", "SqlServer\LazyFramework.MSSqlServer.vbproj", "{50AB965D-B3D0-4DA4-BFD4-49EA2907FC0D}"
-EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Reciver", "MessageConsole\Reciver\Reciver.vbproj", "{4CC5254E-6F94-4675-9F8B-62D313854FEB}"
-EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "LazyFramework.CQRS", "LazyFramework.CQRS\LazyFramework.CQRS.vbproj", "{478C54CA-00C8-4F36-B3C5-AE7291270F70}"
-EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "LazyFramework.EventHandling", "LazyFramework.EventHandling\LazyFramework.EventHandling.vbproj", "{EF6603ED-7F45-4BC4-BEE0-FF7193CC8CFE}"
-EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "LazyFramework.Logging", "LazyFramework.Logging\LazyFramework.Logging.vbproj", "{80F1DF77-210F-4E39-AE66-2FADCC420CDC}"
-EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "LazyFramework.Data", "Lazyframework.Data\LazyFramework.Data.vbproj", "{05175B67-F72A-4618-B050-87D1057156A2}"
-EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Lazyframework.Webhooks", "Lazyframework.Webhooks\Lazyframework.Webhooks.vbproj", "{8D83ED21-F150-414C-9E50-31EFAABF0062}"
-EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "LazyFramework.ClassFactory", "LazyFramework.ClassFactory\LazyFramework.ClassFactory.vbproj", "{919AA000-9D90-4C9D-B585-8AFBF55A5304}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,6 +16,12 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{478C54CA-00C8-4F36-B3C5-AE7291270F70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{478C54CA-00C8-4F36-B3C5-AE7291270F70}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{478C54CA-00C8-4F36-B3C5-AE7291270F70}.DebugPersonalarkiv|Any CPU.ActiveCfg = Debug|Any CPU
+		{478C54CA-00C8-4F36-B3C5-AE7291270F70}.DebugPersonalarkiv|Any CPU.Build.0 = Debug|Any CPU
+		{478C54CA-00C8-4F36-B3C5-AE7291270F70}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{478C54CA-00C8-4F36-B3C5-AE7291270F70}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D72CA321-6426-4493-BCC5-961284F1C51A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D72CA321-6426-4493-BCC5-961284F1C51A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D72CA321-6426-4493-BCC5-961284F1C51A}.DebugPersonalarkiv|Any CPU.ActiveCfg = DebugPersonalarkiv|Any CPU
@@ -50,60 +34,8 @@ Global
 		{7244C152-0CAD-4A1F-B911-3BFECD923E1B}.DebugPersonalarkiv|Any CPU.Build.0 = Debug|Any CPU
 		{7244C152-0CAD-4A1F-B911-3BFECD923E1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7244C152-0CAD-4A1F-B911-3BFECD923E1B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{50AB965D-B3D0-4DA4-BFD4-49EA2907FC0D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{50AB965D-B3D0-4DA4-BFD4-49EA2907FC0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{50AB965D-B3D0-4DA4-BFD4-49EA2907FC0D}.DebugPersonalarkiv|Any CPU.ActiveCfg = Debug|Any CPU
-		{50AB965D-B3D0-4DA4-BFD4-49EA2907FC0D}.DebugPersonalarkiv|Any CPU.Build.0 = Debug|Any CPU
-		{50AB965D-B3D0-4DA4-BFD4-49EA2907FC0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{50AB965D-B3D0-4DA4-BFD4-49EA2907FC0D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4CC5254E-6F94-4675-9F8B-62D313854FEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4CC5254E-6F94-4675-9F8B-62D313854FEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4CC5254E-6F94-4675-9F8B-62D313854FEB}.DebugPersonalarkiv|Any CPU.ActiveCfg = Debug|Any CPU
-		{4CC5254E-6F94-4675-9F8B-62D313854FEB}.DebugPersonalarkiv|Any CPU.Build.0 = Debug|Any CPU
-		{4CC5254E-6F94-4675-9F8B-62D313854FEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4CC5254E-6F94-4675-9F8B-62D313854FEB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{478C54CA-00C8-4F36-B3C5-AE7291270F70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{478C54CA-00C8-4F36-B3C5-AE7291270F70}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{478C54CA-00C8-4F36-B3C5-AE7291270F70}.DebugPersonalarkiv|Any CPU.ActiveCfg = Debug|Any CPU
-		{478C54CA-00C8-4F36-B3C5-AE7291270F70}.DebugPersonalarkiv|Any CPU.Build.0 = Debug|Any CPU
-		{478C54CA-00C8-4F36-B3C5-AE7291270F70}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{478C54CA-00C8-4F36-B3C5-AE7291270F70}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EF6603ED-7F45-4BC4-BEE0-FF7193CC8CFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EF6603ED-7F45-4BC4-BEE0-FF7193CC8CFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EF6603ED-7F45-4BC4-BEE0-FF7193CC8CFE}.DebugPersonalarkiv|Any CPU.ActiveCfg = Debug|Any CPU
-		{EF6603ED-7F45-4BC4-BEE0-FF7193CC8CFE}.DebugPersonalarkiv|Any CPU.Build.0 = Debug|Any CPU
-		{EF6603ED-7F45-4BC4-BEE0-FF7193CC8CFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EF6603ED-7F45-4BC4-BEE0-FF7193CC8CFE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{80F1DF77-210F-4E39-AE66-2FADCC420CDC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{80F1DF77-210F-4E39-AE66-2FADCC420CDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{80F1DF77-210F-4E39-AE66-2FADCC420CDC}.DebugPersonalarkiv|Any CPU.ActiveCfg = Debug|Any CPU
-		{80F1DF77-210F-4E39-AE66-2FADCC420CDC}.DebugPersonalarkiv|Any CPU.Build.0 = Debug|Any CPU
-		{80F1DF77-210F-4E39-AE66-2FADCC420CDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{80F1DF77-210F-4E39-AE66-2FADCC420CDC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{05175B67-F72A-4618-B050-87D1057156A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{05175B67-F72A-4618-B050-87D1057156A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{05175B67-F72A-4618-B050-87D1057156A2}.DebugPersonalarkiv|Any CPU.ActiveCfg = Debug|Any CPU
-		{05175B67-F72A-4618-B050-87D1057156A2}.DebugPersonalarkiv|Any CPU.Build.0 = Debug|Any CPU
-		{05175B67-F72A-4618-B050-87D1057156A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{05175B67-F72A-4618-B050-87D1057156A2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8D83ED21-F150-414C-9E50-31EFAABF0062}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8D83ED21-F150-414C-9E50-31EFAABF0062}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8D83ED21-F150-414C-9E50-31EFAABF0062}.DebugPersonalarkiv|Any CPU.ActiveCfg = Debug|Any CPU
-		{8D83ED21-F150-414C-9E50-31EFAABF0062}.DebugPersonalarkiv|Any CPU.Build.0 = Debug|Any CPU
-		{8D83ED21-F150-414C-9E50-31EFAABF0062}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8D83ED21-F150-414C-9E50-31EFAABF0062}.Release|Any CPU.Build.0 = Release|Any CPU
-		{919AA000-9D90-4C9D-B585-8AFBF55A5304}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{919AA000-9D90-4C9D-B585-8AFBF55A5304}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{919AA000-9D90-4C9D-B585-8AFBF55A5304}.DebugPersonalarkiv|Any CPU.ActiveCfg = Debug|Any CPU
-		{919AA000-9D90-4C9D-B585-8AFBF55A5304}.DebugPersonalarkiv|Any CPU.Build.0 = Debug|Any CPU
-		{919AA000-9D90-4C9D-B585-8AFBF55A5304}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{919AA000-9D90-4C9D-B585-8AFBF55A5304}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{7244C152-0CAD-4A1F-B911-3BFECD923E1B} = {B6A318C8-C2A9-468B-886A-A8F0D37848D5}
-		{4CC5254E-6F94-4675-9F8B-62D313854FEB} = {B6A318C8-C2A9-468B-886A-A8F0D37848D5}
 	EndGlobalSection
 EndGlobal

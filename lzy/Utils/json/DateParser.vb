@@ -16,7 +16,8 @@ Namespace Utils.Json
             TokenAcceptors.Quote(nextChar)
 
             Return Date.Parse(bufferVal)
-            
+
+
         End Function
     End Class
 End NameSpace
