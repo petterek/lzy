@@ -89,6 +89,16 @@ Namespace CQRS.Transform
             End If
             Return transformEntity
         End Function
+        Public Shared Function TransformAndAddAction(ByVal action As IAmAnAction, ByVal transformer As ITransformEntityToDto, e As IEnumerable) As IEnumerable (Of Object)
+            Dim ret = New List(Of Object)
+            For Each res In e
+                Dim transRes = TransformAndAddAction(action, transformer, res)
+                If transRes IsNot Nothing Then
+                    ret.Add(transRes)
+                End If
+            Next
+            Return ret
+        End Function
     End Class
 End Namespace
 

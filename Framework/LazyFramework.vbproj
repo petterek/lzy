@@ -266,6 +266,7 @@
     <Compile Include="Utils\Json\GuidParser.vb" />
     <Compile Include="Utils\Json\IntegerParser.vb" />
     <Compile Include="Utils\Json\IReader.vb" />
+    <Compile Include="Utils\Json\JSonConfig.vb" />
     <Compile Include="Utils\Json\NonGenericListIsNotSupportedException.vb" />
     <Compile Include="Utils\Json\ObjectBuilder.vb" />
     <Compile Include="Utils\Json\Reader.vb" />
