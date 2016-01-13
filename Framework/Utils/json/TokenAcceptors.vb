@@ -57,6 +57,25 @@ Namespace Utils.Json
             End If
         End Sub
 
+
+        Public shared Function QuoteOrNull(nextChar As IReader) As Object
+            Try
+                Quote(nextChar)
+                Return New Object
+            Catch ex As MissingTokenException
+                'Missin " is allowed if value id NULL
+                TokenAcceptors.BufferLegalCharacters(nextChar,"NULnul")
+                If nextChar.Buffer.ToLower = "null" Then
+                    nextChar.ClearBuffer
+                    Return Nothing
+                End If
+                Throw New Exception(nextChar.Buffer)
+            Catch ex As Exception
+                throw
+            End Try
+            
+        End Function
+
         Public Shared Sub Quote(nextChar As IReader)
             If nextChar.Current <> Chr(34) Then
                 Throw New MissingTokenException(Chr(34))

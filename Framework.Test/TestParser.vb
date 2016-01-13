@@ -111,26 +111,27 @@ Imports NUnit.Framework
 
     <Test> Public Sub LongValueIsParsedToProperty()
 
-        Dim v As ClassWithLongAndBooleanProperty
-        Assert.DoesNotThrow(Sub() v = Reader.StringToObject(Of ClassWithLongAndBooleanProperty)("{""Value"":1446212820320}"))
+        Dim v As ClassWithLongBooleanStringProperty
+        Assert.DoesNotThrow(Sub() v = Reader.StringToObject(Of ClassWithLongBooleanStringProperty)("{""Value"":1446212820320}"))
         Assert.AreEqual(1446212820320, v.Value)
 
     End Sub
 
     <Test> Public Sub ValueInStrinIsIgnoredWhenFieldDoesNotExist()
-        Dim v As ClassWithLongAndBooleanProperty
-        Assert.DoesNotThrow(Sub() v = Reader.StringToObject(Of ClassWithLongAndBooleanProperty)("{""Value"":1446212820320,""ValueTwo"":124}"))
+        Dim v As ClassWithLongBooleanStringProperty
+        Assert.DoesNotThrow(Sub() v = Reader.StringToObject(Of ClassWithLongBooleanStringProperty)("{""Value"":1446212820320,""ValueTwo"":124}"))
         Assert.AreEqual(1446212820320, v.Value)
 
     End Sub
 
     <Test> Public Sub BooleanValueIsParsed()
-        Dim v As ClassWithLongAndBooleanProperty
-        Assert.DoesNotThrow(Sub() v = Reader.StringToObject(Of ClassWithLongAndBooleanProperty)("{""Value"":1446212820320,""ValueTrue"":True,""ValueFalse"":False}"))
+        Dim v As ClassWithLongBooleanStringProperty
+        Assert.DoesNotThrow(Sub() v = Reader.StringToObject(Of ClassWithLongBooleanStringProperty)("{""Value"":1446212820320,""ValueTrue"":True,""ValueFalse"":False}"))
         Assert.True( v.ValueTrue)
         Assert.False(v.ValueFalse)
 
     End Sub
+
 
 
     <Test> Public sub ClassWithArrayDoesNotThrow
@@ -145,13 +146,19 @@ Imports NUnit.Framework
         v = Reader.StringToObject(Of ClassWithArray)("{""DataInt"":null}")
 
         v = Reader.StringToObject(Of ClassWithArray)("{""DataInt"":[1,2,3]}")
+
+        v = Reader.StringToObject(Of ClassWithArray)("{""StringValue"": null }")
+        
         
     End sub
 
-    Public Class ClassWithLongAndBooleanProperty
+    Public Class ClassWithLongBooleanStringProperty
         Public Property Value As Long
         Public Property ValueTrue As Boolean
         Public Property ValueFalse As Boolean
+
+        Public Property StringValue As String
+
     End Class
 
 
@@ -172,6 +179,7 @@ Imports NUnit.Framework
     Public Class ClassWithArray
         Public Data As String()
         Public DataInt As Integer()
+        Public StringValue As string
     End Class
 
 End Class

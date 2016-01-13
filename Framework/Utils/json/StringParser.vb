@@ -59,8 +59,11 @@ Namespace Utils.Json
         Public Overrides Function Parse(nextChar As IReader) As Object
             Dim buffer As New Text.StringBuilder
             TokenAcceptors.WhiteSpace(nextChar)
-            TokenAcceptors.Quote(nextChar)
 
+            If TokenAcceptors.QuoteOrNull(nextChar) Is Nothing Then
+                Return Nothing
+            End If
+            
             Dim cur = nextChar.PeekToBuffer
             While cur <> Chr(34)
                 If cur = "\" Then 'Not allowed, is the start of an escape

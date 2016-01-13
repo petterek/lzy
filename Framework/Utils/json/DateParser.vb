@@ -8,7 +8,10 @@ Namespace Utils.Json
 
         Public Overrides Function Parse(nextChar As IReader) As Object
             TokenAcceptors.WhiteSpace(nextChar)
-            TokenAcceptors.Quote(nextChar)
+            
+            If TokenAcceptors.QuoteOrNull(nextChar) Is Nothing Then
+                Return Nothing
+            End If
             TokenAcceptors.BufferLegalCharacters(nextChar, "0123456789.:T+Z- ")
 
             Dim bufferVal = nextChar.Buffer()
