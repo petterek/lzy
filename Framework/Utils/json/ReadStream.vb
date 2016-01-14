@@ -26,11 +26,20 @@ Namespace Utils.Json
         End Function
 
         Public Function Read() As Char Implements IReader.Read
+            _position += 1
             If internaleBuffer.Count = 0 Then
                 Return ChrW(_StreamReader.Read)
             Else
                 Return internaleBuffer.Dequeue
             End If
+        End Function
+
+        Public Function Read(count As Integer) As String Implements IReader.Read
+            Dim retVal(count) As Char
+            _StreamReader.ReadBlock(retVal,0,count)
+            
+            return New String(retVal)
+
         End Function
 
         Public ReadOnly Property Buffer As String Implements IReader.Buffer
@@ -62,6 +71,8 @@ Namespace Utils.Json
             End While
         End Sub
 
+
+
         Public ReadOnly Property BufferPreLastPeek As String Implements IReader.BufferPreLastPeek
             Get
 
@@ -72,10 +83,12 @@ Namespace Utils.Json
                 For x = 0 To internaleBuffer.Count - 2
                     ret.Append(internaleBuffer(x))
                 Next
-                
+
                 Return ret.ToString
 
             End Get
         End Property
+
+        Public ReadOnly Property Position As Long = 0 Implements IReader.Position 
     End Class
-End NameSpace
+End Namespace

@@ -215,7 +215,19 @@ End Module
 
     End sub
 
+
+    <test> public sub DictionaryIsWrittenAsObjectHash
+        Dim dic As New Dictionary(Of String,String)
+        dic.Add("Test","Value")
+        dic.Add("Test2","Value2")
+
+        Assert.AreEqual("{""Test"":""Value"",""Test2"":""Value2""}", Utils.Json.Writer.ObjectToString(dic))
+
+    End sub
+
 End Class
+
+
 
 
 Public Class ClassWithLong

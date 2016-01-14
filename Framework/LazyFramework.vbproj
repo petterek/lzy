@@ -149,6 +149,7 @@
     <Compile Include="Utils\Json\BoolanParser.vb" />
     <Compile Include="Utils\Json\Builder.vb" />
     <Compile Include="Utils\Json\DateParser.vb" />
+    <Compile Include="Utils\Json\DictionaryBuilder.vb" />
     <Compile Include="Utils\Json\DoubleParser.vb" />
     <Compile Include="Utils\Json\GuidParser.vb" />
     <Compile Include="Utils\Json\IFormatValue.vb" />

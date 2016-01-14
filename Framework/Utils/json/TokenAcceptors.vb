@@ -14,7 +14,7 @@ Namespace Utils.Json
         Public Shared Sub EatUntil(c As Char, nextChar As IReader)
             WhiteSpace(nextChar)
             If nextChar.Current <> c Then
-                Throw New MissingTokenException(c)
+                Throw New MissingTokenException(c, nextChar)
             End If
             nextChar.Read()
         End Sub
@@ -58,30 +58,42 @@ Namespace Utils.Json
         End Sub
 
 
-        Public shared Function QuoteOrNull(nextChar As IReader) As Object
-            Try
-                Quote(nextChar)
+        Public Shared Function QuoteOrNull(nextChar As IReader) As Object
+            If Quote(nextChar) Then
                 Return New Object
-            Catch ex As MissingTokenException
-                'Missin " is allowed if value id NULL
-                TokenAcceptors.BufferLegalCharacters(nextChar,"NULnul")
-                If nextChar.Buffer.ToLower = "null" Then
-                    nextChar.ClearBuffer
-                    Return Nothing
-                End If
-                Throw New Exception(nextChar.Buffer)
-            Catch ex As Exception
-                throw
-            End Try
-            
+            End If
+
+            TokenAcceptors.BufferLegalCharacters(nextChar, "NULnul")
+            If nextChar.Buffer.ToLower = "null" Then
+                nextChar.ClearBuffer()
+                Return Nothing
+            End If
+
+            Return Nothing
+
         End Function
 
-        Public Shared Sub Quote(nextChar As IReader)
-            If nextChar.Current <> Chr(34) Then
-                Throw New MissingTokenException(Chr(34))
+        Public Shared Function StartObjectOrNull(nextChar As IReader) As Object
+
+            If nextChar.Current = ObjectStart Then
+                nextChar.Read()
+                Return New Object
+            Else
+                TokenAcceptors.BufferLegalCharacters(nextChar, "NULnul")
+                If nextChar.Buffer.ToLower = "null" Then
+                    nextChar.ClearBuffer()
+                    Return Nothing
+                End If
             End If
-            nextChar.Read() 'Dump quote
-        End Sub
+            Return Nothing
+        End Function
+
+        Public Shared Function Quote(nextChar As IReader) As Boolean
+            If nextChar.Current = Chr(34) Then
+                nextChar.Read() 'Dump quote
+                Return True
+            End If
+        End Function
 
         Public Shared Function Attribute(nextChar As IReader) As String
             'Dim buffer As New StringBuilder
@@ -89,9 +101,12 @@ Namespace Utils.Json
             Quote(nextChar)
             Dim w = AscW(nextChar.PeekToBuffer)
 
-            While (w > 64 AndAlso w < 91) OrElse (w > 96 AndAlso w < 123) 'This is A-Z a-z  The only characters allowed in attribute names.
+            'TokenAcceptors.BufferLegalCharacters(nextChar, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-")
+
+            While (w > 64 AndAlso w < 91) OrElse (w > 96 AndAlso w < 123) OrElse (w > 47 AndAlso w <58) OrElse w = 45 'This is A-Z a-z  The only characters allowed in attribute names.
                 w = AscW(nextChar.PeekToBuffer)
             End While
+
             Dim ret = nextChar.Buffer
             Quote(nextChar)
             Return ret
@@ -116,35 +131,36 @@ Namespace Utils.Json
             Dim fInfo As MemberInfo = Reflection.SearchForSetterInfo(result.GetType, name)
             If fInfo IsNot Nothing Then
                 fType = CType(fInfo, PropertyInfo).PropertyType
-            Else 
-                fInfo = Reflection.SearchForFieldInfo(result.GetType,name)
+            Else
+                fInfo = Reflection.SearchForFieldInfo(result.GetType, name)
                 If fInfo IsNot Nothing Then
-                    fType = CType(fInfo,FieldInfo).FieldType
+                    fType = CType(fInfo, FieldInfo).FieldType
                 End If
             End If
-
-            Dim value As Object
-
+            
             If fInfo Is Nothing Then
-                'Or just ignore this.. 
-                'Must implement Unknown Attribute Parse To Dev Null
-                'Throw New UnknownAttributeException(name)
                 fType = GetType(UnknownFieldParser)
             End If
+                           
             
-            If fType.IsValueType Or fType Is GetType(String) or fType Is GetType(UnknownFieldParser) Then
-                value = TypeParserMapper(fType).Parse(nextChar)
-            Else
-                value = Reader.StringToObject(nextChar, fType)
+            Dim parsedValue  = ParseValue(fType,nextChar)
+            If fInfo IsNot Nothing Then
+                SetterCache.GetInfo(fInfo).Setter()(result, parsedValue)
             End If
 
-            If fInfo IsNot Nothing Then
-                SetterCache.GetInfo(fInfo).Setter()(result,value)
-            End If
-            
 
             'fInfo.SetValue(result, value)
         End Sub
+
+        Public Shared Function ParseValue(t As Type, nextChar As IReader) as Object
+            Dim value As Object
+            If t.IsValueType Or t Is GetType(String) Or t Is GetType(UnknownFieldParser) Then
+                value = TypeParserMapper(t).Parse(nextChar)
+            Else
+                value = Reader.StringToObject(nextChar, t)
+            End If
+            Return value
+        End Function
 
         Public Shared Sub BufferLegalCharacters(nextChar As IReader, leagal As String)
             Dim toArray = leagal.ToArray

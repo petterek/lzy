@@ -33,6 +33,8 @@ Namespace Utils.Json
 
             If GetType(IList).IsAssignableFrom(type) Then
                 builder = New ArrayBuilder(type)
+            ElseIf GetType(IDictionary).IsAssignableFrom(type) then
+                builder = New DictionaryBuilder(type)
             Else
                 builder = New ObjectBuilder(type)
             End If
@@ -42,7 +44,7 @@ Namespace Utils.Json
 
 
 
-    End Class
+    End Class   
 
 
     <Serializable> Friend Class PropertyNotFoundException
@@ -63,8 +65,8 @@ Namespace Utils.Json
 
         Private ReadOnly _S As String
 
-        Public Sub New(ByVal s As String)
-            MyBase.New(s)
+        Public Sub New(ByVal s As String, ByVal nextChar As IReader)
+            MyBase.New("Missing: " & s & vbCrLf & "@" & nextChar.Position & nextChar.Read(25))
             _S = s
         End Sub
 

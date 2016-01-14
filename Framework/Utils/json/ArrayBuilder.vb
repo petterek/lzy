@@ -24,10 +24,8 @@
                 strategy = New ListParseStrategy(type)
             End If
             
+            TokenAcceptors.WhiteSpace(nextChar)
             
-            
-
-
             Do
                 If strategy.InnerType.IsValueType Or strategy.InnerType = GetType(String) Then
                     TokenAcceptors.WhiteSpace(nextChar)

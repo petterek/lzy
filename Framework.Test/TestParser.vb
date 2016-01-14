@@ -149,6 +149,10 @@ Imports NUnit.Framework
 
         v = Reader.StringToObject(Of ClassWithArray)("{""StringValue"": null }")
         
+        v = Reader.StringToObject(Of ClassWithArray)("{""Attributes"": null }")
+
+        v = Reader.StringToObject(Of ClassWithArray)("{""Attributes"": {""Test"":""Value"",""Test2"":""Value2""} }")
+        
         
     End sub
 
@@ -180,6 +184,7 @@ Imports NUnit.Framework
         Public Data As String()
         Public DataInt As Integer()
         Public StringValue As string
+        Public Attributes As Dictionary(Of String,String)
     End Class
 
 End Class

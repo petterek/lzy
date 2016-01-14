@@ -7,11 +7,11 @@ Namespace Utils.Json
         End Sub
 
         Public Overrides Function Parse(nextChar As IReader) As Object
-            Try
-                TokenAcceptors.EatUntil(TokenAcceptors.ObjectStart, nextChar)
-            Catch ex As MissingTokenException
+            TokenAcceptors.WhiteSpace(nextChar)
+
+            If TokenAcceptors.StartObjectOrNull(nextChar) Is Nothing Then
                 Return Nothing
-            End Try
+            End If
 
             Dim Result = Activator.CreateInstance(type)
 
@@ -22,4 +22,4 @@ Namespace Utils.Json
             Return Result
         End Function
     End Class
-End NameSpace
+End Namespace
