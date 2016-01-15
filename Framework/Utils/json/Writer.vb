@@ -149,6 +149,7 @@ Namespace Utils.Json
 
             if value.GetType.IsEnum Then
                 t = value.GetType.GetEnumUnderlyingType
+                value = CTypeDynamic(value, t)
             End If
 
             If Formatters.ContainsKey(t) Then
