@@ -225,7 +225,18 @@ End Module
 
     End sub
 
+    <test> Public sub WriteEnumValues
+        Dim v As New TestParser.ClassWithEnum
+
+        v.Value = TestParser.MyEnum.Value1
+
+        Assert.AreEqual("{""Value"":1}", Utils.Json.Writer.ObjectToString(v))
+
+
+    End sub
 End Class
+
+
 
 
 

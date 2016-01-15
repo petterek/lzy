@@ -147,15 +147,22 @@ Namespace Utils.Json
                 Return
             End If
 
+            if value.GetType.IsEnum Then
+                t = value.GetType.GetEnumUnderlyingType
+            End If
+
             If Formatters.ContainsKey(t) Then
                 Formatters(t)(writer, value)
             Else
                 If value.GetType.IsValueType Then
+
                     If value.GetType.GetMembers(System.Reflection.BindingFlags.DeclaredOnly Or System.Reflection.BindingFlags.Public Or System.Reflection.BindingFlags.Instance).Count > 0 Then
                         ObjectToString(writer, value)
                     Else
                         writer.Write(value.ToString)
                     End If
+
+
                 Else
                     ObjectToString(writer, value)
                 End If
