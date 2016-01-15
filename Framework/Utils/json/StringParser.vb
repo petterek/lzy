@@ -1,10 +1,7 @@
 Namespace Utils.Json
     Public Class StringParser
         Inherits Builder
-        Public Sub New()
-            MyBase.New(GetType(String))
-        End Sub
-
+        
         Public Delegate Function TransformText(reader As IReader) As String
         Public Delegate Function Match(input As String) As Boolean
 
@@ -56,7 +53,7 @@ Namespace Utils.Json
                            End Function}
             }
 
-        Public Overrides Function Parse(nextChar As IReader) As Object
+        Public Overrides Function Parse(nextChar As IReader, t As Type) As Object
             Dim buffer As New Text.StringBuilder
             TokenAcceptors.WhiteSpace(nextChar)
 

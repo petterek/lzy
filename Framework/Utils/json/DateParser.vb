@@ -2,11 +2,8 @@ Namespace Utils.Json
     Public Class DateParser
         Inherits Builder
 
-        Public Sub New()
-            MyBase.New(GetType(Date))
-        End Sub
-
-        Public Overrides Function Parse(nextChar As IReader) As Object
+    
+        Public Overrides Function Parse(nextChar As IReader, t As Type) As Object
             TokenAcceptors.WhiteSpace(nextChar)
             
             If TokenAcceptors.QuoteOrNull(nextChar) Is Nothing Then

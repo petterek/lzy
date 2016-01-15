@@ -156,6 +156,27 @@ Imports NUnit.Framework
         
     End sub
 
+
+    <Test>Public sub DeserializeEnums
+
+        Dim toTest As ClassWithEnum
+
+        toTest = Reader.StringToObject(Of ClassWithEnum)("{""Value"": 1}")
+        toTest = Reader.StringToObject(Of ClassWithEnum)("{""Value"": ""Value1""}")
+
+        
+
+    End sub
+
+    Public Class ClassWithEnum
+        Public Value As MyEnum
+    End Class
+
+    Public Enum MyEnum
+        Value1 = 1
+        Value2 = 2
+    End Enum
+
     Public Class ClassWithLongBooleanStringProperty
         Public Property Value As Long
         Public Property ValueTrue As Boolean

@@ -2,18 +2,15 @@ Namespace Utils.Json
     Public Class ObjectBuilder
         Inherits Builder
 
-        Public Sub New(t As Type)
-            MyBase.New(t)
-        End Sub
 
-        Public Overrides Function Parse(nextChar As IReader) As Object
+        Public Overrides Function Parse(nextChar As IReader, t As Type) As Object
             TokenAcceptors.WhiteSpace(nextChar)
 
             If TokenAcceptors.StartObjectOrNull(nextChar) Is Nothing Then
                 Return Nothing
             End If
 
-            Dim Result = Activator.CreateInstance(type)
+            Dim Result = Activator.CreateInstance(t)
 
             TokenAcceptors.Attributes(Result, nextChar)
 

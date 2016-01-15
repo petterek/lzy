@@ -2,14 +2,9 @@
     Friend Class ArrayBuilder
         Inherits Builder
 
-        Public Sub New(t As Type)
-            MyBase.New(t)
-        End Sub
+        
 
-
-
-
-        Public Overrides Function Parse(nextChar As IReader) As Object
+        Public Overrides Function Parse(nextChar As IReader,t As Type) As Object
 
             TokenAcceptors.BufferLegalCharacters(nextChar,"nul" )
             Dim buffer = nextChar.Buffer
@@ -18,10 +13,10 @@
             TokenAcceptors.EatUntil(TokenAcceptors.ListStart, nextChar) 
             
             Dim strategy As IParseStrategy
-            If type.IsArray Then
-                strategy = New ArrayParserStrategy(type)
+            If t.IsArray Then
+                strategy = New ArrayParserStrategy(t)
             Else
-                strategy = New ListParseStrategy(type)
+                strategy = New ListParseStrategy(t)
             End If
             
             TokenAcceptors.WhiteSpace(nextChar)
@@ -30,7 +25,7 @@
                 If strategy.InnerType.IsValueType Or strategy.InnerType = GetType(String) Then
                     TokenAcceptors.WhiteSpace(nextChar)
                     If nextChar.Peek <> TokenAcceptors.ListEnd Then
-                        strategy.ItemList.Add(TokenAcceptors.TypeParserMapper(strategy.InnerType).Parse(nextChar))
+                        strategy.ItemList.Add(TokenAcceptors.TypeParserMapper(strategy.InnerType).Parse(nextChar,t))
                     End If
                 Else
                     Dim v As Object = Reader.StringToObject(nextChar, strategy.InnerType)

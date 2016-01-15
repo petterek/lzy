@@ -8,6 +8,7 @@ Namespace Utils.Json
         Public Const ObjectEnd = "}"c
         Public Const Qualifier = ":"c
         Public Const Separator = ","c
+        Public Const Hyphen = Chr(34)
 
         Public Shared BuilderFactory As Type = GetType(ObjectBuilder)
 
@@ -103,7 +104,7 @@ Namespace Utils.Json
 
             'TokenAcceptors.BufferLegalCharacters(nextChar, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-")
 
-            While (w > 64 AndAlso w < 91) OrElse (w > 96 AndAlso w < 123) OrElse (w > 47 AndAlso w <58) OrElse w = 45 'This is A-Z a-z  The only characters allowed in attribute names.
+            While (w > 64 AndAlso w < 91) OrElse (w > 96 AndAlso w < 123) OrElse (w > 47 AndAlso w < 58) OrElse w = 45 'This is A-Z a-z  The only characters allowed in attribute names.
                 w = AscW(nextChar.PeekToBuffer)
             End While
 
@@ -126,7 +127,8 @@ Namespace Utils.Json
         End Sub
 
         Private Shared Sub CreateAttributeValue(ByVal nextChar As IReader, ByVal result As Object, ByVal name As String)
-            Dim fType As Type
+            Dim fType As Type = Nothing
+            Dim parserType As Type = Nothing
 
             Dim fInfo As MemberInfo = Reflection.SearchForSetterInfo(result.GetType, name)
             If fInfo IsNot Nothing Then
@@ -137,13 +139,19 @@ Namespace Utils.Json
                     fType = CType(fInfo, FieldInfo).FieldType
                 End If
             End If
-            
+
             If fInfo Is Nothing Then
                 fType = GetType(UnknownFieldParser)
             End If
-                           
+
+            If fType.IsEnum Then
+                parserType = GetType(EnumParser)
+            End If
+
+
             
-            Dim parsedValue  = ParseValue(fType,nextChar)
+            Dim value As Object = ParseValue(fType, nextChar, parserType)
+            Dim parsedValue = value
             If fInfo IsNot Nothing Then
                 SetterCache.GetInfo(fInfo).Setter()(result, parsedValue)
             End If
@@ -152,10 +160,16 @@ Namespace Utils.Json
             'fInfo.SetValue(result, value)
         End Sub
 
-        Public Shared Function ParseValue(t As Type, nextChar As IReader) as Object
+        Public Shared Function ParseValue(t As Type, nextChar As IReader, Optional parserType As Type = Nothing) As Object
             Dim value As Object
-            If t.IsValueType Or t Is GetType(String) Or t Is GetType(UnknownFieldParser) Then
-                value = TypeParserMapper(t).Parse(nextChar)
+            Dim useParser As Type = t
+
+            If parserType Isnot Nothing Then
+                useParser = parserType
+            End If
+
+            If TypeParserMapper.ContainsKey(useParser) Then
+                value = TypeParserMapper(useParser).Parse(nextChar, t)
             Else
                 value = Reader.StringToObject(nextChar, t)
             End If
@@ -179,7 +193,8 @@ Namespace Utils.Json
                                                                             {GetType(Double), New DoubleParser},
                                                                             {GetType(Guid), New GuidParser},
                                                                             {GetType(Boolean), New BoolanParser},
-                                                                            {GetType(UnknownFieldParser), New UnknownFieldParser}
+                                                                            {GetType(UnknownFieldParser), New UnknownFieldParser},
+                                                                            {GetType(EnumParser), New EnumParser}
                                                                         }
 
         Friend Shared Function CanFindValueSeparator(ByVal nextChar As IReader) As Boolean

@@ -32,14 +32,14 @@ Namespace Utils.Json
             Dim builder As Builder
 
             If GetType(IList).IsAssignableFrom(type) Then
-                builder = New ArrayBuilder(type)
+                builder = New ArrayBuilder()
             ElseIf GetType(IDictionary).IsAssignableFrom(type) then
-                builder = New DictionaryBuilder(type)
+                builder = New DictionaryBuilder()
             Else
-                builder = New ObjectBuilder(type)
+                builder = New ObjectBuilder()
             End If
 
-            Return builder.Parse(input)
+            Return builder.Parse(input, type)
         End Function
 
 

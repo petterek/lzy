@@ -2,11 +2,8 @@ Namespace Utils.Json
     Public Class GuidParser
         Inherits Builder
 
-        Public sub New
-            MyBase.New(GetType(Guid))
-        End sub
-
-        Public Overrides Function Parse(nextChar As IReader) As Object
+        
+        Public Overrides Function Parse(nextChar As IReader, t As Type) As Object
             TokenAcceptors.WhiteSpace(nextChar)
             If TokenAcceptors.QuoteOrNull(nextChar) Is Nothing Then
                 Return Nothing

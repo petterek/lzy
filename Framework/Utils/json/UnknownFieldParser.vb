@@ -2,11 +2,8 @@ Namespace Utils.Json
     Public Class UnknownFieldParser
         Inherits Builder
 
-        Public Sub New()
-            MyBase.New(GetType(UnknownFieldParser))
-        End Sub
-
-        Public Overrides Function Parse(nextChar As IReader) As Object
+        
+        Public Overrides Function Parse(nextChar As IReader, t As Type) As Object
             TokenAcceptors.WhiteSpace(nextChar)
             Dim value As Object
 
@@ -14,11 +11,11 @@ Namespace Utils.Json
 
             Select Case ascw(peek)
                 Case = 34 'This is a " start of string pass on to stringparser... 
-                    value = TokenAcceptors.TypeParserMapper(GetType(String)).Parse(nextChar)
+                    value = TokenAcceptors.TypeParserMapper(GetType(String)).Parse(nextChar, GetType(string))
                 Case =  45,46,48,49,50,51,52,53,54,55,56,57 'This is a number of some kind..
-                    value = TokenAcceptors.TypeParserMapper(GetType(Long)).Parse(nextChar)
+                    value = TokenAcceptors.TypeParserMapper(GetType(Long)).Parse(nextChar, GetType(Double))
                 Case = 70,84 ' T or F -> boolean
-                    value = TokenAcceptors.TypeParserMapper(GetType(BoolanParser)).Parse(nextChar)
+                    value = TokenAcceptors.TypeParserMapper(GetType(BoolanParser)).Parse(nextChar, GetType(BoolanParser))
                 Case = 78,44 'N null or , means no value.
                     value = Nothing
                 Case = 123 ' {

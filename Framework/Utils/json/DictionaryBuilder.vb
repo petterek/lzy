@@ -1,13 +1,9 @@
 Namespace Utils.Json
     Friend Class DictionaryBuilder
         Inherits Builder
-        Public Sub New(type As Type)
-            MyBase.New(type)
+        
 
-
-        End Sub
-
-        Public Overrides Function Parse(nextChar As IReader) As Object
+        Public Overrides Function Parse(nextChar As IReader, t As Type) As Object
 
             Dim res As IDictionary = Nothing
             'this is a dictionary... 
@@ -17,7 +13,7 @@ Namespace Utils.Json
             If TokenAcceptors.StartObjectOrNull(nextChar) IsNot Nothing Then
                 Dim key As Object
                 Dim value As Object
-                Dim getGenericArguments = Me.type.GetGenericArguments
+                Dim getGenericArguments = t.GetGenericArguments
                 Dim typeOfValue As Type
 
                 If getGenericArguments.Count = 2 Then 'Name value
@@ -29,7 +25,7 @@ Namespace Utils.Json
                     Throw New UnsupportedDictionaryException()
                 End If
 
-                res = CType(Activator.CreateInstance(Me.type), IDictionary)
+                res = CType(Activator.CreateInstance(t), IDictionary)
                 TokenAcceptors.WhiteSpace(nextChar)
                 If nextChar.Current = Chr(34) Then
                     Do
@@ -41,9 +37,7 @@ Namespace Utils.Json
                 End If
             End If
             'Cleaning out whitespace, check for " to ensure not empty object
-
-
-
+          
 
             Return res
         End Function
