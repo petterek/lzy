@@ -6,6 +6,7 @@ Namespace Utils.Json
 
         Private ReadOnly _StreamReader As StreamReader
         Private ReadOnly internaleBuffer As New Queue(Of Char)
+        Private _position As Long
 
         Public Sub New(s As StreamReader)
             _StreamReader = s
@@ -89,6 +90,10 @@ Namespace Utils.Json
             End Get
         End Property
 
-        Public ReadOnly Property Position As Long = 0 Implements IReader.Position 
+        Public ReadOnly Property Position As Long Implements IReader.Position 
+        Get
+                Return _position
+        End Get
+        End Property
     End Class
 End Namespace
