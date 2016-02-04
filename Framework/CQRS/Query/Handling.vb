@@ -93,6 +93,10 @@ Namespace CQRS.Query
         End Property
 
         Public Shared Function ExecuteQuery(q As IAmAQuery) As Object
+            If Not IsQueryAvailable(CType(q, QueryBase)) Then
+                EventHub.Publish(New NoAccess(q))
+                Throw New ActionIsNotAvailableException(q, q.User)
+            End If
 
             If Not ActionSecurity.Current.UserCanRunThisAction(q.User, q) Then
                 EventHub.Publish(New NoAccess(q))
@@ -110,6 +114,7 @@ Namespace CQRS.Query
                     End If
 
                     q.HandlerStart()
+
                     Dim invoke As Object = Handlers(q.GetType)(0).Invoke(Nothing, {q})
 
                     EventHub.Publish(New QueryExecuted(q))
@@ -180,7 +185,10 @@ Namespace CQRS.Query
             Throw New NotSupportedException("Query handler not found")
 
         End Function
-
+        
+        Public Shared Function IsQueryAvailable(query As QueryBase) As Boolean
+            Return query.IsAvailable()
+        End Function
 
 
         Private Shared _multihandlers As Dictionary(Of Type, FindHandlers.MethodList)

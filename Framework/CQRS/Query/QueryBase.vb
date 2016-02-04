@@ -6,7 +6,7 @@ Namespace CQRS.Query
         Implements IAmAQuery
         
         Public Overrides Function IsAvailable() As Boolean
-            Return True
+            Return IsAvailable(User)
         End Function
 
         Public Overrides Function IsAvailable(user As IPrincipal) As Boolean
