@@ -16,7 +16,7 @@ Namespace CQRS.Transform
                 Dim res As Object
 
 
-                If Runtime.Context.Current.ChickenMode Then
+                If not transformerFactory.RunAsParallel orelse Runtime.Context.Current.ChickenMode Then
                     For Each e In CType(result, IList)
                         res = TransformAndAddAction(action, If(transformer Is Nothing, transformerFactory.GetTransformer(action, e), transformer), e)
                         If res IsNot Nothing Then
@@ -50,11 +50,11 @@ Namespace CQRS.Transform
                     End If
 
                     Dim retList = ret.ToList
-                    If transformerFactory.SortingFunc IsNot Nothing Then
-                        retList.Sort(transformerFactory.SortingFunc)
+                    If transformerFactory.SortingFunc(action) IsNot Nothing Then
+                        retList.Sort(transformerFactory.SortingFunc(action))
                     Else
-                        If transformer IsNot Nothing AndAlso TypeOf (transformer) Is ISortingFunction AndAlso CType(transformer, ISortingFunction).SortingFunc IsNot Nothing Then
-                            retList.Sort(CType(transformer, ISortingFunction).SortingFunc)
+                        If transformer IsNot Nothing AndAlso TypeOf (transformer) Is ISortingFunction AndAlso CType(transformer, ISortingFunction).SortingFunc(action) IsNot Nothing Then
+                            retList.Sort(CType(transformer, ISortingFunction).SortingFunc(action))
                         End If
                     End If
 
