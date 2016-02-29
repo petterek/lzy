@@ -17,6 +17,14 @@ Namespace CQRS.Command
         Public Overridable Sub FillEntityList()
 
         End Sub
+        
+        ''' <summary>
+        ''' Override this method to fill the InnerEntityList when checking availability when the command input data is not set
+        ''' </summary>
+        ''' <remarks></remarks>
+        Public Overridable Sub FillEntityListForEmptyCommand()
+
+        End Sub
 
         <System.ComponentModel.EditorBrowsable(ComponentModel.EditorBrowsableState.Never)>
         Public Sub SetInnerEntity(o As Object)
