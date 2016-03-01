@@ -90,13 +90,13 @@ Public Class CommandHandler
 
         CommandHandler.CustomerRepository.Add(customer.Id, customer)
 
-        EventHandling.EventHub.Publish(New CustomerCreatedEvent(customer))
+        EventHandling.EventHub.Publish(Runtime.Context.Current.CurrentUser,New CustomerCreatedEvent(customer))
 
     End Sub
 
     Public Shared Sub AlterName(cmd As UpdateCustomerNameCommand)
         CustomerRepository(cmd.Id).Name = cmd.NewName
-        EventHandling.EventHub.Publish( New CustomerAlteredEvent(cmd.Id))
+        EventHandling.EventHub.Publish(Runtime.Context.Current.CurrentUser, New CustomerAlteredEvent(cmd.Id))
     End Sub
 
 End Class

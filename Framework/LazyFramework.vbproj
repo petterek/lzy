@@ -109,12 +109,10 @@
   <ItemGroup>
     <Compile Include="BaseClasses\CompareFunctions.vb" />
     <Compile Include="BaseClasses\Exceptions.vb" />
-    <Compile Include="Extensions.vb" />
     <Compile Include="NotConfiguredException.vb" />
     <Compile Include="Pipeline\Base.vb" />
     <Compile Include="Pipeline\IPipeline.vb" />
     <Compile Include="Pipeline\IPipelineStep.vb" />
-    <Compile Include="Reflection.vb" />
     <Compile Include="Runtime\Constants.vb" />
     <Compile Include="Runtime\Context.vb" />
     <Compile Include="Runtime\ExecutionContext.vb" />
@@ -124,7 +122,6 @@
     <Compile Include="Runtime\TestContext.vb" />
     <Compile Include="Runtime\Web.vb" />
     <Compile Include="Runtime\WinThread.vb" />
-    <Compile Include="Utils\ActionHandlerMapper.vb" />
     <Compile Include="Utils\BrokenRule.vb" />
     <Compile Include="Utils\ChangedValues.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
@@ -208,7 +205,12 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\LazyFramework.Reflection\LazyFramework.Reflection.vbproj">
+      <Project>{ccc53780-1804-4826-b51b-a4950a606e5b}</Project>
+      <Name>LazyFramework.Reflection</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>
     <PostBuildEvent>

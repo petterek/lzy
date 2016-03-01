@@ -19,6 +19,8 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "LazyFramework.MSSqlServer",
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "LazyFramework.EventHandling", "LazyFramework.EventHandling\LazyFramework.EventHandling.vbproj", "{EF6603ED-7F45-4BC4-BEE0-FF7193CC8CFE}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "LazyFramework.Reflection", "LazyFramework.Reflection\LazyFramework.Reflection.vbproj", "{CCC53780-1804-4826-B51B-A4950A606E5B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -74,6 +76,12 @@ Global
 		{EF6603ED-7F45-4BC4-BEE0-FF7193CC8CFE}.DebugPersonalarkiv|Any CPU.Build.0 = Debug|Any CPU
 		{EF6603ED-7F45-4BC4-BEE0-FF7193CC8CFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EF6603ED-7F45-4BC4-BEE0-FF7193CC8CFE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CCC53780-1804-4826-B51B-A4950A606E5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CCC53780-1804-4826-B51B-A4950A606E5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CCC53780-1804-4826-B51B-A4950A606E5B}.DebugPersonalarkiv|Any CPU.ActiveCfg = Debug|Any CPU
+		{CCC53780-1804-4826-B51B-A4950A606E5B}.DebugPersonalarkiv|Any CPU.Build.0 = Debug|Any CPU
+		{CCC53780-1804-4826-B51B-A4950A606E5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CCC53780-1804-4826-B51B-A4950A606E5B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

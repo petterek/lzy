@@ -103,6 +103,7 @@
     <Compile Include="NewLzyTest.vb" />
     <Compile Include="PipelineTest.vb" />
     <Compile Include="PubSub.vb" />
+    <Compile Include="PushMessageToRabbit.vb" />
     <Compile Include="Query.vb" />
     <Compile Include="Reflection.vb" />
     <Compile Include="ResponseThread.vb" />
@@ -164,6 +165,10 @@
     <ProjectReference Include="..\LazyFramework.Logging\LazyFramework.Logging.vbproj">
       <Project>{80f1df77-210f-4e39-ae66-2fadcc420cdc}</Project>
       <Name>LazyFramework.Logging</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LazyFramework.Reflection\LazyFramework.Reflection.vbproj">
+      <Project>{ccc53780-1804-4826-b51b-a4950a606e5b}</Project>
+      <Name>LazyFramework.Reflection</Name>
     </ProjectReference>
     <ProjectReference Include="..\SqlServer\LazyFramework.MSSqlServer.vbproj">
       <Project>{50ab965d-b3d0-4da4-bfd4-49ea2907fc0d}</Project>

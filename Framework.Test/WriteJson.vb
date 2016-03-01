@@ -293,4 +293,3 @@ Public Class ExcavationTripDate
     Public StartDate As Date
     Public EndDate As Date
 End Class
-

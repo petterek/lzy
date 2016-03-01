@@ -2,7 +2,7 @@
 Imports System.Reflection
 Imports System.Security.Principal
 Imports System.Threading
-Imports LazyFramework.Utils
+
 
 ''' <summary>
 ''' 
@@ -78,13 +78,13 @@ Public Class EventHub
     ''' </summary>
     ''' <param name="event"></param>
     ''' <remarks></remarks>
-    Public Shared Sub Publish([event] As IAmAnEvent, Optional runAsync As Boolean = False)
+    Public Shared Sub Publish(currentUser As IPrincipal, [event] As IAmAnEvent, Optional runAsync As Boolean = False)
         Dim key As System.Type = [event].GetType
         While key IsNot Nothing
             If AllHandlers.ContainsKey(key) Then
                 For Each MethodInfo In AllHandlers(key)
                     Try
-                        WrapAndFire(MethodInfo, [event], runAsync)
+                        WrapAndFire(currentUser, MethodInfo, [event], runAsync)
                     Catch ex As Exception
 
                     End Try
@@ -93,9 +93,6 @@ Public Class EventHub
             key = key.BaseType
         End While
         [event].ActionComplete()
-
-        Logging.Logger.Write([event])
-
     End Sub
 
     Private Shared Sub WriteToEventLog(ByVal message As String)
@@ -110,7 +107,7 @@ Public Class EventHub
 
     End Sub
 
-    Private Shared Sub WrapAndFire(ByVal methodInfo As MethodInfo, ByVal [event] As IAmAnEvent, ByVal runAsync As Boolean)
+    Private Shared Sub WrapAndFire(currentUser As IPrincipal, ByVal methodInfo As MethodInfo, ByVal [event] As IAmAnEvent, ByVal runAsync As Boolean)
         'Wrapper den alltid.
         'ikke nødvendig, men da blir det i hvertfall likt.. :) 
         Dim doAsync As Boolean = False
@@ -123,7 +120,7 @@ Public Class EventHub
             End If
         End If
 
-        Dim w = New ThreadWrapper(methodInfo, [event], Runtime.Context.Current.CurrentUser)
+        Dim w = New ThreadWrapper(methodInfo, [event], currentUser)
         If doAsync Then
             Dim waitCallback As WaitCallback = New WaitCallback(AddressOf w.Start)
             ThreadPool.QueueUserWorkItem(waitCallback)

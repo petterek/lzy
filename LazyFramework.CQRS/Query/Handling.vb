@@ -102,7 +102,7 @@ Namespace Query
                     End If
                     Dim invoke As Object = handler.Invoke(TypeInstanceCache(handler.DeclaringType), {q})
 
-                    EventHub.Publish(New QueryExecuted(q))
+                    EventHub.Publish(Runtime.Context.Current.CurrentUser,New QueryExecuted(q))
 
 
                     invoke = Transform.Handling.TransformResult(profile, q, invoke)

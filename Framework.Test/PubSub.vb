@@ -35,7 +35,7 @@ Public Class EventPublisher
 
     <PublishesEventOfType(GetType(PersonGotNewName))> Public Shared Sub PublishEvent()
 
-        EventHub.Publish(New PersonGotNewName With {.Name = "Petter"})
+        EventHub.Publish(Runtime.Context.Current.CurrentUser,New PersonGotNewName With {.Name = "Petter"})
 
     End Sub
 End Class
