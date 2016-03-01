@@ -2,9 +2,13 @@
     Public MustInherit Class ValidateActionBase(Of TAction As IAmAnAction)
         Implements IValidateAction
 
+        Public Overridable ReadOnly Property DetaildExecptionInfo As Boolean = False
+
         Friend Sub InternalValidate(action As IAmAnAction) Implements IValidateAction.InternalValidate
             '    ValidatAction(CType(action, TAction))
             Dim val As New ValidationException
+            Dim exList As New Dictionary(Of String, Exception)
+
 
             Dim [getType] As Type = Me.GetType
 
@@ -14,18 +18,22 @@
                         p.Invoke(Me, {action})
                     End If
                 Catch ex As Exception
-                    val.ExceptionList.Add(p.Name, ex.InnerException)
+                    exList.Add(p.Name, ex.InnerException)
                 End Try
-
             Next
 
-            If val.ExceptionList.Count > 0 Then
-                Throw val
+            If exList.Any Then
+                If Not DetaildExecptionInfo Then
+                    val.ExceptionList = exList
+                    Throw val
+                Else
+                    Dim ex As New DetailedValidationException(exList)
+                    Throw ex
+                End If
+
             End If
 
         End Sub
 
-        '        Public MustOverride Sub ValidatAction(action As TAction)
-
     End Class
-End NameSpace
+End Namespace

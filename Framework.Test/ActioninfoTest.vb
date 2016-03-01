@@ -17,14 +17,14 @@ Imports System.Security.Principal
 
     <Test> Public Sub ActionsIsFoundForEntity()
 
-        Assert.AreEqual(2, CQRS.ActionInfo.GetAvailableActionsForEntity(Nothing, New ActionEntity).Count)
+        Assert.AreEqual(2, CQRS.ActionInfo.GetAvailableActionsForEntity(Nothing, New ActionEntity,New MenuAction).Count)
         'Ikke en god test, men det får holde for nå..
-        Assert.IsInstanceOf(Of AcionForActionEntity)(ActionInfo.GetAvailableActionsForEntity(Nothing, New ActionEntity)(1))
+        Assert.IsInstanceOf(Of AcionForActionEntity)(ActionInfo.GetAvailableActionsForEntity(Nothing, New ActionEntity,New MenuAction)(1))
 
     End Sub
 
     <Test> Public Sub WiredActionIsFoundForEntity()
-        Assert.IsInstanceOf(Of MenuAction)(ActionInfo.GetAvailableActionsForEntity(Nothing, New ActionEntity)(0))
+        Assert.IsInstanceOf(Of MenuAction)(ActionInfo.GetAvailableActionsForEntity(Nothing, New ActionEntity,New MenuAction)(0))
     End Sub
 
 End Class

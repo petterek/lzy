@@ -151,6 +151,7 @@
     <Compile Include="CQRS\Dto\ISupportActionList.vb" />
     <Compile Include="CQRS\Transform\Handling.vb" />
     <Compile Include="CQRS\Transform\TransformerFactoryForActionAllreadyExists.vb" />
+    <Compile Include="CQRS\Validation\DetailedValidationException.vb" />
     <Compile Include="CQRS\Validation\Handling.vb" />
     <Compile Include="CQRS\Transform\ITransformEntityToDto.vb" />
     <Compile Include="CQRS\Transform\ITransformerFactory.vb" />
