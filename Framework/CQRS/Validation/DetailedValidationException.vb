@@ -1,5 +1,5 @@
 ﻿Namespace CQRS.Validation
-    Friend Class DetailedValidationException
+    Public Class DetailedValidationException
         Inherits System.Exception
 
         Private ReadOnly _exList As Dictionary(Of String,Exception)

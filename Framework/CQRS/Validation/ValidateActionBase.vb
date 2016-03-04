@@ -2,7 +2,7 @@
     Public MustInherit Class ValidateActionBase(Of TAction As IAmAnAction)
         Implements IValidateAction
 
-        Public Overridable ReadOnly Property DetaildExecptionInfo As Boolean = False
+        Public Overridable ReadOnly Property DetailedExceptionInfo As Boolean = False
 
         Friend Sub InternalValidate(action As IAmAnAction) Implements IValidateAction.InternalValidate
             '    ValidatAction(CType(action, TAction))
@@ -23,7 +23,7 @@
             Next
 
             If exList.Any Then
-                If Not DetaildExecptionInfo Then
+                If Not DetailedExceptionInfo Then
                     val.ExceptionList = exList
                     Throw val
                 Else

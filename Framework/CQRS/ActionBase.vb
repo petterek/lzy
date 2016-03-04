@@ -38,7 +38,7 @@ Namespace CQRS
 
         <System.ComponentModel.EditorBrowsable(ComponentModel.EditorBrowsableState.Never)>
         Public Overridable Function ActionName() As String Implements IAmAnAction.ActionName
-            Return Me.GetType.FullName.Replace("."c, "")
+            Return Me.GetType.FullName
         End Function
 
         <System.ComponentModel.EditorBrowsable(ComponentModel.EditorBrowsableState.Never)>
