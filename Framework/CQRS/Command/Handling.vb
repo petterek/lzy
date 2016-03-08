@@ -67,49 +67,57 @@ Namespace CQRS.Command
         ''' <remarks>Any command can have only 1 handler. An exception will be thrown if there is found more than one for any given command. </remarks>
         <PublishesEventOfType(GetType(NoAccess), GetType(HandlerNotFound), GetType(CommandHasBeenExecutedEvent))>
         Public Shared Sub ExecuteCommand(command As IAmACommand)
+            Dim cmdType = command.GetType
 
-            If AllHandlers.ContainsKey(command.GetType) Then
-                'If TypeOf (command) Is ActionBase Then
-                '    DirectCast(command, ActionBase).OnActionBegin()
-                'End If
-
-                If TypeOf (command) Is CommandBase Then
-                    If Not IsCommandAvailable(CType(command, CommandBase)) Then
-                        EventHub.Publish(New NoAccess(command))
-                        Throw New ActionIsNotAvailableException(command, command.User)
-                    End If
+            While cmdType IsNot Nothing
+                If AllHandlers.ContainsKey(cmdType) Then
+                    Exit While
                 End If
+                cmdType = cmdType.BaseType
+            End While
 
-                If Not CanUserRunCommand(CType(command, CommandBase)) Then
-                    EventHub.Publish(New NoAccess(command))
-                    Throw New ActionSecurityAuthorizationFaildException(command, command.User)
-                End If
-
-                Validation.Handling.ValidateAction(command)
-
-                Try
-                    Dim temp = AllHandlers(command.GetType)(0).Invoke(Nothing, {command})
-                    If temp IsNot Nothing Then
-                        command.SetResult(Transform.Handling.TransformResult(command, temp))
-                    End If
-
-                    'If TypeOf (command) Is ActionBase Then
-                    '    DirectCast(command, ActionBase).OnActionComplete()
-                    'End If
-
-                Catch ex As TargetInvocationException
-                    EventHub.Publish(New CommandFailureEvent(command))
-                    Logging.Log.Error(command, ex)
-                    Throw ex.InnerException
-                Catch ex As Exception
-                    Logging.Log.Error(command, ex)
-                    Throw
-                End Try
-            Else
+            If cmdType Is Nothing Then
                 Dim notImplementedException = New NotImplementedException(command.ActionName)
                 Logging.Log.Error(command, notImplementedException)
                 Throw notImplementedException
             End If
+
+            'If TypeOf (command) Is ActionBase Then
+            '    DirectCast(command, ActionBase).OnActionBegin()
+            'End If
+
+            If TypeOf (command) Is CommandBase Then
+                If Not IsCommandAvailable(CType(command, CommandBase)) Then
+                    EventHub.Publish(New NoAccess(command))
+                    Throw New ActionIsNotAvailableException(command, command.User)
+                End If
+            End If
+
+            If Not CanUserRunCommand(CType(command, CommandBase)) Then
+                EventHub.Publish(New NoAccess(command))
+                Throw New ActionSecurityAuthorizationFaildException(command, command.User)
+            End If
+
+            Validation.Handling.ValidateAction(command)
+
+            Try
+                Dim temp = AllHandlers(cmdType)(0).Invoke(Nothing, {command})
+                If temp IsNot Nothing Then
+                    command.SetResult(Transform.Handling.TransformResult(command, temp))
+                End If
+
+                'If TypeOf (command) Is ActionBase Then
+                '    DirectCast(command, ActionBase).OnActionComplete()
+                'End If
+
+            Catch ex As TargetInvocationException
+                EventHub.Publish(New CommandFailureEvent(command))
+                Logging.Log.Error(command, ex)
+                Throw ex.InnerException
+            Catch ex As Exception
+                Logging.Log.Error(command, ex)
+                Throw
+            End Try
             
             command.ActionComplete()
             Logging.Log.Command(command)

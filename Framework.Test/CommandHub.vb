@@ -50,7 +50,7 @@ Imports System.Security.Principal
     <Test> Public Sub CommandIsMappedToName()
         Dim toTest As New CommandForA
 
-        Assert.AreEqual(toTest.ActionName, Handling.CommandList(toTest.ActionName).FullName.Replace("."c, ""))
+        Assert.AreEqual(toTest.ActionName, Handling.CommandList(toTest.ActionName).FullName)
 
     End Sub
 
@@ -65,6 +65,15 @@ Imports System.Security.Principal
 
     End Sub
 
+    
+    <Test> Public Sub GenericParameterizedCommandFound()
+
+        Dim cmd = New InheritedEntityCommand()
+        cmd.Message = "Hi"
+        Handling.ExecuteCommand(cmd)
+        Assert.AreEqual("Hi", cmd.Result)
+
+    End Sub
     
 
 End Class
@@ -94,8 +103,35 @@ Public Class AnotherCommandForA
 End Class
 
 
+Public Class BaseEntity
+    Public Id As integer
+End Class
+
+Public Class InheritedEntity
+    Inherits BaseEntity
+
+End Class
 
 
+Public MustInherit Class BaseEntityCommand
+    Inherits CommandBase(Of BaseEntity)
+
+    Public Message As string
+
+End Class
+Public Class InheritedEntityCommand
+    Inherits BaseEntityCommand
+
+
+
+End Class
+
+Public Class BaseEntityHandler
+    Implements IHandleCommand
+    Public Shared function BaseEntityHandler(cmd As BaseEntityCommand) As string
+        Return cmd.Message 
+    End function
+End Class
 
 Public Class CalculateKm
     Inherits CommandBase
