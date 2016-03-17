@@ -75,7 +75,14 @@ Namespace CQRS
                 Next
             Else
                 If ActionConstraintsForAction.ContainsKey(fromAction.GetType) Then
-                    For Each a In ActionConstraintsForAction(fromAction.GetType).Actions
+                    Dim col = ActionConstraintsForAction(fromAction.GetType)
+                    Dim list As IEnumerable(Of IActionBase)
+                    If col.ContainsKey(entity.GetType) Then
+                        list = col(entity.GetType).Actions
+                    Else
+                        list = col(GetType(Object)).Actions
+                    End If
+                    For Each a In list
                         If CheckAvailability(entity, a, user) Then
                             ret.Add(a)
                         End If
@@ -100,24 +107,28 @@ Namespace CQRS
             Return ret
         End Function
 
-        Private Shared _ActionConstraintsForAction As Dictionary(Of Type, IActionListForAction)
+        Private Shared _ActionConstraintsForAction As Dictionary(Of Type, Dictionary(Of Type, IActionListForAction))
         Private Shared PadLock As New Object
-        Private Shared ReadOnly Property ActionConstraintsForAction As Dictionary(Of Type, IActionListForAction)
+        Private Shared ReadOnly Property ActionConstraintsForAction As Dictionary(Of Type, Dictionary(Of Type, IActionListForAction))
             Get
                 If _ActionConstraintsForAction Is Nothing Then
                     SyncLock PadLock
                         If _ActionConstraintsForAction Is Nothing Then
-                            Dim temp As New Dictionary(Of Type, IActionListForAction)
+                            Dim temp As New Dictionary(Of Type, Dictionary(Of Type, IActionListForAction))
 
                             For Each el In TypeValidation.FindAllClassesOfTypeInApplication(GetType(IActionListForAction))
                                 If el.IsAbstract Then Continue For
 
-                                Dim getGenericArguments As Type = el.BaseType.GetGenericArguments(0)
-                                If Not temp.ContainsKey(getGenericArguments) Then
-                                    temp.Add(getGenericArguments, CType(Activator.CreateInstance(el), IActionListForAction))
+                                Dim getGenericArguments  = el.BaseType.GetGenericArguments
+                                If Not temp.ContainsKey(getGenericArguments(0)) Then
+                                    temp.Add(getGenericArguments(0), New Dictionary(Of Type, IActionListForAction))
+                                End If
+                                Dim entType As Type = If(getGenericArguments.Length = 2 ,getGenericArguments(1),gettype(Object))
+
+                                If Not temp(getGenericArguments(0)).ContainsKey(entType) Then
+                                    temp(getGenericArguments(0)).Add(entType, CType(Activator.CreateInstance(el), IActionListForAction) )
                                 End If
                             Next
-
                             _ActionConstraintsForAction = temp
                         End If
                     End SyncLock
@@ -146,8 +157,14 @@ Namespace CQRS
         Function Actions() As IEnumerable(Of IActionBase)
     End Interface
     Public MustInherit Class ActionListForAction(Of T As IActionBase)
-        implements IActionListForAction
+        Implements IActionListForAction
 
         Public MustOverride Function Actions() As IEnumerable(Of IActionBase) Implements IActionListForAction.Actions
     End Class
+    Public MustInherit Class ActionListForAction(Of T As IActionBase,TEntityType)
+        Implements IActionListForAction
+
+        Public MustOverride Function Actions() As IEnumerable(Of IActionBase) Implements IActionListForAction.Actions
+    End Class
+
 End Namespace
