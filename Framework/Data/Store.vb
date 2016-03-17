@@ -29,12 +29,16 @@ Namespace Data
             ExecReader(Of Object)(connectionInfo, command, New FillStatus(Of Object)(Nothing), CommandBehavior.SingleResult, Nothing, Nothing)
         End Sub
 
-
-        Public Shared Sub GetStream(of T As {New,WillDisposeThoseForU})(connectionInfo As ServerConnectionInfo, command As CommandInfo, data As T)
-            ExecReaderWithStream(Of T)(connectionInfo,command,New FillStatus(Of T)(data),CommandBehavior.SingleResult Or CommandBehavior.SingleRow, AddressOf ReadOne(Of T), data.GetType)
+        Public Shared Sub Exec(Of T As Structure)(connectionInfo As ServerConnectionInfo, command As CommandInfo, data As ICollection(Of T), colName As String)
+            ExecReader(Of T)(connectionInfo, command, data, CommandBehavior.SingleResult, AddressOf New ListFiller(colName).FillListForValueType)
         End Sub
 
-        
+
+        Public Shared Sub GetStream(Of T As {New, WillDisposeThoseForU})(connectionInfo As ServerConnectionInfo, command As CommandInfo, data As T)
+            ExecReaderWithStream(Of T)(connectionInfo, command, New FillStatus(Of T)(data), CommandBehavior.SingleResult Or CommandBehavior.SingleRow, AddressOf ReadOne(Of T), data.GetType)
+        End Sub
+
+
 
 #Region "Privates"
 
@@ -70,6 +74,31 @@ Namespace Data
 
         End Sub
 
+        Private Shared Sub ExecReader(Of T As Structure)(ByVal connectionInfo As ServerConnectionInfo, ByVal command As CommandInfo, data As ICollection(Of T), readerOptions As CommandBehavior, handler As HandleReaderForValueType(Of T))
+            Dim pluginCollection As List(Of DataModificationPluginBase)
+            Dim provider = connectionInfo.GetProvider
+
+            Using cmd = provider.CreateCommand(command)
+                FirePlugin(pluginCollection, PluginExecutionPointEnum.Pre, connectionInfo, command, data)
+                Using conn = provider.CreateConnection(connectionInfo)
+
+                    cmd.Connection = conn
+                    conn.Open()
+                    Dim filler As FillObject = Nothing
+                    Dim reader As IDataReader = Nothing
+
+                    Using New InlineTimer(connectionInfo.Database & "-" & cmd.CommandText, ResponseThread.Current.Timer.Timings)
+                        reader = cmd.ExecuteReader(readerOptions Or CommandBehavior.CloseConnection Or CommandBehavior.SequentialAccess)
+
+                        handler(reader, data)
+
+                    End Using
+                End Using
+
+                FirePlugin(pluginCollection, PluginExecutionPointEnum.Post, connectionInfo, command, data)
+
+            End Using
+        End Sub
 
 
         Private Shared Sub ExecReader(Of T As New)(ByVal connectionInfo As ServerConnectionInfo, ByVal command As CommandInfo, data As FillStatus(Of T), readerOptions As CommandBehavior, handler As HandleReader(Of T), dataObjectType As Type)
@@ -82,7 +111,7 @@ Namespace Data
                 FirePlugin(pluginCollection, PluginExecutionPointEnum.Pre, connectionInfo, command, data.Value)
 
                 Using conn = provider.CreateConnection(connectionInfo)
-                    
+
                     cmd.Connection = conn
                     conn.Open()
                     Dim filler As FillObject = Nothing
@@ -164,6 +193,8 @@ Namespace Data
             Next
         End Sub
 
+
+
         Private Shared Sub ReadOne(Of T As New)(filler As FillObject, reader As IDataReader, data As FillStatus(Of T))
             If reader.Read Then
                 FillData(reader, filler, data.Value)
@@ -190,7 +221,7 @@ Namespace Data
             If Not Fillers.ContainsKey(key) Then
                 SyncLock PadLock
                     If Not Fillers.ContainsKey(key) Then
-                        Fillers(key) = New DataFiller(dataReader, t,commandInfo.CommandText.Contains("*"c))
+                        Fillers(key) = New DataFiller(dataReader, t, commandInfo.CommandText.Contains("*"c))
                     End If
                 End SyncLock
             End If
@@ -204,6 +235,7 @@ Namespace Data
 
         Friend Delegate Sub FillObject(reader As IDataReader, data As Object)
         Private Delegate Sub HandleReader(Of T As New)(filler As FillObject, reader As IDataReader, data As FillStatus(Of T))
+        Private Delegate Sub HandleReaderForValueType(Of T As Structure)(reader As IDataReader, data As ICollection(Of T))
 #End Region
 
     End Class
