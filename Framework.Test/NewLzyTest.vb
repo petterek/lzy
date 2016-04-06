@@ -4,7 +4,7 @@ Imports NUnit.Framework
 
 <TestFixture> Public Class NewLzyTest
 
-    Public Shared Connection As New MSSqlServer.ServerConnectionInfo With {.Address = "13-testsql", .Database = "hr", .UserName = "sa", .Password = "supermann"}
+    Public Shared Connection As New MSSqlServer.ServerConnectionInfo With {.Address = "10.151.46.52", .Database = "hr", .UserName = "loginFor_HR", .Password = "AsDfGhJkL12345"}
 
     Private _MemoryLogger As MemoryWriter
 
@@ -36,7 +36,7 @@ Imports NUnit.Framework
 
         Dim ret As New DataObject
         Store.Exec(Connection, cmd, ret)
-        Assert.AreEqual("Sigurd Brekkesen", ret.Name)
+        Assert.AreEqual(27, ret.id)
 
         Debug.Print(LazyFramework.Utils.ResponseThread.Current.Timer.Timings.Count.ToString)
         For Each t In LazyFramework.Utils.ResponseThread.Current.Timer.Timings
@@ -262,7 +262,7 @@ Imports NUnit.Framework
         Dim cmd2 As New Data.CommandInfo
         cmd2.CommandText = "select * from HrFile where id = @Id"
         cmd2.TypeOfCommand = CommandTypeEnum.Read
-        cmd2.Parameters.Add("Id", DbType.Int32, False, 2375)
+        cmd2.Parameters.Add("Id", DbType.Int32, False, 19)
 
         Using data As New StreamTo
             Dim mem As New System.IO.MemoryStream

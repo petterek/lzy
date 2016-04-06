@@ -3,8 +3,7 @@ Imports System.Runtime.CompilerServices
 Imports LazyFramework.Utils
 
 ''' <summary>
-''' This is an IoC factory. Possible extensions to be made is to configure things from a config file. 
-''' 
+''' This is an IoC class factory. 
 ''' </summary>
 ''' <remarks></remarks>
 Public Class ClassFactory

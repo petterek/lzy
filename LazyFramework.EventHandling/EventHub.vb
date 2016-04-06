@@ -37,8 +37,7 @@ Public Class EventHub
             Return _handlers
         End Get
     End Property
-
-
+    
 
     Public Shared Function Publishers(Of T)() As IEnumerable(Of MethodInfo)
 

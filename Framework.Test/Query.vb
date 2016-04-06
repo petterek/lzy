@@ -6,6 +6,7 @@ Imports System.Security.Principal
 Imports LazyFramework.CQRS.ExecutionProfile
 Imports LazyFramework.CQRS.Security
 Imports LazyFramework.Test.Cqrs
+Imports LazyFramework.EventHandling
 
 Public Class DebugLogger
     Implements LazyFramework.CQRS.Monitor.IMonitorWriter
@@ -48,7 +49,7 @@ End Class
 
         Dim res As Object
 
-        res = LazyFramework.CQRS.Query.Handling.ExecuteQuery(New TestExecutionProfileProvider().GetExecutionProfile,q)
+        res = LazyFramework.CQRS.Query.Handling.ExecuteQuery(New TestExecutionProfileProvider().GetExecutionProfile, q)
 
         Assert.IsInstanceOf(Of QueryResultDto)(res)
 
@@ -58,18 +59,18 @@ End Class
     <Test> Public Sub ListIsConvertedCorrectlyAndSorted()
 
         Dim q As New TestQuery2 With {.Id = 1, .Startdate = Now}
-        Dim res = LazyFramework.CQRS.Query.Handling.ExecuteQuery(New TestExecutionProfileProvider().GetExecutionProfile,q)
+        Dim res = LazyFramework.CQRS.Query.Handling.ExecuteQuery(New TestExecutionProfileProvider().GetExecutionProfile, q)
 
         Assert.IsInstanceOf(Of QueryResultDto)(CType(res, IEnumerable)(0))
 
-        Assert.AreEqual(4,ctype(CType(res, IEnumerable)(0),QueryResultDto).Id)
+        Assert.AreEqual(4, ctype(CType(res, IEnumerable)(0), QueryResultDto).Id)
     End Sub
 
 
 
     <Test> Public Sub ContextSetupIsFound
         Dim q As New TestQuery With {.Id = 1}
-        Dim res As QueryResultDto = CType(LazyFramework.CQRS.Query.Handling.ExecuteQuery(New TestExecutionProfileProvider().GetExecutionProfile,q), QueryResultDto)
+        Dim res As QueryResultDto = CType(LazyFramework.CQRS.Query.Handling.ExecuteQuery(New TestExecutionProfileProvider().GetExecutionProfile, q), QueryResultDto)
 
         Assert.AreEqual(1, res.Id)
         StringAssert.StartsWith("jhjhhjk", res.NameAndDate)
@@ -88,11 +89,16 @@ End Class
 
 Public Class TestExecutionProfile
     Implements IExecutionProfile
-
     Private v As Integer
+
+    Private eventLIst As New List(Of IAmAnEvent)
 
     Public Sub New(v As Integer)
         Me.v = v
+    End Sub
+
+    Public Sub Publish(currentUser As IPrincipal, [event] As IAmAnEvent) Implements IExecutionProfile.Publish
+        eventLIst.Add([event])
     End Sub
 
     Public Function Application() As IApplicationInfo Implements IExecutionProfile.Application
@@ -184,7 +190,7 @@ Public Class QueryHandler
         Return New QueryResult With {.Id = 1, .Name = _someExternalInjection.A, .SomeDate = New Date(1986, 7, 24)}
     End Function
 
-    Public  Function Dummy2QueryHandler(q As TestQuery2) As List(Of QueryResult)
+    Public Function Dummy2QueryHandler(q As TestQuery2) As List(Of QueryResult)
 
         Return New List(Of QueryResult) From {
             New QueryResult With {.Id = 1, .Name = "Espen", .SomeDate = New Date(1986, 7, 24)},
@@ -197,7 +203,7 @@ Public Class SortResult
     Inherits LazyFramework.CQRS.Sorting.SortResultBase(Of TestQuery2, QueryResultDto)
 
     Public Overrides Function Compare(x As QueryResultDto, y As QueryResultDto) As Integer
-        Return y.Id - x.Id 
+        Return y.Id - x.Id
     End Function
 End Class
 

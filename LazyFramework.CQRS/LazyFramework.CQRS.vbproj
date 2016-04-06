@@ -69,7 +69,9 @@
     <Compile Include="Availability\CommandAvailability.vb" />
     <Compile Include="Availability\Handler.vb" />
     <Compile Include="Availability\ICommandAvilability.vb" />
+    <Compile Include="Dto\ActionDescriptor.vb" />
     <Compile Include="EntityResolver\Handling.vb" />
+    <Compile Include="ExecutionProfile\IEventPublisher.vb" />
     <Compile Include="Query\QueryMonitorData.vb" />
     <Compile Include="Security\ActionSecurity.vb" />
     <Compile Include="Security\ActionSecurityAuthorizationFaildException.vb" />
