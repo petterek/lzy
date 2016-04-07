@@ -13,5 +13,10 @@
 
         Public MustOverride Function GetTransformer(action As TAction, ent As TEntity) As ITransformEntityToDto
         
+        Public Overridable Function SortingFunc(action As IAmAnAction) As Comparison(Of Object) Implements ISortingFunction.SortingFunc
+            Return Nothing
+        End Function
+
+        Public Property RunAsParallel As Boolean = true Implements ITransformerFactory.RunAsParallel
     End Class
 End Namespace

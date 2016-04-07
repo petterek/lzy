@@ -1,4 +1,5 @@
-﻿    Imports LazyFramework.CQRS.ExecutionProfile
+﻿    Imports System.Security.Principal
+    Imports LazyFramework.CQRS.ExecutionProfile
 
 ''' <summary>
     ''' Values of the interface is declared as functions to avoid serializing.. 
@@ -7,7 +8,7 @@
     Public Interface IAmAnAction
         Inherits IActionBase
 
-        
+        Function User() As IPrincipal
         Function Guid() As Guid
         Function TimeStamp() As Long
         Function EndTimeStamp() As Long

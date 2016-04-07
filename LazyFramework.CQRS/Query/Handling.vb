@@ -73,6 +73,10 @@ Namespace Query
 
         Public Shared Function ExecuteQuery(profile As ExecutionProfile.IExecutionProfile, q As IAmAQuery) As Object
 
+            If Not IsQueryAvailable(CType(q, QueryBase)) Then
+                 profile.Publish(profile.User, New NoAccess(q))
+                 Throw New ActionIsNotAvailableException(q, q.User)
+             End If
 
             If Not ActionSecurity.Current.UserCanRunThisAction(profile, q) Then
                 Dim actionSecurityAuthorizationFaildException As ActionSecurityAuthorizationFaildException = New ActionSecurityAuthorizationFaildException(q, profile.User)
@@ -144,6 +148,9 @@ Namespace Query
 
         End Function
 
+          Public Shared Function IsQueryAvailable(query As QueryBase) As Boolean
+            Return query.IsAvailable()
+        End Function
 
 
         Private Shared _multihandlers As Dictionary(Of Type, FindHandlers.MethodList)

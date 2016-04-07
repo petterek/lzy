@@ -240,7 +240,19 @@ Imports NUnit.Framework
 
 
     End Sub
+    
 
+     <test> public Sub AddDataToHashSet
+        Dim cmd2 As New CommandInfo
+        cmd2.CommandText = "select id from Hrunit"
+        cmd2.TypeOfCommand = CommandTypeEnum.Read
+        
+        Dim data As New HashSet(Of Integer)
+        Store.Exec(Connection, cmd2,data,"Id")
+        
+        Assert.Greater(data.Count,0)
+
+    End Sub
 
     <Test> Public Sub ProprtiesOfBaseClassIsFilledIfNotFOundOnInstanceClass()
 

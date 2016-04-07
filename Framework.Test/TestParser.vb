@@ -102,7 +102,7 @@ Imports NUnit.Framework
 
     <Test> Public Sub LongValueIsParsed()
 
-        Dim v As ClassWithLong
+        Dim v As ClassWithLong = Nothing
         Assert.DoesNotThrow(Sub() v = Reader.StringToObject(Of ClassWithLong)("{""Value"":1446212820320}"))
         Assert.AreEqual(1446212820320, v.Value)
 
@@ -111,21 +111,21 @@ Imports NUnit.Framework
 
     <Test> Public Sub LongValueIsParsedToProperty()
 
-        Dim v As ClassWithLongBooleanStringProperty
+        Dim v As ClassWithLongBooleanStringProperty = Nothing
         Assert.DoesNotThrow(Sub() v = Reader.StringToObject(Of ClassWithLongBooleanStringProperty)("{""Value"":1446212820320}"))
         Assert.AreEqual(1446212820320, v.Value)
 
     End Sub
 
     <Test> Public Sub ValueInStrinIsIgnoredWhenFieldDoesNotExist()
-        Dim v As ClassWithLongBooleanStringProperty
+        Dim v As ClassWithLongBooleanStringProperty = Nothing
         Assert.DoesNotThrow(Sub() v = Reader.StringToObject(Of ClassWithLongBooleanStringProperty)("{""Value"":1446212820320,""ValueTwo"":124}"))
         Assert.AreEqual(1446212820320, v.Value)
 
     End Sub
 
     <Test> Public Sub BooleanValueIsParsed()
-        Dim v As ClassWithLongBooleanStringProperty
+        Dim v As ClassWithLongBooleanStringProperty = Nothing
         Assert.DoesNotThrow(Sub() v = Reader.StringToObject(Of ClassWithLongBooleanStringProperty)("{""Value"":1446212820320,""ValueTrue"":True,""ValueFalse"":False}"))
         Assert.True( v.ValueTrue)
         Assert.False(v.ValueFalse)

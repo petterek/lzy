@@ -1,11 +1,11 @@
-﻿
-Imports System.Security.Principal
-Imports LazyFramework.CQRS
+﻿Imports System.Security.Principal
 Imports LazyFramework.CQRS.ExecutionProfile
 
 Public MustInherit Class ActionBase
     Implements IAmAnAction
 
+
+    Private _User As IPrincipal
     Private ReadOnly _GUID As Guid
     Private ReadOnly _TimeStamp As Long
     Private _EndTimeStamp As Long
@@ -19,6 +19,11 @@ Public MustInherit Class ActionBase
     <System.ComponentModel.EditorBrowsable(ComponentModel.EditorBrowsableState.Never)>
     Friend Sub ActionComplete() Implements IAmAnAction.ActionComplete
         _EndTimeStamp = Now.Ticks
+    End Sub
+
+    <System.ComponentModel.EditorBrowsable(ComponentModel.EditorBrowsableState.Never)>
+    Public Sub SetUser(u As IPrincipal)
+        _User = u
     End Sub
 
     <System.ComponentModel.EditorBrowsable(ComponentModel.EditorBrowsableState.Never)>
@@ -41,6 +46,17 @@ Public MustInherit Class ActionBase
         Return _TimeStamp
     End Function
 
+    <System.ComponentModel.EditorBrowsable(ComponentModel.EditorBrowsableState.Never)>
+    Public Function User() As IPrincipal Implements IAmAnAction.User
+        If _User Is Nothing Then
+            Return Runtime.Context.Current.CurrentUser
+        End If
+        Return _User
+    End Function
+    <System.ComponentModel.EditorBrowsable(ComponentModel.EditorBrowsableState.Never)> Public MustOverride Function IsAvailable(user As IPrincipal, o As Object) As Boolean Implements IAmAnAction.IsAvailable
+    <System.ComponentModel.EditorBrowsable(ComponentModel.EditorBrowsableState.Never)> Public MustOverride Function IsAvailable(user As IPrincipal) As Boolean Implements IActionBase.IsAvailable
+    <System.ComponentModel.EditorBrowsable(ComponentModel.EditorBrowsableState.Never)> Public MustOverride Function IsAvailable() As Boolean Implements IActionBase.IsAvailable
+
     Public Function Contexts() As IEnumerable(Of ActionContext.ActionContext)
         Return ActionContext.Handling.GetContextsForAction(Me)
     End Function
@@ -54,7 +70,7 @@ Public MustInherit Class ActionBase
     Public Function HandlerStartTimeStamp() As Long Implements IAmAnAction.HandlerStartTimeStamp
         Return _hsts
     End Function
-    
+
     '<System.ComponentModel.EditorBrowsable(ComponentModel.EditorBrowsableState.Never)> Public Function ExecutionProfile() As IExecutionProfile Implements IAmAnAction.ExecutionProfile
     '    Return _profile
     'End Function

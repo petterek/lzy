@@ -1,11 +1,15 @@
-﻿Imports LazyFramework.CQRS.Command
+﻿Imports System.Security.Principal
+Imports LazyFramework.CQRS.Command
 Imports LazyFramework.EventHandling
 Imports LazyFramework.Logging
 
 
 Public Class CustomerCommandBase
     Inherits CommandBase(Of Customer)
+
     Public Id As Guid
+
+   
 End Class
 
 Public Class CreateCustomerCommand
@@ -90,7 +94,7 @@ Public Class CommandHandler
 
         CommandHandler.CustomerRepository.Add(customer.Id, customer)
 
-        EventHandling.EventHub.Publish(Runtime.Context.Current.CurrentUser,New CustomerCreatedEvent(customer))
+        EventHandling.EventHub.Publish(Runtime.Context.Current.CurrentUser, New CustomerCreatedEvent(customer))
 
     End Sub
 
@@ -115,7 +119,7 @@ End Class
 
 Public Class Persistdata
     Implements ILogWriter
-    
+
     Public Sub Write(info As LogInfo) Implements ILogWriter.Write
         Throw New NotImplementedException()
     End Sub

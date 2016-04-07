@@ -86,12 +86,7 @@ Public Class ClassFactory
         Return CType(ti.CreateInstance, T)
     End Function
 
-    ''' <summary>
-    ''' 
-    ''' </summary>
-    ''' <typeparam name="T"></typeparam>
-    ''' <returns></returns>
-
+    
     Private Shared Function GetTypeInstance(type As Type) As Object
         Dim ti As ITypeInfo = Nothing
 

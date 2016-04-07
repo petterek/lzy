@@ -6,10 +6,17 @@ Namespace Command
         Inherits ActionBase
         Implements IAmACommand
 
+         Protected IsResolved As Boolean
+
         <System.ComponentModel.EditorBrowsable(ComponentModel.EditorBrowsableState.Never)>
         Public Sub SetInnerEntity(o As Object)
             InnerEntity = o
         End Sub
+
+          <System.ComponentModel.EditorBrowsable(ComponentModel.EditorBrowsableState.Never)>
+        Public Overridable Function ResolveEntity() As Object
+            Return Nothing
+        End Function
 
         <System.ComponentModel.EditorBrowsable(ComponentModel.EditorBrowsableState.Never)>
         Function Result() As Object Implements IAmACommand.Result
@@ -32,6 +39,37 @@ Namespace Command
 
         Public Function GetEntityList() As List(Of Object)
             Return InnerEntityList
+        End Function
+
+           ''' <summary>
+        ''' Override this method to fill the InnerEntityList
+        ''' </summary>
+        ''' <remarks></remarks>
+        Public Overridable Sub FillEntityList()
+
+        End Sub
+
+                <System.ComponentModel.EditorBrowsable(ComponentModel.EditorBrowsableState.Never)>
+        Public Overrides Function IsAvailable() As Boolean
+            If InnerEntity Is Nothing Then
+                InnerEntity = ResolveEntity()
+                FillEntityList()
+                IsResolved = True
+            End If
+            Return IsAvailable(User, InnerEntity)
+        End Function
+
+        <System.ComponentModel.EditorBrowsable(ComponentModel.EditorBrowsableState.Never)>
+        Public Overrides Function IsAvailable(user As IPrincipal, o As Object) As Boolean
+            SetUser(user)
+            SetInnerEntity(o)
+            Return True
+        End Function
+
+        <System.ComponentModel.EditorBrowsable(ComponentModel.EditorBrowsableState.Never)>
+        Public Overrides Function IsAvailable(user As IPrincipal) As Boolean
+            SetUser(user)
+            Return True
         End Function
 
     End Class

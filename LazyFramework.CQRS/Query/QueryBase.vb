@@ -6,6 +6,17 @@ Namespace Query
         Inherits ActionBase
         Implements IAmAQuery
         
+         Public Overrides Function IsAvailable() As Boolean
+            Return IsAvailable(User)
+        End Function
+
+        Public Overrides Function IsAvailable(user As IPrincipal) As Boolean
+            Return True
+        End Function
+
+        Public Overrides Function IsAvailable(user As IPrincipal, o As Object) As Boolean
+            Return True
+        End Function
     End Class
 
 

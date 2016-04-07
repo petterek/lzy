@@ -83,12 +83,12 @@ Namespace Command
                 EntityResolver.Handling.ResolveEntity(profile, command)
 
                 If Not Availability.Handler.CommandIsAvailable(profile,command) Then
-                    profile.EventBus.Publish(Runtime.Context.Current.CurrentUser, New NoAccess(command))
+                    profile.Publish(Runtime.Context.Current.CurrentUser, New NoAccess(command))
                     Throw New ActionIsNotAvailableException(command, profile.User)
                 End If
 
                 If Not CanUserRunCommand(profile, CType(command, CommandBase)) Then
-                    profile.EventBus.Publish(Runtime.Context.Current.CurrentUser,New NoAccess(command))
+                    profile.Publish(Runtime.Context.Current.CurrentUser,New NoAccess(command))
                     Throw New ActionSecurityAuthorizationFaildException(command, profile.User)
                 End If
 

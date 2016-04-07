@@ -16,7 +16,7 @@ Namespace Utils.Json
         End Function
 
         Public Function SetInfo() As NameInfo
-
+            Return Nothing 'Not implemented
         End Function
 
 

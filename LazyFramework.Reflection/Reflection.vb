@@ -1,3 +1,4 @@
+Imports System.Diagnostics
 Imports System.IO
 Imports System.Linq.Expressions
 Imports System.Reflection
@@ -61,7 +62,7 @@ Public Class Reflection
     End Function
 
 
-    Private Shared _allTypes As List(Of Type)
+    Private Shared _allTypes As List(Of Type) = Nothing
     Private Shared _guidmap As New Dictionary(Of Guid, Type)
 
     Private Shared ReadOnly _PadLock As New Object

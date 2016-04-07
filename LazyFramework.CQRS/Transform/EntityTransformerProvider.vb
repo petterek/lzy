@@ -1,7 +1,7 @@
 ﻿
 
 Namespace Transform
-    Public Class EntityTransformerProvider
+       Public Class EntityTransformerProvider
         Private Shared ReadOnly PadLock As New Object
         Private Shared _allTransformers As Dictionary(Of Type, ITransformerFactory)
 
@@ -11,7 +11,7 @@ Namespace Transform
                     SyncLock PadLock
                         If _allTransformers Is Nothing Then
                             Dim temp As New Dictionary(Of Type, ITransformerFactory)
-                            For Each t In Reflection.FindAllClassesOfTypeInApplication(GetType(ITransformerFactory))
+                            For Each t In TypeValidation.FindAllClassesOfTypeInApplication(GetType(ITransformerFactory))
                                 If Not t.IsAbstract Then
                                     If t.BaseType.IsGenericType Then
                                         Dim key = t.BaseType.GetGenericArguments()(0)
@@ -54,7 +54,9 @@ Namespace Transform
             
             ReadOnly _Trans As New DoNothingWithTheEntityTransformer
 
-            Public Function GetTransformer(action As IAmAnAction, ent As Object) As ITransformEntityToDto Implements ITransformerFactory.GetTransformer
+            Public Property RunAsParallel As Boolean = true Implements ITransformerFactory.RunAsParallel
+
+            Public Function GetTransformer(someAction As IAmAnAction, ent As Object) As ITransformEntityToDto Implements ITransformerFactory.GetTransformer
                 Return _Trans
             End Function
 
@@ -67,7 +69,11 @@ Namespace Transform
 
                 Public Property Action As IAmAnAction Implements ITransformEntityToDto.Action
             End Class
-            
+
+
+            Public Function SortingFunc(action As IAmAnAction) As Comparison(Of Object) Implements ISortingFunction.SortingFunc
+                Return Nothing
+            End Function
         End Class
 
     End Class

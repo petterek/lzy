@@ -21,7 +21,18 @@ End Class
 Public Class ToValidate
     Inherits LazyFramework.CQRS.ActionBase
     Property Id As Integer
-    
+
+    Public Overrides Function IsAvailable() As Boolean
+        Throw New NotImplementedException()
+    End Function
+
+    Public Overrides Function IsAvailable(user As IPrincipal) As Boolean
+        Throw New NotImplementedException()
+    End Function
+
+    Public Overrides Function IsAvailable(user As IPrincipal, o As Object) As Boolean
+        Throw New NotImplementedException()
+    End Function
 End Class
 
 

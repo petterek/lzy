@@ -102,9 +102,9 @@ Namespace Cqrs
 
     Public Class ThisCommandIsNotAvailableIfIdIs0
         Inherits BaseCommand(Of Entity)
-
-
+        
         Public Property Id As Integer
+
 
     End Class
 
@@ -125,6 +125,7 @@ Namespace Cqrs
         Inherits BaseCommand(Of Entity)
 
         Public MyParam As Integer = 1
+
 
     End Class
 
@@ -148,6 +149,8 @@ Namespace Cqrs
             Return "Kalkuler km sats"
 
         End Function
+
+        
     End Class
 
     Public Class TestSecurity
@@ -210,6 +213,8 @@ Namespace Cqrs
             Return "Exception"
 
         End Function
+
+  
     End Class
 
     Public Class AnotherCommand
@@ -218,6 +223,8 @@ Namespace Cqrs
         Public Overrides Function ActionName() As String
             Return "jbjkbkjb"
         End Function
+
+  
     End Class
 
     Public Class ByrefCommand
@@ -230,6 +237,7 @@ Namespace Cqrs
             Return ""
 
         End Function
+        
     End Class
 
     Public Class TestCommand
@@ -241,7 +249,7 @@ Namespace Cqrs
 
         End Function
 
-
+        
     End Class
 
 

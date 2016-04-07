@@ -40,7 +40,19 @@ Public Class SomeOtherActionBase(Of T)
     Public Function ActionName() As String Implements IActionBase.ActionName
         Return "m.m"
     End Function
-    
+
+    Public Function IsAvailable() As Boolean Implements IActionBase.IsAvailable
+        Throw New NotImplementedException()
+    End Function
+
+    Public Function IsAvailable(user As IPrincipal) As Boolean Implements IActionBase.IsAvailable
+        Throw New NotImplementedException()
+    End Function
+
+    Public Function IsAvailable(user As IPrincipal, o As Object) As Boolean Implements IActionBase.IsAvailable
+        Throw New NotImplementedException()
+    End Function
+
     'Public Sub SetProfile(profile As IExecutionProfile) Implements IActionBase.SetProfile
     '    _profile = profile
     'End Sub
@@ -62,4 +74,5 @@ End Class
 
 Public Class AcionForActionEntity
     Inherits BaseCommand(Of ActionEntity)
+
 End Class

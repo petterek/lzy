@@ -71,7 +71,6 @@
     <Compile Include="Availability\ICommandAvilability.vb" />
     <Compile Include="Dto\ActionDescriptor.vb" />
     <Compile Include="EntityResolver\Handling.vb" />
-    <Compile Include="ExecutionProfile\IEventPublisher.vb" />
     <Compile Include="Query\QueryMonitorData.vb" />
     <Compile Include="Security\ActionSecurity.vb" />
     <Compile Include="Security\ActionSecurityAuthorizationFaildException.vb" />
@@ -130,8 +129,10 @@
     <Compile Include="Transform\TransformerBase.vb" />
     <Compile Include="Transform\TransformerFactoryBase.vb" />
     <Compile Include="Transform\TransformerFactoryForActionAllreadyExists.vb" />
+    <Compile Include="Validation\DetailedValidationException.vb" />
     <Compile Include="Validation\Handling.vb" />
     <Compile Include="Validation\IValidateAction.vb" />
+    <Compile Include="Validation\UnableToMapAsValidatorFunction.vb" />
     <Compile Include="Validation\ValidateActionBase.vb" />
     <Compile Include="Validation\ValidationException.vb" />
   </ItemGroup>

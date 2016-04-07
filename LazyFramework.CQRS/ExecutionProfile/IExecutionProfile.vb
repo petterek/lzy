@@ -1,4 +1,5 @@
 Imports System.Security.Principal
+Imports LazyFramework.EventHandling
 
 Namespace ExecutionProfile
 
@@ -6,7 +7,6 @@ Namespace ExecutionProfile
         Function User() As IPrincipal
         Function Application As IApplicationInfo
 
-        ReadOnly Property EventBus As IEventPublisher
-
+        Sub Publish(currentUser As IPrincipal, [event] As IAmAnEvent)
     End Interface
-End NameSpace
+End Namespace
