@@ -58,8 +58,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommandInfo.vb" />
-    <Compile Include="CommandInfoCommandTypeEnum.vb" />
-    <Compile Include="IConnectionInfoProvider.vb" />
+    <Compile Include="CommandTypeEnum.vb" />
     <Compile Include="DataFiller.vb" />
     <Compile Include="DataModificationPluginBase.vb" />
     <Compile Include="DataModificationPluginContext.vb" />
@@ -122,10 +121,6 @@
     <ProjectReference Include="..\Framework\LazyFramework.vbproj">
       <Project>{D72CA321-6426-4493-BCC5-961284F1C51A}</Project>
       <Name>LazyFramework</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\LazyFramework.Logging\LazyFramework.Logging.vbproj">
-      <Project>{80f1df77-210f-4e39-ae66-2fadcc420cdc}</Project>
-      <Name>LazyFramework.Logging</Name>
     </ProjectReference>
     <ProjectReference Include="..\LazyFramework.Reflection\LazyFramework.Reflection.vbproj">
       <Project>{ccc53780-1804-4826-b51b-a4950a606e5b}</Project>

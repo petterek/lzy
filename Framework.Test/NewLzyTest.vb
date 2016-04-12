@@ -1,21 +1,17 @@
 ﻿Imports LazyFramework.Data
-Imports LazyFramework.Logging
 Imports NUnit.Framework
 
 <TestFixture> Public Class NewLzyTest
 
     Public Shared Connection As New MSSqlServer.ServerConnectionInfo With {.Address = "10.151.46.52", .Database = "hr", .UserName = "loginFor_HR", .Password = "AsDfGhJkL12345"}
-
-    Private _MemoryLogger As MemoryWriter
+       
 
 
     <SetUp> Public Sub SetUp()
         Runtime.Context.Current = New Runtime.WinThread
         LazyFramework.ClassFactory.Clear()
 
-
-        _MemoryLogger = New LazyFramework.Logging.MemoryWriter
-        Log.AddWriter(Of Object)(_MemoryLogger)
+            
 
     End Sub
 

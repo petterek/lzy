@@ -42,32 +42,35 @@ Public Class CommandInfo
             Return _parameters
         End Get
     End Property
+    
+
+    'Private _commandDuration As Long
+    'Public Property CommandDuration() As Long
+    '    Get
+    '        Return _commandDuration
+    '    End Get
+    '    Set(ByVal value As Long)
+    '        _commandDuration = value
+    '    End Set
+    'End Property
+
+    'Private _count As Long = 1
+    'Public Property Count() As Long
+    '    Get
+    '        Return _count
+    '    End Get
+    '    Set(ByVal value As Long)
+    '        _count = value
+    '    End Set
+    'End Property
+
+'    Public Property CommandQuery() As Linq.Expressions.Expression
 
 
-
-    Private _commandDuration As Long
-    Public Property CommandDuration() As Long
-        Get
-            Return _commandDuration
-        End Get
-        Set(ByVal value As Long)
-            _commandDuration = value
-        End Set
-    End Property
-
-    Private _count As Long = 1
-    Public Property Count() As Long
-        Get
-            Return _count
-        End Get
-        Set(ByVal value As Long)
-            _count = value
-        End Set
-    End Property
-
-    Public Property CommandQuery() As Linq.Expressions.Expression
-
-
+    ''' <summary>
+    ''' Implemented as a helper to ease copying the command to the Querywindow.
+    ''' </summary>
+    ''' <returns></returns>
     Public Overrides Function ToString() As String
         Dim res As New System.Text.StringBuilder
 

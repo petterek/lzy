@@ -1,9 +1,8 @@
 ﻿Imports LazyFramework.CQRS.Logging
-
 Namespace Security
 
     Public Class NoAccess
-        Inherits BaseLogEvent
+        Inherits Exception
 
         Private ReadOnly _AnAction As IAmAnAction
 

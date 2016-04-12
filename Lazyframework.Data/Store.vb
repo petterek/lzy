@@ -2,9 +2,7 @@
 Imports System.Reflection
 Imports System.Runtime.InteropServices
 Imports System.Text.RegularExpressions
-Imports LazyFramework.Logging
 Imports LazyFramework.Utils
-
 
     Public Class Store
 
@@ -117,12 +115,12 @@ Imports LazyFramework.Utils
             End Using
             sw.Stop()
 
-            Dim loginfo As New DbRequestOkLog With {.DbName = connectionInfo, .Command = command, .Took = sw.ElapsedMilliseconds}
-            LazyFramework.Logging.Log.Write(Of DbRequestLog)(loginfo, Logging.LogLevelEnum.Info)
+            'Dim loginfo As New DbRequestOkLog With {.DbName = connectionInfo, .Command = command, .Took = sw.ElapsedMilliseconds}
+            'LazyFramework.Logging.Log.Write(Of DbRequestLog)(loginfo, Logging.LogLevelEnum.Info)
         Catch ex As Exception
             sw.Stop()
-            Dim loginfo As New DbRequestFaildLog With {.DbName = connectionInfo, .Command = command, .Took = sw.ElapsedMilliseconds, .Error = ex}
-            LazyFramework.Logging.Log.Write(Of DbRequestFaildLog)(loginfo, Logging.LogLevelEnum.Info)
+            'Dim loginfo As New DbRequestFaildLog With {.DbName = connectionInfo, .Command = command, .Took = sw.ElapsedMilliseconds, .Error = ex}
+            'LazyFramework.Logging.Log.Write(Of DbRequestFaildLog)(loginfo, Logging.LogLevelEnum.Info)
             Throw
         End Try
 

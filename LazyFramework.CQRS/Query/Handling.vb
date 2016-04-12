@@ -1,9 +1,7 @@
 ﻿Imports System.Reflection
-Imports System.Runtime.CompilerServices
 Imports LazyFramework.Utils
 Imports LazyFramework.CQRS.Monitor
 Imports LazyFramework.CQRS.Security
-Imports LazyFramework.EventHandling
 
 Namespace Query
     Public Class Handling
@@ -105,10 +103,7 @@ Namespace Query
                         End SyncLock
                     End If
                     Dim invoke As Object = handler.Invoke(TypeInstanceCache(handler.DeclaringType), {q})
-
-                    EventHub.Publish(Runtime.Context.Current.CurrentUser,New QueryExecuted(q))
-
-
+                                                            
                     invoke = Transform.Handling.TransformResult(profile, q, invoke)
                     Sorting.Handler.SortResult(q, invoke)
 

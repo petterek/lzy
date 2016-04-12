@@ -1,19 +1,14 @@
 ﻿Imports System.Reflection
 Imports LazyFramework.CQRS.Security
-Imports LazyFramework.EventHandling
-Imports LazyFramework.Logging
-Imports LazyFramework.Pipeline
-Imports LazyFramework.Utils
 
 Namespace Command
     Public Class Handling
-        Implements IPublishEvent
 
         Private Shared ReadOnly PadLock As New Object
         Private Shared _handlers As ActionHandlerMapper
         Private Shared _commadList As Dictionary(Of String, Type)
 
-        
+
         ''' <summary>
         ''' 
         ''' </summary>
@@ -53,12 +48,12 @@ Namespace Command
                 If _handlers Is Nothing Then
                     SyncLock PadLock
                         If _handlers Is Nothing Then
-                           _handlers = New ActionHandlerMapper(
-                                Reflection.AllTypes.IsAssignableFrom(Of IHandleCommand).union(Reflection.AllTypes.NameEndsWith("CommandHandler")).ToList().
-                                AllMethods.
-                                NameEndsWith("Handler").
-                                IsSub.
-                                SignatureIs(GetType(Object)).ToList, False)
+                            _handlers = New ActionHandlerMapper(
+                                 Reflection.AllTypes.IsAssignableFrom(Of IHandleCommand).Union(Reflection.AllTypes.NameEndsWith("CommandHandler")).ToList().
+                                 AllMethods.
+                                 NameEndsWith("Handler").
+                                 IsSub.
+                                 SignatureIs(GetType(Object)).ToList, False)
                         End If
                     End SyncLock
                 End If
@@ -67,8 +62,8 @@ Namespace Command
         End Property
 
 
-        Private shared ReadOnly instanceLock As New Object
-        Private Shared ReadOnly TypeInstanceCache As new Dictionary(Of Type, Object)
+        Private Shared ReadOnly instanceLock As New Object
+        Private Shared ReadOnly TypeInstanceCache As New Dictionary(Of Type, Object)
 
 
         ''' <summary>
@@ -82,24 +77,24 @@ Namespace Command
 
                 EntityResolver.Handling.ResolveEntity(profile, command)
 
-                If Not Availability.Handler.CommandIsAvailable(profile,command) Then
+                If Not Availability.Handler.CommandIsAvailable(profile, command) Then
                     profile.Publish(Runtime.Context.Current.CurrentUser, New NoAccess(command))
                     Throw New ActionIsNotAvailableException(command, profile.User)
                 End If
 
                 If Not CanUserRunCommand(profile, CType(command, CommandBase)) Then
-                    profile.Publish(Runtime.Context.Current.CurrentUser,New NoAccess(command))
+                    profile.Publish(Runtime.Context.Current.CurrentUser, New NoAccess(command))
                     Throw New ActionSecurityAuthorizationFaildException(command, profile.User)
                 End If
 
                 Validation.Handling.ValidateAction(profile, command)
 
                 Try
-                    Dim methodInfo  = AllHandlers(command.GetType)(0)
+                    Dim methodInfo = AllHandlers(command.GetType)(0)
 
-                    If not TypeInstanceCache.ContainsKey(methodInfo.DeclaringType) Then
+                    If Not TypeInstanceCache.ContainsKey(methodInfo.DeclaringType) Then
                         SyncLock instanceLock
-                            If not TypeInstanceCache.ContainsKey(methodInfo.DeclaringType) Then
+                            If Not TypeInstanceCache.ContainsKey(methodInfo.DeclaringType) Then
                                 TypeInstanceCache(methodInfo.DeclaringType) = ClassFactory.Construct(methodInfo.DeclaringType)
                             End If
                         End SyncLock
@@ -124,8 +119,7 @@ Namespace Command
             End If
 
             command.ActionComplete()
-
-            Log.Write(command, LogLevelEnum.System)
+                        
         End Sub
 
         Public Shared Function IsCommandAvailable(profile As ExecutionProfile.IExecutionProfile, cmd As CommandBase) As Boolean

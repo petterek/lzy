@@ -89,15 +89,16 @@ End Class
 
 Public Class TestExecutionProfile
     Implements IExecutionProfile
+
     Private v As Integer
 
-    Private eventLIst As New List(Of IAmAnEvent)
+    Private eventLIst As New List(Of Object)
 
     Public Sub New(v As Integer)
         Me.v = v
     End Sub
 
-    Public Sub Publish(currentUser As IPrincipal, [event] As IAmAnEvent) Implements IExecutionProfile.Publish
+    Public Sub Publish(currentUser As IPrincipal, [event] As Object) Implements IExecutionProfile.Publish
         eventLIst.Add([event])
     End Sub
 
@@ -108,6 +109,11 @@ Public Class TestExecutionProfile
     Public Function User() As IPrincipal Implements IExecutionProfile.User
         Return System.Threading.Thread.CurrentPrincipal
     End Function
+      
+
+    Public Sub Log(level As Integer, message As String) Implements IExecutionProfile.Log
+        Throw New NotImplementedException()
+    End Sub
 End Class
 
 Public Class ApplicationInfo
@@ -174,6 +180,10 @@ End Class
 Public Class TestQuery3
     Inherits TestQuery2
 
+End Class
+
+Public Class SomeInfoClass
+    Public A As String
 End Class
 
 Public Class QueryHandler

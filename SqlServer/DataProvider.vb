@@ -4,7 +4,7 @@ Imports LazyFramework.Data
 Public Class DataProvider
     Implements IDataAccessProvider
 
-    Public Function CreateCommand(cmd As data.CommandInfo) As IDbCommand Implements IDataAccessProvider.CreateCommand
+    Public Function CreateCommand(cmd As CommandInfo) As IDbCommand Implements IDataAccessProvider.CreateCommand
         Dim ret As New SqlCommand()
 
         ret.CommandText = cmd.CommandText

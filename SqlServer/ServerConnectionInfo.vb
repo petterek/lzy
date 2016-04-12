@@ -1,7 +1,5 @@
-
 Imports LazyFramework.Data
 
-<CLSCompliant(True)>
 Public Class ServerConnectionInfo
     Inherits LazyFramework.Data.ServerConnectionInfo
 

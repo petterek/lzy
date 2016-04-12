@@ -1,7 +1,5 @@
-﻿Imports System.Security.Principal
-Imports LazyFramework.CQRS.Command
+﻿Imports LazyFramework.CQRS.Command
 Imports LazyFramework.EventHandling
-Imports LazyFramework.Logging
 
 
 Public Class CustomerCommandBase
@@ -116,18 +114,3 @@ Public Class EventHandler
 
 End Class
 
-
-Public Class Persistdata
-    Implements ILogWriter
-
-    Public Sub Write(info As LogInfo) Implements ILogWriter.Write
-        Throw New NotImplementedException()
-    End Sub
-
-    Public Function Level() As LogLevelEnum Implements ILogWriter.Level
-        Return LogLevelEnum.Verbose
-    End Function
-
-    Public Property EventList As New List(Of LazyFramework.CQRS.Command.IAmACommand)
-
-End Class

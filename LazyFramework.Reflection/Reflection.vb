@@ -21,9 +21,6 @@ Public Class Reflection
         If AllTypes.Count > 0 Then
             _guidmap.TryGetValue(guid, ret)
         End If
-
-
-
         Return ret
     End Function
 
@@ -45,6 +42,7 @@ Public Class Reflection
         Dim targetType = memberInfo.DeclaringType
         Dim exTarget = Expression.Parameter(GetType(Object), "t")
         Dim exValue = Expression.Parameter(GetType(Object), "p")
+
         Dim res As Action(Of Object, Object)
 
         Dim exBody As Expression

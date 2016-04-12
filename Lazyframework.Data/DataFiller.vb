@@ -12,15 +12,14 @@ Public Class DataFiller
         Private ReadOnly _name As String
         Private ReadOnly _fieldInfo As FieldInfo
         Private ReadOnly _setter As Action(Of Object, Object)
-
-        
-
+              
 
         Public Sub New(ByVal reader As Object, ByVal col As Integer, ByVal fieldInfo As FieldInfo, ByVal name As String, ByVal mapByName As Boolean)
             _col = col
             _fieldInfo = fieldInfo
             _name = name
             If GetType(System.IO.Stream).IsAssignableFrom(_fieldInfo.FieldType) Then
+                'Not to good.. could not find a better way to do it.
                 If TypeOf (reader) Is SqlDataReader Then
                     _getValue = AddressOf GetStream
                 Else

@@ -11,7 +11,7 @@ Namespace Transform
                     SyncLock PadLock
                         If _allTransformers Is Nothing Then
                             Dim temp As New Dictionary(Of Type, ITransformerFactory)
-                            For Each t In TypeValidation.FindAllClassesOfTypeInApplication(GetType(ITransformerFactory))
+                            For Each t In Reflection.FindAllClassesOfTypeInApplication(GetType(ITransformerFactory))
                                 If Not t.IsAbstract Then
                                     If t.BaseType.IsGenericType Then
                                         Dim key = t.BaseType.GetGenericArguments()(0)
