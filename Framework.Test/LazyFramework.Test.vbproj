@@ -108,7 +108,6 @@
     <Compile Include="ResponseThread.vb" />
     <Compile Include="SpawnThread.vb" />
     <Compile Include="TestParser.vb" />
-    <Compile Include="UtilsConfig.vb" />
     <Compile Include="WriteJson.vb" />
     <Compile Include="ValidatorTest.vb" />
   </ItemGroup>

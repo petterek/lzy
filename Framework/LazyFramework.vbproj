@@ -139,7 +139,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Utils\Config\Reader.vb" />
     <Compile Include="Utils\FileExtension.vb" />
     <Compile Include="Utils\FindHandlers.vb" />
     <Compile Include="Utils\Json\ArrayBuilder.vb" />
@@ -167,7 +166,6 @@
     <Compile Include="Utils\Json\Writer.vb" />
     <Compile Include="Utils\ResponseThread.vb" />
     <Compile Include="Utils\Timing.vb" />
-    <Compile Include="Utils\TypeValidation\TypeValidation.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">
