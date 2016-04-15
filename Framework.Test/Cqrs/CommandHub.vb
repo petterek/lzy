@@ -85,6 +85,12 @@ Namespace Cqrs
         End Sub
 
 
+        <Test> Public sub AddHandlerManually
+            Dim cmdHandler As New CommandHandler
+            
+            LazyFramework.CQRS.Command.Handling.Add(Of ThisCommandIsNotAvailableIfIdIs0)(addressof cmdHandler.CommandHandler)
+        End sub
+
     End Class
 
 
@@ -179,7 +185,7 @@ Namespace Cqrs
 
         Public Shared Found As Boolean = False
 
-        Public shared sub CommandHandler(cmd As ThisCommandIsNotAvailableIfIdIs0)
+        Public  sub CommandHandler(cmd As ThisCommandIsNotAvailableIfIdIs0)
 
         End sub
 

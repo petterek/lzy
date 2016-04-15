@@ -8,6 +8,7 @@ Namespace Command
         Private Shared _handlers As ActionHandlerMapper
         Private Shared _commadList As Dictionary(Of String, Type)
 
+        Public Shared Property UserAutoDiscoveryForHandlers As Boolean = True
 
         ''' <summary>
         ''' 
@@ -48,18 +49,26 @@ Namespace Command
                 If _handlers Is Nothing Then
                     SyncLock PadLock
                         If _handlers Is Nothing Then
-                            _handlers = New ActionHandlerMapper(
+                            If UserAutoDiscoveryForHandlers Then
+                                _handlers = New ActionHandlerMapper(
                                  Reflection.AllTypes.IsAssignableFrom(Of IHandleCommand).Union(Reflection.AllTypes.NameEndsWith("CommandHandler")).ToList().
                                  AllMethods.
                                  NameEndsWith("Handler").
                                  IsSub.
                                  SignatureIs(GetType(Object)).ToList, False)
+                            Else
+                                Throw New NotConfiguredException("You must add handlers for your commands")
+                            End If
                         End If
                     End SyncLock
                 End If
                 Return _handlers
             End Get
         End Property
+
+        Public Shared Sub Add(Of TCommand)(run As Action(Of TCommand))
+
+        End Sub
 
 
         Private Shared ReadOnly instanceLock As New Object
@@ -119,7 +128,7 @@ Namespace Command
             End If
 
             command.ActionComplete()
-                        
+
         End Sub
 
         Public Shared Function IsCommandAvailable(profile As ExecutionProfile.IExecutionProfile, cmd As CommandBase) As Boolean

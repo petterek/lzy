@@ -29,6 +29,9 @@ Public Class ActionHandlerMapper
 
     End Sub
 
+    Public Sub AddActionHandler(of TAction)(action As Action(Of TAction ))
+        
+    End Sub
 
     Public Function TryFindHandler(t As Type, ByRef handler As MethodInfo) As Boolean
         Dim list = FindKeyForListAndCache(t)

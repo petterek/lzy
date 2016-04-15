@@ -59,6 +59,13 @@ Public Class Reflection
         Return res
     End Function
 
+    Public Shared Function CreateAction(memberInfo As MethodInfo) As Action
+        'Dim ex = Expression.Call(memberInfo, Expression.Parameter(GetType(T), "value"))
+        'Dim res As Action(Of T) = Expression.Lambda(Of Action(Of T))(ex).Compile
+
+        'Return res
+    End Function
+
 
     Private Shared _allTypes As List(Of Type) = Nothing
     Private Shared _guidmap As New Dictionary(Of Guid, Type)
@@ -188,7 +195,7 @@ Public Class Reflection
         Return Nothing
     End Function
 
-    
+
     Public Delegate Function ClassFilter(type As List(Of Type)) As List(Of Type)
     Public Delegate Function MethodFilter(type As List(Of MethodInfo)) As List(Of MethodInfo)
 
