@@ -138,9 +138,15 @@ Namespace CQRS
         End Property
 
         Private Shared Function CheckAvailability(ByVal entity As Object, ByVal createInstance As IActionBase, ByVal user As IPrincipal) As Boolean
-
+            Dim types = createInstance.GetType()
+            While types.GetGenericArguments().Length = 0 AndAlso types.BaseType IsNot Nothing
+                types = types.BaseType()
+            End While
+            If types.GetGenericArguments().Length > 0 AndAlso Not entity.GetType().IsAssignableFrom(types.GetGenericArguments(0)) Then
+                Return False
+            End If
             If createInstance.IsAvailable(user, entity) Then
-                If TypeOf (createInstance) Is CommandBase Then
+                If TypeOf (createInstance) Is CommandBase  Then
                     CType(createInstance, CommandBase).SetInnerEntity(entity)
                     CType(createInstance, CommandBase).FillEntityListForEmptyCommand()
                 End If
