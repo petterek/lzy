@@ -142,7 +142,7 @@ Namespace CQRS
             While types.GetGenericArguments().Length = 0 AndAlso types.BaseType IsNot Nothing
                 types = types.BaseType()
             End While
-            If types.GetGenericArguments().Length > 0 AndAlso Not entity.GetType().IsAssignableFrom(types.GetGenericArguments(0)) Then
+            If types.GetGenericArguments().Length > 0 AndAlso Not types.GetGenericArguments(0).IsAssignableFrom(entity.GetType()) Then
                 Return False
             End If
             If createInstance.IsAvailable(user, entity) Then
