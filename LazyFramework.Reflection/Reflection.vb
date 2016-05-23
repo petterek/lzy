@@ -131,7 +131,10 @@ Public Class Reflection
                                     Try
                                         If type.IsClass AndAlso Not type.IsAbstract Then
                                             allTypesTemp.Add(type)
-                                            _guidmap.Add(type.GUID, type)
+                                            If Not _guidmap.ContainsKey(type.GUID) Then
+                                                'Same guid could occure when different assenlies is loaded with same class.. strange...
+                                                _guidmap.Add(type.GUID, type)
+                                            End If
                                         End If
                                     Catch ex As Exception
                                         Throw New ApplicationException("Add type" & type.FullName, ex)
