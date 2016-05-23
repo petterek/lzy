@@ -18,7 +18,7 @@ Namespace Utils.Json
             write.Write(input)
             write.Flush()
             write.BaseStream.Position = 0
-            Return StringToObject(new ReadStream(New StreamReader(mem, System.Text.Encoding.UTF8)), type)
+            Return StringToObject(New ReadStream(New StreamReader(mem, System.Text.Encoding.UTF8)), type)
         End Function
 
         'Here we can add another function that accepts stream as parameter
@@ -28,12 +28,18 @@ Namespace Utils.Json
 
         End Function
 
+        Public Shared Function StringToObject(input As StreamReader, type As Type) As Object
+
+            Return StringToObject(New ReadStream(input),type)
+
+        End Function
+
         Friend Shared Function StringToObject(input As IReader, type As Type) As Object
             Dim builder As Builder
 
             If GetType(IList).IsAssignableFrom(type) Then
                 builder = New ArrayBuilder()
-            ElseIf GetType(IDictionary).IsAssignableFrom(type) then
+            ElseIf GetType(IDictionary).IsAssignableFrom(type) Then
                 builder = New DictionaryBuilder()
             Else
                 builder = New ObjectBuilder()
@@ -44,7 +50,7 @@ Namespace Utils.Json
 
 
 
-    End Class   
+    End Class
 
 
     <Serializable> Friend Class PropertyNotFoundException

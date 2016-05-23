@@ -29,6 +29,16 @@
 
     End sub
 
+    <Test> Public sub FindClassesThatInheritsGenericTypeFromOpenGenericTypeWithObject
+
+        Dim toSearch As New List(Of Type)
+        toSearch.Add(GetType(InheritsWithObject))
+
+        Assert.AreEqual(1, toSearch.FromOpenGeneric(GetType(MyGenericType(Of))).Count)
+        
+
+    End sub
+
 
     Public Class MyGenericType(Of T)
 
@@ -37,6 +47,10 @@
     Public Class InheritsGenericType
         Inherits MyGenericType(Of Integer)
 
+    End Class
+
+    Public Class InheritsWithObject
+        Inherits MyGenericType(Of Object)
     End Class
 
 
