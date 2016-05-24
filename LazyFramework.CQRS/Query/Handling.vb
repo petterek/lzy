@@ -73,14 +73,17 @@ Namespace Query
 
             If Not IsQueryAvailable(CType(q, QueryBase)) Then
                  profile.Publish(profile.User, New NoAccess(q))
-                 Throw New ActionIsNotAvailableException(q, q.User)
-             End If
-
-            If Not ActionSecurity.Current.UserCanRunThisAction(profile, q) Then
-                Dim actionSecurityAuthorizationFaildException As ActionSecurityAuthorizationFaildException = New ActionSecurityAuthorizationFaildException(q, profile.User)
-                Logging.Log.Error(q, actionSecurityAuthorizationFaildException)
-                Throw actionSecurityAuthorizationFaildException
+                Throw New ActionIsNotAvailableException(q, profile.User)
             End If
+
+            If Setup.ActionSecurity IsNot Nothing Then
+                If Not Setup.ActionSecurity.UserCanRunThisAction(profile, q) Then
+                    Dim actionSecurityAuthorizationFaildException As ActionSecurityAuthorizationFaildException = New ActionSecurityAuthorizationFaildException(q, profile.User)
+                    Logging.Log.Error(q, actionSecurityAuthorizationFaildException)
+                    Throw actionSecurityAuthorizationFaildException
+                End If
+            End If
+
 
             Validation.Handling.ValidateAction(profile, q)
             Dim handler As MethodInfo = Nothing
@@ -88,20 +91,23 @@ Namespace Query
             'Standard queryhandling. 1->1 mapping 
             If Handlers.TryFindHandler(q.GetType, handler) Then
                 Try
-                    Dim ctx = ExecutionContext.GetContextForAction(q)
-                    If ctx IsNot Nothing Then
-                        ctx.StartSession(q)
-                    End If
+                    'Dim ctx = ExecutionContext.GetContextForAction(q)
+                    ''Try to find a wrapping context for this action, this is to be used for caching
+                    'If ctx IsNot Nothing Then
+                    '    ctx.StartSession(q)
+                    'End If
+                    '####REMOVED FOR NOW#####
 
                     q.HandlerStart()
 
-                    If not TypeInstanceCache.ContainsKey(handler.DeclaringType) Then
+                    If Not TypeInstanceCache.ContainsKey(handler.DeclaringType) Then
                         SyncLock instanceLock
-                            If not TypeInstanceCache.ContainsKey(handler.DeclaringType) Then
-                                TypeInstanceCache(handler.DeclaringType) = ClassFactory.Construct(handler.DeclaringType)
+                            If Not TypeInstanceCache.ContainsKey(handler.DeclaringType) Then
+                                TypeInstanceCache(handler.DeclaringType) = Setup.ClassFactory.CreateInstance(handler.DeclaringType)
                             End If
                         End SyncLock
                     End If
+
                     Dim invoke As Object = handler.Invoke(TypeInstanceCache(handler.DeclaringType), {q})
                                                             
                     invoke = Transform.Handling.TransformResult(profile, q, invoke)
@@ -109,9 +115,9 @@ Namespace Query
 
                     q.ActionComplete()
 
-                    If ctx IsNot Nothing Then
-                        ctx.EndSession()
-                    End If
+                    'If ctx IsNot Nothing Then
+                    '    ctx.EndSession()
+                    'End If
 
                     Dim info = CType(Attribute.GetCustomAttribute(q.GetType, GetType(Monitor.MonitorMaxTimeAttribute)), MonitorMaxTimeAttribute)
                     If info IsNot Nothing AndAlso New TimeSpan(q.EndTimeStamp - q.HandlerStartTimeStamp).Milliseconds >= info.MaxTimeInMs Then
@@ -148,15 +154,15 @@ Namespace Query
         End Function
 
 
-        Private Shared _multihandlers As Dictionary(Of Type, FindHandlers.MethodList)
+        'Private Shared _multihandlers As Dictionary(Of Type, FindHandlers.MethodList)
 
-        Public Shared ReadOnly Property MultiHandlers() As Dictionary(Of Type, FindHandlers.MethodList)
-            Get
-                If _multihandlers Is Nothing Then
-                    _multihandlers = FindHandlers.FindAllMultiHandlers(Of IParalellQuery, IAmAQuery)()
-                End If
-                Return _multihandlers
-            End Get
-        End Property
+        'Public Shared ReadOnly Property MultiHandlers() As Dictionary(Of Type, FindHandlers.MethodList)
+        '    Get
+        '        If _multihandlers Is Nothing Then
+        '            _multihandlers = FindHandlers.FindAllMultiHandlers(Of IParalellQuery, IAmAQuery)()
+        '        End If
+        '        Return _multihandlers
+        '    End Get
+        'End Property
     End Class
 End Namespace

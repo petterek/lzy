@@ -8,26 +8,25 @@ Imports LazyFramework.Test.Cqrs
 <TestFixture> Public Class ActioninfoTest
 
     <SetUp> Public Sub SetupFixture()
-        Runtime.Context.Current = New Runtime.WinThread
-        LazyFramework.ClassFactory.Clear()
-        LazyFramework.ClassFactory.SetTypeInstance(Of IActionSecurity)(New TestSecurity)
+        LazyFramework.CQRS.Setup.ActionSecurity = New TestSecurity()
+        LazyFramework.CQRS.Setup.ClassFactory = New ClassFactoryImpl
     End Sub
 
     <TearDown> Public Sub TearDown()
-        LazyFramework.ClassFactory.Clear()
+
     End Sub
 
 
     <Test> Public Sub ActionsIsFoundForEntity()
 
-        Assert.AreEqual(2, LazyFramework.CQRS.ActionInfo.GetAvailableActionsForEntity(Nothing, New ActionEntity).Count)
+        Assert.AreEqual(2, LazyFramework.CQRS.ActionInfo.GetAvailableActionsForEntity(New TestExecutionProfileProvider().GetExecutionProfile, New ActionEntity).Count)
         'Ikke en god test, men det får holde for nå..
-        Assert.IsInstanceOf(Of AcionForActionEntity)(ActionInfo.GetAvailableActionsForEntity(Nothing, New ActionEntity)(1))
+        Assert.IsInstanceOf(Of AcionForActionEntity)(ActionInfo.GetAvailableActionsForEntity(New TestExecutionProfileProvider().GetExecutionProfile, New ActionEntity)(1))
 
     End Sub
 
     <Test> Public Sub WiredActionIsFoundForEntity()
-        Assert.IsInstanceOf(Of MenuAction)(ActionInfo.GetAvailableActionsForEntity(Nothing, New ActionEntity)(0))
+        Assert.IsInstanceOf(Of MenuAction)(ActionInfo.GetAvailableActionsForEntity(New TestExecutionProfileProvider().GetExecutionProfile, New ActionEntity)(0))
     End Sub
 
 End Class

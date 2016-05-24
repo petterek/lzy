@@ -99,7 +99,7 @@ Public Class ActionInfo
             If TypeOf (action) Is CommandBase Then
                 CType(action, CommandBase).SetInnerEntity(entity)
             End If
-            If Not ActionSecurity.Current.UserCanRunThisAction(profile, action, If(TypeOf (entity) Is IProvideSecurityContext, DirectCast(entity, IProvideSecurityContext).Context, entity)) Then
+            If Not Setup.ActionSecurity.UserCanRunThisAction(profile, action, If(TypeOf (entity) Is IProvideSecurityContext, DirectCast(entity, IProvideSecurityContext).Context, entity)) Then
                 Return False
             End If
             Return True

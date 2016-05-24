@@ -1,12 +1,9 @@
 ﻿Imports LazyFramework.CQRS
 Imports NUnit.Framework
 Imports LazyFramework.CQRS.Transform
-Imports LazyFramework.Test
 Imports System.Security.Principal
 Imports LazyFramework.CQRS.ExecutionProfile
-Imports LazyFramework.CQRS.Security
 Imports LazyFramework.Test.Cqrs
-Imports LazyFramework.EventHandling
 
 Public Class DebugLogger
     Implements LazyFramework.CQRS.Monitor.IMonitorWriter
@@ -21,19 +18,28 @@ Public Class DebugLogger
     Public Property IsSuspended As Boolean Implements Monitor.IMonitorWriter.IsSuspended
 End Class
 
+Public Class ClassFactoryImpl
+    Implements LazyFramework.CQRS.IClassFactory
+
+    Public Function CreateInstance(type As Type) As Object Implements IClassFactory.CreateInstance
+        Return LazyFramework.ClassFactory.Construct(type)
+    End Function
+
+    Public Function CreateInstance(Of T)() As T Implements IClassFactory.CreateInstance
+        Return LazyFramework.ClassFactory.Construct(Of T)()
+    End Function
+End Class
+
 <TestFixture> Public Class Query
 
     <SetUp> Public Sub First()
-        LazyFramework.Runtime.Context.Current = New Runtime.WinThread
 
-        LazyFramework.ClassFactory.Clear()
-        LazyFramework.ClassFactory.SetTypeInstance(Of IActionSecurity)(New TestSecurity)
-        LazyFramework.ClassFactory.SetTypeInstance(Of IExecutionProfileProvider)(New TestExecutionProfileProvider)
+        LazyFramework.CQRS.Setup.ActionSecurity = New TestSecurity
+        LazyFramework.CQRS.Setup.ClassFactory = New ClassFactoryImpl
 
         'Debug.Print(Now.Ticks.ToString)
-
-        LazyFramework.CQRS.Monitor.Handling.StartMonitoring()
-        Monitor.Logger.Loggers.Add(New DebugLogger)
+        'LazyFramework.CQRS.Monitor.Handling.StartMonitoring()
+        'Monitor.Logger.Loggers.Add(New DebugLogger)
     End Sub
 
     '<SetUp> Public Sub SetUp()
@@ -41,7 +47,7 @@ End Class
     'End Sub
 
     <TearDown> Public Sub TearDown()
-        LazyFramework.CQRS.Monitor.Handling.StopMonitor
+        '  LazyFramework.CQRS.Monitor.Handling.StopMonitor()
     End Sub
 
     <Test> Public Sub QueryFlowIsCorrect()
@@ -63,12 +69,12 @@ End Class
 
         Assert.IsInstanceOf(Of QueryResultDto)(CType(res, IEnumerable)(0))
 
-        Assert.AreEqual(4, ctype(CType(res, IEnumerable)(0), QueryResultDto).Id)
+        Assert.AreEqual(4, CType(CType(res, IEnumerable)(0), QueryResultDto).Id)
     End Sub
 
 
 
-    <Test> Public Sub ContextSetupIsFound
+    <Test> Public Sub ContextSetupIsFound()
         Dim q As New TestQuery With {.Id = 1}
         Dim res As QueryResultDto = CType(LazyFramework.CQRS.Query.Handling.ExecuteQuery(New TestExecutionProfileProvider().GetExecutionProfile, q), QueryResultDto)
 
@@ -91,8 +97,18 @@ Public Class TestExecutionProfile
     Implements IExecutionProfile
 
     Private v As Integer
+    Private profileStore As IDictionary(Of String, Object) = New Dictionary(Of String, Object)
 
     Private eventLIst As New List(Of Object)
+
+    Public Property Storage As IDictionary(Of String, Object) Implements IExecutionProfile.Storage
+        Get
+            Return profileStore
+        End Get
+        Set(value As IDictionary(Of String, Object))
+            profileStore = value
+        End Set
+    End Property
 
     Public Sub New(v As Integer)
         Me.v = v
@@ -109,11 +125,15 @@ Public Class TestExecutionProfile
     Public Function User() As IPrincipal Implements IExecutionProfile.User
         Return System.Threading.Thread.CurrentPrincipal
     End Function
-      
+
 
     Public Sub Log(level As Integer, message As String) Implements IExecutionProfile.Log
         Throw New NotImplementedException()
     End Sub
+
+    Public Function Time() As Date Implements IExecutionProfile.Time
+        Return Now
+    End Function
 End Class
 
 Public Class ApplicationInfo
@@ -137,16 +157,16 @@ End Class
 
 
 
-Public Class TestQueryContext
-    Inherits LazyFramework.CQRS.ExecutionContext.Context(Of TestQuery)
+'Public Class TestQueryContext
+'    Inherits LazyFramework.CQRS.ExecutionContext.Context(Of TestQuery)
 
-    Public Overrides Sub SetupCache(action As TestQuery)
-        MyBase.SetupCache(action)
+'    Public Overrides Sub SetupCache(action As TestQuery)
+'        MyBase.SetupCache(action)
 
-        action.Id = 100
-    End Sub
+'        action.Id = 100
+'    End Sub
 
-End Class
+'End Class
 
 
 
@@ -191,10 +211,10 @@ Public Class QueryHandler
 
     Private ReadOnly _someExternalInjection As SomeInfoClass
 
-    Public sub New(someExternalInjection As SomeInfoClass)
+    Public Sub New(someExternalInjection As SomeInfoClass)
         _someExternalInjection = someExternalInjection
         _someExternalInjection.A = "jhjhhjk"
-    End sub
+    End Sub
 
     Public Function DummyQueryHandler(q As TestQuery) As QueryResult
         Return New QueryResult With {.Id = 1, .Name = _someExternalInjection.A, .SomeDate = New Date(1986, 7, 24)}

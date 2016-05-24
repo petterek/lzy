@@ -15,7 +15,7 @@ Namespace Transform
                                 If Not t.IsAbstract Then
                                     If t.BaseType.IsGenericType Then
                                         Dim key = t.BaseType.GetGenericArguments()(0)
-                                        Dim value = Activator.CreateInstance(t)
+                                        Dim value = Setup.ClassFactory.CreateInstance(t)
                                         If temp.ContainsKey(key) Then
                                             Throw New TransformerFactoryForActionAllreadyExists(key, t, temp(key))
                                         End If

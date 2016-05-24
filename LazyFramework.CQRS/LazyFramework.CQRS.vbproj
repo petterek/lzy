@@ -83,7 +83,6 @@
     <Compile Include="Dto\DtoBase.vb" />
     <Compile Include="Dto\IActionDescriptor.vb" />
     <Compile Include="Dto\ISupportActionList.vb" />
-    <Compile Include="ExecutionContext.vb" />
     <Compile Include="IActionBase.vb" />
     <Compile Include="ExecutionProfile\IExecutionProfile.vb" />
     <Compile Include="Security\IActionSecurity.vb" />
@@ -117,6 +116,7 @@
     <Compile Include="Query\ParalellQueryBase.vb" />
     <Compile Include="Query\QueryBase.vb" />
     <Compile Include="Security\NoAccess.vb" />
+    <Compile Include="Setup.vb" />
     <Compile Include="Sorting\Handler.vb" />
     <Compile Include="Transform\EntityTransformerProvider.vb" />
     <Compile Include="Transform\Handling.vb" />
@@ -154,14 +154,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Framework\LazyFramework.vbproj">
-      <Project>{d72ca321-6426-4493-bcc5-961284f1c51a}</Project>
-      <Name>LazyFramework</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\LazyFramework.ClassFactory\LazyFramework.ClassFactory.vbproj">
-      <Project>{919aa000-9d90-4c9d-b585-8afbf55a5304}</Project>
-      <Name>LazyFramework.ClassFactory</Name>
-    </ProjectReference>
     <ProjectReference Include="..\LazyFramework.Reflection\LazyFramework.Reflection.vbproj">
       <Project>{ccc53780-1804-4826-b51b-a4950a606e5b}</Project>
       <Name>LazyFramework.Reflection</Name>

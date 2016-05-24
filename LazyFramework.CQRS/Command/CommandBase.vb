@@ -6,14 +6,14 @@ Namespace Command
         Inherits ActionBase
         Implements IAmACommand
 
-         Protected IsResolved As Boolean
+        Protected IsResolved As Boolean
 
         <System.ComponentModel.EditorBrowsable(ComponentModel.EditorBrowsableState.Never)>
         Public Sub SetInnerEntity(o As Object)
             InnerEntity = o
         End Sub
 
-          <System.ComponentModel.EditorBrowsable(ComponentModel.EditorBrowsableState.Never)>
+        <System.ComponentModel.EditorBrowsable(ComponentModel.EditorBrowsableState.Never)>
         Public Overridable Function ResolveEntity() As Object
             Return Nothing
         End Function
@@ -41,7 +41,7 @@ Namespace Command
             Return InnerEntityList
         End Function
 
-           ''' <summary>
+        ''' <summary>
         ''' Override this method to fill the InnerEntityList
         ''' </summary>
         ''' <remarks></remarks>
@@ -49,26 +49,24 @@ Namespace Command
 
         End Sub
 
-                <System.ComponentModel.EditorBrowsable(ComponentModel.EditorBrowsableState.Never)>
+        <System.ComponentModel.EditorBrowsable(ComponentModel.EditorBrowsableState.Never)>
         Public Overrides Function IsAvailable() As Boolean
             If InnerEntity Is Nothing Then
                 InnerEntity = ResolveEntity()
                 FillEntityList()
                 IsResolved = True
             End If
-            Return IsAvailable(User, InnerEntity)
+            Return True  'IsAvailable(User, InnerEntity)
         End Function
 
         <System.ComponentModel.EditorBrowsable(ComponentModel.EditorBrowsableState.Never)>
         Public Overrides Function IsAvailable(user As IPrincipal, o As Object) As Boolean
-            SetUser(user)
             SetInnerEntity(o)
             Return True
         End Function
 
         <System.ComponentModel.EditorBrowsable(ComponentModel.EditorBrowsableState.Never)>
         Public Overrides Function IsAvailable(user As IPrincipal) As Boolean
-            SetUser(user)
             Return True
         End Function
 
@@ -84,6 +82,6 @@ Namespace Command
             End If
             Return _Entity
         End Function
-        
+
     End Class
 End Namespace

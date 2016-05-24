@@ -47,29 +47,30 @@
             Sub EndSession()
 
         End Interface
-        ''' <summary>
-        ''' Sets up a classfactory session to wrap the Action in. 
-        ''' </summary>
-        ''' <typeparam name="T"></typeparam>
-        Public MustInherit Class Context(Of T As IAmAnAction)
-            Implements IContext
+    ''' <summary>
+    ''' Sets up a classfactory session to wrap the Action in. 
+    ''' </summary>
+    ''' <typeparam name="T"></typeparam>
 
-            Private session As LazyFramework.ClassFactory.SessionInstance
+    Public MustInherit Class Context(Of T As IAmAnAction)
+        Implements IContext
 
-            Public Overridable Sub SetupCache(action As T)
+        Private session As LazyFramework.ClassFactory.SessionInstance
 
-            End Sub
+        Public Overridable Sub SetupCache(action As T)
 
-            Friend Sub StartSession(action As IAmAnAction) Implements IContext.StartSession
-                session = New LazyFramework.ClassFactory.SessionInstance
-                SetupCache(CType(action, T))
-            End Sub
+        End Sub
 
-            Friend Sub EndSession() Implements IContext.EndSession
-                session.Complete()
-                session.Dispose()
-                session = Nothing
-            End Sub
+        Friend Sub StartSession(action As IAmAnAction) Implements IContext.StartSession
+            session = New LazyFramework.ClassFactory.SessionInstance
+            SetupCache(CType(action, T))
+        End Sub
 
-        End Class
+        Friend Sub EndSession() Implements IContext.EndSession
+            session.Complete()
+            session.Dispose()
+            session = Nothing
+        End Sub
+
     End Class
+End Class

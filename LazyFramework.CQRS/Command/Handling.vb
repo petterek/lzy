@@ -57,7 +57,7 @@ Namespace Command
                                  IsSub.
                                  SignatureIs(GetType(Object)).ToList, False)
                             Else
-                                Throw New NotConfiguredException("You must add handlers for your commands")
+                                Throw New Exception("You must add handlers for your commands")
                             End If
                         End If
                     End SyncLock
@@ -87,12 +87,12 @@ Namespace Command
                 EntityResolver.Handling.ResolveEntity(profile, command)
 
                 If Not Availability.Handler.CommandIsAvailable(profile, command) Then
-                    profile.Publish(Runtime.Context.Current.CurrentUser, New NoAccess(command))
+                    profile.Publish(profile.User, New NoAccess(command))
                     Throw New ActionIsNotAvailableException(command, profile.User)
                 End If
 
                 If Not CanUserRunCommand(profile, CType(command, CommandBase)) Then
-                    profile.Publish(Runtime.Context.Current.CurrentUser, New NoAccess(command))
+                    profile.Publish(profile.User, New NoAccess(command))
                     Throw New ActionSecurityAuthorizationFaildException(command, profile.User)
                 End If
 
@@ -104,7 +104,7 @@ Namespace Command
                     If Not TypeInstanceCache.ContainsKey(methodInfo.DeclaringType) Then
                         SyncLock instanceLock
                             If Not TypeInstanceCache.ContainsKey(methodInfo.DeclaringType) Then
-                                TypeInstanceCache(methodInfo.DeclaringType) = ClassFactory.Construct(methodInfo.DeclaringType)
+                                TypeInstanceCache(methodInfo.DeclaringType) = Setup.ClassFactory.CreateInstance(methodInfo.DeclaringType)
                             End If
                         End SyncLock
                     End If
@@ -137,9 +137,9 @@ Namespace Command
 
         Public Shared Function CanUserRunCommand(profile As ExecutionProfile.IExecutionProfile, cmd As CommandBase) As Boolean
             If cmd.GetInnerEntity Is Nothing Then
-                Return ActionSecurity.Current.UserCanRunThisAction(profile, cmd)
+                Return Setup.ActionSecurity.UserCanRunThisAction(profile, cmd)
             Else
-                Return ActionSecurity.Current.UserCanRunThisAction(profile, cmd, cmd.GetInnerEntity)
+                Return Setup.ActionSecurity.UserCanRunThisAction(profile, cmd, cmd.GetInnerEntity)
             End If
         End Function
 

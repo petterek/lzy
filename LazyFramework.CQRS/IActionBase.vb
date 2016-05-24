@@ -1,5 +1,4 @@
 ﻿Imports System.Security.Principal
-Imports LazyFramework.CQRS.ExecutionProfile
 
 
 ''' <summary>

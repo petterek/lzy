@@ -5,9 +5,9 @@ Imports LazyFramework.CQRS.ExecutionProfile
 Imports LazyFramework.CQRS.Security
 
 Namespace Transform
-     Public Class Handling
+    Public Class Handling
 
-        Public Shared Function TransformResult(profile As iExecutionProfile, ByVal action As IAmAnAction, ByVal result As Object, Optional ByVal transformer As ITransformEntityToDto = Nothing) As Object
+        Public Shared Function TransformResult(profile As IExecutionProfile, ByVal action As IAmAnAction, ByVal result As Object, Optional ByVal transformer As ITransformEntityToDto = Nothing) As Object
             Dim transformerFactory As ITransformerFactory = EntityTransformerProvider.GetFactory(action)
 
             'Hmmmm skal vi ha logikk her som sjekker om det er noe factory, og hvis det ikke er det bare returnere det den fikk inn. 
@@ -18,30 +18,28 @@ Namespace Transform
                 Dim res As Object
 
 
-                If not transformerFactory.RunAsParallel orelse Runtime.Context.Current.ChickenMode Then
+                If Not transformerFactory.RunAsParallel OrElse Setup.ChickenMode Then
                     For Each e In CType(result, IList)
-                        res = TransformAndAddAction(profile,action, If(transformer Is Nothing, transformerFactory.GetTransformer(action, e), transformer), e)
+                        res = TransformAndAddAction(profile, action, If(transformer Is Nothing, transformerFactory.GetTransformer(action, e), transformer), e)
                         If res IsNot Nothing Then
                             ret.Enqueue(res)
                         End If
                     Next
                     Return ret.ToList
                 Else
-                    Dim user = Runtime.Context.Current.CurrentUser  'Have to copy this from outside of the loop
-                    Dim s = Runtime.Context.Current.Storage
-                    Dim cm = Runtime.Context.Current.ChickenMode
+                    'Dim user = profile.User  'Have to copy this from outside of the loop
+                    'Dim s = profile.Storage
+                    'Dim cm = profile.ChickenMode
                     Dim Errors As New Concurrent.ConcurrentBag(Of Exception)
 
                     CType(result, IList).
                         Cast(Of Object).
                         AsParallel.ForAll(Sub(o As Object)
                                               Try
-                                                  Using New Runtime.SpawnThreadContext(user, s, cm)
-                                                      Dim temp = TransformAndAddAction(profile,action, If(transformer Is Nothing, transformerFactory.GetTransformer(action, o), transformer), o)
-                                                      If temp IsNot Nothing Then
-                                                          ret.Enqueue(temp)
-                                                      End If
-                                                  End Using
+                                                  Dim temp = TransformAndAddAction(profile, action, If(transformer Is Nothing, transformerFactory.GetTransformer(action, o), transformer), o)
+                                                  If temp IsNot Nothing Then
+                                                      ret.Enqueue(temp)
+                                                  End If
                                               Catch ex As Exception
                                                   Errors.Add(ex)
                                               End Try
@@ -65,7 +63,7 @@ Namespace Transform
                     Return retList
                 End If
             Else
-                Return TransformAndAddAction(profile,action, If(transformer Is Nothing, transformerFactory.GetTransformer(action, result), transformer), result)
+                Return TransformAndAddAction(profile, action, If(transformer Is Nothing, transformerFactory.GetTransformer(action, result), transformer), result)
             End If
         End Function
 
@@ -78,7 +76,7 @@ Namespace Transform
                 securityContext = e
             End If
 
-            If Not ActionSecurity.Current.EntityIsAvailableForUser(profile, action, securityContext) Then Return Nothing
+            If Not Setup.ActionSecurity.EntityIsAvailableForUser(profile, action, securityContext) Then Return Nothing
 
             Dim transformEntity As Object = transformer.TransformEntity(e)
             If transformEntity Is Nothing Then Return Nothing
@@ -91,10 +89,10 @@ Namespace Transform
             End If
             Return transformEntity
         End Function
-        Public Shared Function TransformAndAddAction(profile As IExecutionProfile, ByVal action As IAmAnAction, ByVal transformer As ITransformEntityToDto, e As IEnumerable) As IEnumerable (Of Object)
+        Public Shared Function TransformAndAddAction(profile As IExecutionProfile, ByVal action As IAmAnAction, ByVal transformer As ITransformEntityToDto, e As IEnumerable) As IEnumerable(Of Object)
             Dim ret = New List(Of Object)
             For Each res In e
-                Dim transRes = TransformAndAddAction(profile,action, transformer, res)
+                Dim transRes = TransformAndAddAction(profile, action, transformer, res)
                 If transRes IsNot Nothing Then
                     ret.Add(transRes)
                 End If

@@ -25,7 +25,8 @@ Namespace Validation
                                     If Not temp.ContainsKey(key) Then
                                         temp.Add(key, New List(Of IValidateAction))
                                     End If
-                                    temp(key).Add(CType(Activator.CreateInstance(t), IValidateAction))
+
+                                    temp(key).Add(CType(Setup.ClassFactory.CreateInstance(t), IValidateAction))
 
                                 End If
                             Next

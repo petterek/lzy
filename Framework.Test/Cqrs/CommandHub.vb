@@ -12,10 +12,8 @@ Namespace Cqrs
     <TestFixture> Public Class CommandHub
 
         <SetUp> Public Sub SetupFixture()
-            Runtime.Context.Current = New Runtime.WinThread
-            LazyFramework.ClassFactory.Clear()
-            LazyFramework.ClassFactory.SetTypeInstance(Of IActionSecurity)(New TestSecurity)
-            LazyFramework.ClassFactory.SetTypeInstance(Of IExecutionProfileProvider)(New TestExecutionProfileProvider)
+            LazyFramework.CQRS.Setup.ActionSecurity = New TestSecurity
+            LazyFramework.CQRS.Setup.ClassFactory = New ClassFactoryImpl
         End Sub
 
         <TearDown> Public Sub TearDown()

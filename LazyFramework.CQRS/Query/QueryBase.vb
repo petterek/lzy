@@ -7,7 +7,7 @@ Namespace Query
         Implements IAmAQuery
         
          Public Overrides Function IsAvailable() As Boolean
-            Return IsAvailable(User)
+            Return True 'IsAvailable(User)
         End Function
 
         Public Overrides Function IsAvailable(user As IPrincipal) As Boolean
