@@ -20,7 +20,7 @@ Namespace Transform
 
                 If Not transformerFactory.RunAsParallel OrElse Setup.ChickenMode Then
                     For Each e In CType(result, IList)
-                        res = TransformAndAddAction(profile, action, If(transformer Is Nothing, transformerFactory.GetTransformer(action, e), transformer), e)
+                        res = Transform(profile, action, If(transformer Is Nothing, transformerFactory.GetTransformer(action, e), transformer), e)
                         If res IsNot Nothing Then
                             ret.Enqueue(res)
                         End If
@@ -34,7 +34,11 @@ Namespace Transform
                         Cast(Of Object).
                         AsParallel.ForAll(Sub(o As Object)
                                               Try
-                                                  Dim temp = TransformAndAddAction(profile, action, If(transformer Is Nothing, transformerFactory.GetTransformer(action, o), transformer), o)
+                                                  Dim temp = Transform(profile, action, If(transformer Is Nothing, transformerFactory.GetTransformer(action, o), transformer), o)
+                                                  If TypeOf (temp) Is ISupportActionList Then
+                                                      CType(temp, ISupportActionList).Actions.AddRange(Setup.ActionSecurity.GetActionList(profile, action, temp))
+                                                  End If
+
                                                   If temp IsNot Nothing Then
                                                       ret.Enqueue(temp)
                                                   End If
@@ -59,11 +63,11 @@ Namespace Transform
                     Return retList
                 End If
             Else
-                Return TransformAndAddAction(profile, action, If(transformer Is Nothing, transformerFactory.GetTransformer(action, result), transformer), result)
+                Return Transform(profile, action, If(transformer Is Nothing, transformerFactory.GetTransformer(action, result), transformer), result)
             End If
         End Function
 
-        Public Shared Function TransformAndAddAction(profile As IExecutionProfile, ByVal action As IAmAnAction, ByVal transformer As ITransformEntityToDto, e As Object) As Object
+        Public Shared Function Transform(profile As IExecutionProfile, ByVal action As IAmAnAction, ByVal transformer As ITransformEntityToDto, e As Object) As Object
             Dim securityContext As Object
             If transformer Is Nothing Then Return Nothing
             If TypeOf (e) Is IProvideSecurityContext Then
@@ -72,7 +76,6 @@ Namespace Transform
                 securityContext = e
             End If
 
-
             If Setup.ActionSecurity IsNot Nothing Then
                 If Not Setup.ActionSecurity.EntityIsAvailableForUser(profile, action, securityContext) Then Return Nothing
             End If
@@ -80,16 +83,13 @@ Namespace Transform
             Dim transformEntity As Object = transformer.TransformEntity(e)
             If transformEntity Is Nothing Then Return Nothing
 
-            If TypeOf (transformEntity) Is ISupportActionList Then
-                CType(transformEntity, ISupportActionList).Actions.AddRange(Setup.ActionSecurity.GetActionList(profile, action, e))
-            End If
 
             Return transformEntity
         End Function
-        Public Shared Function TransformAndAddAction(profile As IExecutionProfile, ByVal action As IAmAnAction, ByVal transformer As ITransformEntityToDto, e As IEnumerable) As IEnumerable(Of Object)
+        Public Shared Function Transform(profile As IExecutionProfile, ByVal action As IAmAnAction, ByVal transformer As ITransformEntityToDto, e As IEnumerable) As IEnumerable(Of Object)
             Dim ret = New List(Of Object)
             For Each res In e
-                Dim transRes = TransformAndAddAction(profile, action, transformer, res)
+                Dim transRes = Transform(profile, action, transformer, res)
                 If transRes IsNot Nothing Then
                     ret.Add(transRes)
                 End If
