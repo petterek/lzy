@@ -1,4 +1,4 @@
-param([bool]$force = $false,[string]$configuration = "Release", $output = "..\nuget\",[string] $symbolServer = "http://nuget.infotjenester.no/" , [string]$repo = "lzy\")
+param([bool]$force = $false,[string]$configuration = "Release", $output = "..\nuget\",[string] $symbolServer = "http://nuget.infotjenester.no:8080/nuget/Default" , [string]$repo = "lzy\")
 
 $projects = @(
     @{Path = '.\LazyFramework.Reflection\'; Project = "LazyFramework.Reflection"}
@@ -11,7 +11,7 @@ $projects = @(
    ,@{Path = '.\LazyFramework.CQRS\'; Project = 'LazyFramework.CQRS'}
 )
 
-if($force){ C:\Windows\Microsoft.NET\Framework64\v4.0.30319\MSBuild.exe .\LazyFramework.sln /p:Configuration=$configuration /t:Clean,Rebuild /nologo /v:q}
+if($force){ "C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe .\LazyFramework.sln /p:Configuration=$configuration /t:Clean,Rebuild /nologo /v:q"}
 
 $output = $output + $repo
 
@@ -113,7 +113,7 @@ $packed | % {
      $match = $_ + "\.\d+\.\d+\.\d+\.\d+\.symbols"
      Get-ChildItem $output |
      Where-Object {$_.Name -match "$match"} | % {
-        .\nuget push $_.FullName  p:p -source $symbolServer
+        .\nuget push $_.FullName  Admin:Admin -source $symbolServer
     }
 
 }
