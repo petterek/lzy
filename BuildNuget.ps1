@@ -1,4 +1,4 @@
-param([bool]$force = $false,[string]$configuration = "Release", $output = "..\nuget\",[string] $symbolServer = "http://symbol.itaslan.infotjenester.no/nuget/Core" , [string]$repo = "lzy\")
+param([bool]$force = $false,[string]$configuration = "Release", $output = "..\nuget\",[string] $symbolServer = "http://nuget.infotjenester.no/" , [string]$repo = "lzy\")
 
 $projects = @(
     @{Path = '.\LazyFramework.Reflection\'; Project = "LazyFramework.Reflection"}
