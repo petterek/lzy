@@ -191,6 +191,7 @@ Namespace Utils.Json
                                                                             {GetType(Int16), New IntegerParser},
                                                                             {GetType(Date), New DateParser},
                                                                             {GetType(Double), New DoubleParser},
+                                                                            {GetType(Decimal), New DecimalParser},
                                                                             {GetType(Guid), New GuidParser},
                                                                             {GetType(Boolean), New BoolanParser},
                                                                             {GetType(UnknownFieldParser), New UnknownFieldParser},
