@@ -72,17 +72,18 @@ Namespace Transform
                 securityContext = e
             End If
 
-            If Not Setup.ActionSecurity.EntityIsAvailableForUser(profile, action, securityContext) Then Return Nothing
+
+            If Setup.ActionSecurity IsNot Nothing Then
+                If Not Setup.ActionSecurity.EntityIsAvailableForUser(profile, action, securityContext) Then Return Nothing
+            End If
 
             Dim transformEntity As Object = transformer.TransformEntity(e)
             If transformEntity Is Nothing Then Return Nothing
 
             If TypeOf (transformEntity) Is ISupportActionList Then
-                CType(transformEntity, ISupportActionList).Actions.AddRange(ActionSecurity.Current.GetActionList(profile, action, e))
+                CType(transformEntity, ISupportActionList).Actions.AddRange(Setup.ActionSecurity.GetActionList(profile, action, e))
             End If
-            'If TypeOf transformEntity Is ActionContext.ActionContext Then
 
-            'End If
             Return transformEntity
         End Function
         Public Shared Function TransformAndAddAction(profile As IExecutionProfile, ByVal action As IAmAnAction, ByVal transformer As ITransformEntityToDto, e As IEnumerable) As IEnumerable(Of Object)
