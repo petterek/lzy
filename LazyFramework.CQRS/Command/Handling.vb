@@ -5,10 +5,15 @@ Namespace Command
     Public Class Handling
 
         Private Shared ReadOnly PadLock As New Object
-        Private Shared _handlers As ActionHandlerMapper
-        Private Shared _commadList As Dictionary(Of String, Type)
+        Private Shared _handlers As New Dictionary(Of Type, Func(Of Object, Object))
+        Private Shared _commadList As New Dictionary(Of String, Type)
 
         Public Shared Property UserAutoDiscoveryForHandlers As Boolean = True
+
+        Public Shared Sub ClearMapping()
+            _handlers = New Dictionary(Of Type, Func(Of Object, Object))
+            _commadList = New Dictionary(Of String, Type)
+        End Sub
 
         ''' <summary>
         ''' 
@@ -18,21 +23,6 @@ Namespace Command
         ''' <remarks></remarks>
         Public Shared ReadOnly Property CommandList As Dictionary(Of String, Type)
             Get
-                If _commadList Is Nothing Then
-                    SyncLock PadLock
-                        If _commadList Is Nothing Then
-                            Dim temp As New Dictionary(Of String, Type)
-                            For Each t In Reflection.FindAllClassesOfTypeInApplication(GetType(IAmACommand))
-                                If t.IsAbstract Then Continue For 'Do not map abstract commands. 
-
-                                Dim c As IAmACommand = CType(Activator.CreateInstance(t), IAmACommand)
-                                temp.Add(c.ActionName, t)
-                            Next
-                            _commadList = temp
-                        End If
-                    End SyncLock
-                End If
-
                 Return _commadList
             End Get
         End Property
@@ -44,36 +34,38 @@ Namespace Command
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Private Shared ReadOnly Property AllHandlers() As ActionHandlerMapper
+        Private Shared ReadOnly Property AllHandlers() As Dictionary(Of Type, Func(Of Object, Object))
             Get
-                If _handlers Is Nothing Then
-                    SyncLock PadLock
-                        If _handlers Is Nothing Then
-                            If UserAutoDiscoveryForHandlers Then
-                                _handlers = New ActionHandlerMapper(
-                                 Reflection.AllTypes.IsAssignableFrom(Of IHandleCommand).Union(Reflection.AllTypes.NameEndsWith("CommandHandler")).ToList().
-                                 AllMethods.
-                                 NameEndsWith("Handler").
-                                 IsSub.
-                                 SignatureIs(GetType(Object)).ToList, False)
-                            Else
-                                Throw New Exception("You must add handlers for your commands")
-                            End If
-                        End If
-                    End SyncLock
-                End If
                 Return _handlers
             End Get
         End Property
 
-        Public Shared Sub Add(Of TCommand)(run As Action(Of TCommand))
+        Public Shared Sub AddCommandHandler(Of TCommand As IAmACommand)(run As Action(Of TCommand))
+            Dim cmdInstance = Setup.ClassFactory.CreateInstance(Of TCommand)
+
+            If _commadList.ContainsKey(cmdInstance.ActionName) Then
+                Throw New CommandAllreadyMappedExcpetion(GetType(TCommand))
+            End If
+            _commadList.Add(cmdInstance.ActionName(), cmdInstance.GetType())
+
+            _handlers.Add(GetType(TCommand), New Func(Of Object, Object)(Function(cmd As Object)
+                                                                             run(CType(cmd, TCommand))
+                                                                             Return Nothing
+                                                                         End Function
+                                                                 ))
 
         End Sub
+        Public Shared Sub AddCommandHandler(Of TCommand As IAmACommand)(run As Func(Of TCommand, Object))
+            Dim cmdInstance = Setup.ClassFactory.CreateInstance(Of TCommand)
 
+            If _commadList.ContainsKey(cmdInstance.ActionName) Then
+                Throw New CommandAllreadyMappedExcpetion(GetType(TCommand))
+            End If
+            _commadList.Add(cmdInstance.ActionName(), cmdInstance.GetType())
 
-        Private Shared ReadOnly instanceLock As New Object
-        Private Shared ReadOnly TypeInstanceCache As New Dictionary(Of Type, Object)
+            _handlers.Add(GetType(TCommand), New Func(Of Object, Object)(Function(cmd As Object) run(CType(cmd, TCommand))))
 
+        End Sub
 
         ''' <summary>
         ''' Executes a command by finding the mapping to the type of command passed in. 
@@ -84,7 +76,7 @@ Namespace Command
 
             If AllHandlers.ContainsKey(command.GetType) Then
 
-                EntityResolver.Handling.ResolveEntity(profile, command)
+                EntityResolver.Handling.ResolveEntity(command)
 
                 If Not Availability.Handler.CommandIsAvailable(profile, command) Then
                     profile.Publish(profile.User, New NoAccess(command))
@@ -99,17 +91,7 @@ Namespace Command
                 Validation.Handling.ValidateAction(profile, command)
 
                 Try
-                    Dim methodInfo = AllHandlers(command.GetType)(0)
-
-                    If Not TypeInstanceCache.ContainsKey(methodInfo.DeclaringType) Then
-                        SyncLock instanceLock
-                            If Not TypeInstanceCache.ContainsKey(methodInfo.DeclaringType) Then
-                                TypeInstanceCache(methodInfo.DeclaringType) = Setup.ClassFactory.CreateInstance(methodInfo.DeclaringType)
-                            End If
-                        End SyncLock
-                    End If
-
-                    Dim temp = methodInfo.Invoke(TypeInstanceCache(methodInfo.DeclaringType), {command})
+                    Dim temp = AllHandlers(command.GetType)(command)
                     If temp IsNot Nothing Then
                         command.SetResult(Transform.Handling.TransformResult(profile, command, temp))
                     End If
@@ -126,9 +108,7 @@ Namespace Command
                 Logging.Log.Error(command, implementedException)
                 Throw implementedException
             End If
-
             command.ActionComplete()
-
         End Sub
 
         Public Shared Function IsCommandAvailable(profile As ExecutionProfile.IExecutionProfile, cmd As CommandBase) As Boolean

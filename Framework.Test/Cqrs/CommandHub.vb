@@ -14,6 +14,8 @@ Namespace Cqrs
         <SetUp> Public Sub SetupFixture()
             LazyFramework.CQRS.Setup.ActionSecurity = New TestSecurity
             LazyFramework.CQRS.Setup.ClassFactory = New ClassFactoryImpl
+
+            LazyFramework.CQRS.Command.Handling.ClearMapping()
         End Sub
 
         <TearDown> Public Sub TearDown()
@@ -22,7 +24,7 @@ Namespace Cqrs
 
         <Test> Public Sub CommandIsLogged()
 
-            Handling.ExecuteCommand(New TestExecutionProfileProvider().GetExecutionProfile, New TestCommand)
+            'Handling.ExecuteCommand(New TestExecutionProfileProvider().GetExecutionProfile, New TestCommand)
             'Assert.IsTrue(_TestLogger.LogIsCalled)
 
         End Sub
@@ -31,6 +33,8 @@ Namespace Cqrs
         <Test> Public Sub CommandIsRunned()
 
             Dim testExecutionProfileProvider = New TestExecutionProfileProvider()
+            LazyFramework.CQRS.Command.Handling.AddCommandHandler(Of TestCommand)(AddressOf CommandHandler.CommandHandler)
+            LazyFramework.CQRS.Command.Handling.AddCommandHandler(Of AnotherCommand)(AddressOf Another.HandleSomethingElseCommandHandler)
             Handling.ExecuteCommand(testExecutionProfileProvider.GetExecutionProfile, New TestCommand)
             Handling.ExecuteCommand(testExecutionProfileProvider.GetExecutionProfile, New AnotherCommand)
             Assert.IsTrue(CommandHandler.Found)
@@ -39,21 +43,15 @@ Namespace Cqrs
 
 
         <Test> Public Sub ExecptionIsHandledCorrectly()
-
+            LazyFramework.CQRS.Command.Handling.AddCommandHandler(Of ExceptionIsThrownCommand)(AddressOf Another.ExceptionIsThrownCommandHandler)
             Assert.Throws(Of InnerException)(Sub() Handling.ExecuteCommand(New TestExecutionProfileProvider().GetExecutionProfile, New ExceptionIsThrownCommand))
 
         End Sub
 
-        <Test> Public Sub ByRefparemSubIsCalled()
-            Dim byrefCommand As ByrefCommand = New ByrefCommand
-            Handling.ExecuteCommand(New TestExecutionProfileProvider().GetExecutionProfile, byrefCommand)
-
-            Assert.IsTrue(byrefCommand.Called)
-
-        End Sub
 
         <Test> Public Sub CommandIsMappedToName()
             Dim toTest As New CommandForA
+            LazyFramework.CQRS.Command.Handling.AddCommandHandler(Of CommandForA)(Function(c) Nothing)
 
             Assert.AreEqual(toTest.ActionName, Handling.CommandList(toTest.ActionName).FullName.Replace("."c, ""))
 
@@ -71,23 +69,20 @@ Namespace Cqrs
         End Sub
 
         <Test> Public Sub NotAvailableCommandIsStopped()
-
+            LazyFramework.CQRS.Command.Handling.AddCommandHandler(Of ThisCommandIsNotAvailableIfIdIs0)(AddressOf New CommandHandler().CommandHandler)
+            LazyFramework.CQRS.Availability.Handler.AvailabilityList.Add(GetType(ThisCommandIsNotAvailableIfIdIs0), New CommandAvaialability)
             Assert.Throws(Of ActionIsNotAvailableException)(Sub() Handling.ExecuteCommand(New TestExecutionProfileProvider().GetExecutionProfile, New ThisCommandIsNotAvailableIfIdIs0 With {.Id = 0}))
             
         End Sub
 
         <Test> Public Sub CommandAvailabilityIsCalled
 
+            LazyFramework.CQRS.Command.Handling.AddCommandHandler(Of ThisCommandIsNotAvailableIfIdIs0)(AddressOf New CommandHandler().CommandHandler)
             Assert.DoesNotThrow(Sub() Handling.ExecuteCommand(New TestExecutionProfileProvider().GetExecutionProfile, New ThisCommandIsNotAvailableIfIdIs0 With {.Id= 1}))
             
         End Sub
 
 
-        <Test> Public sub AddHandlerManually
-            Dim cmdHandler As New CommandHandler
-            
-            LazyFramework.CQRS.Command.Handling.Add(Of ThisCommandIsNotAvailableIfIdIs0)(addressof cmdHandler.CommandHandler)
-        End sub
 
     End Class
 
@@ -112,7 +107,6 @@ Namespace Cqrs
 
     End Class
 
-    
 
     Public Class Entity
         Public Property A As Integer
@@ -137,9 +131,6 @@ Namespace Cqrs
         Inherits CommandForA
 
     End Class
-
-
-
 
 
     Public Class CalculateKm

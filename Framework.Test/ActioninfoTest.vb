@@ -19,6 +19,8 @@ Imports LazyFramework.Test.Cqrs
 
     <Test> Public Sub ActionsIsFoundForEntity()
 
+        '  LazyFramework.CQRS.ActionInfo.AddActionForType(Of ActionEntity)
+
         Assert.AreEqual(2, LazyFramework.CQRS.ActionInfo.GetAvailableActionsForEntity(New TestExecutionProfileProvider().GetExecutionProfile, New ActionEntity).Count)
         'Ikke en god test, men det får holde for nå..
         Assert.IsInstanceOf(Of AcionForActionEntity)(ActionInfo.GetAvailableActionsForEntity(New TestExecutionProfileProvider().GetExecutionProfile, New ActionEntity)(1))
@@ -40,25 +42,6 @@ Public Class SomeOtherActionBase(Of T)
         Return "m.m"
     End Function
 
-    Public Function IsAvailable() As Boolean Implements IActionBase.IsAvailable
-        Throw New NotImplementedException()
-    End Function
-
-    Public Function IsAvailable(user As IPrincipal) As Boolean Implements IActionBase.IsAvailable
-        Throw New NotImplementedException()
-    End Function
-
-    Public Function IsAvailable(user As IPrincipal, o As Object) As Boolean Implements IActionBase.IsAvailable
-        Throw New NotImplementedException()
-    End Function
-
-    'Public Sub SetProfile(profile As IExecutionProfile) Implements IActionBase.SetProfile
-    '    _profile = profile
-    'End Sub
-
-    'Public Function ExecutionProfile() As IExecutionProfile Implements IActionBase.ExecutionProfile
-    '    Return _profile
-    'End Function
 End Class
 
 Public Class MenuAction

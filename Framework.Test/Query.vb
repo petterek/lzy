@@ -37,6 +37,8 @@ End Class
         LazyFramework.CQRS.Setup.ActionSecurity = New TestSecurity
         LazyFramework.CQRS.Setup.ClassFactory = New ClassFactoryImpl
 
+        LazyFramework.CQRS.Query.Handling.ClearHandlers()
+
         'Debug.Print(Now.Ticks.ToString)
         'LazyFramework.CQRS.Monitor.Handling.StartMonitoring()
         'Monitor.Logger.Loggers.Add(New DebugLogger)
@@ -52,8 +54,9 @@ End Class
 
     <Test> Public Sub QueryFlowIsCorrect()
         Dim q As New TestQuery With {.Id = 1}
-
         Dim res As Object
+
+        LazyFramework.CQRS.Query.Handling.AddQueryHandler(Of TestQuery)(AddressOf New QueryHandler(New SomeInfoClass).DummyQueryHandler)
 
         res = LazyFramework.CQRS.Query.Handling.ExecuteQuery(New TestExecutionProfileProvider().GetExecutionProfile, q)
 
@@ -65,6 +68,10 @@ End Class
     <Test> Public Sub ListIsConvertedCorrectlyAndSorted()
 
         Dim q As New TestQuery2 With {.Id = 1, .Startdate = Now}
+        LazyFramework.CQRS.Query.Handling.AddQueryHandler(Of TestQuery2)(AddressOf New QueryHandler(New SomeInfoClass).Dummy2QueryHandler)
+        LazyFramework.CQRS.Transform.EntityTransformerProvider.AddFactory(Of TestQuery2)(New TransformFactory)
+        LazyFramework.CQRS.Sorting.Handler.AddSorter(Of TestQuery2)(New SortResult)
+
         Dim res = LazyFramework.CQRS.Query.Handling.ExecuteQuery(New TestExecutionProfileProvider().GetExecutionProfile, q)
 
         Assert.IsInstanceOf(Of QueryResultDto)(CType(res, IEnumerable)(0))
@@ -76,6 +83,10 @@ End Class
 
     <Test> Public Sub ContextSetupIsFound()
         Dim q As New TestQuery With {.Id = 1}
+        LazyFramework.CQRS.Query.Handling.AddQueryHandler(Of TestQuery)(AddressOf New QueryHandler(New SomeInfoClass).DummyQueryHandler)
+        LazyFramework.CQRS.Transform.EntityTransformerProvider.AddFactory(Of TestQuery)(New TransformFactory)
+
+
         Dim res As QueryResultDto = CType(LazyFramework.CQRS.Query.Handling.ExecuteQuery(New TestExecutionProfileProvider().GetExecutionProfile, q), QueryResultDto)
 
         Assert.AreEqual(1, res.Id)

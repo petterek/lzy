@@ -64,13 +64,13 @@
     <Compile Include="ActionContext\Handling.vb" />
     <Compile Include="ActionInfo.vb" />
     <Compile Include="ActionIsNotAvailableException.vb" />
-    <Compile Include="ActionLink\ActionLinkBase.vb" />
-    <Compile Include="ActionLink\Handling.vb" />
     <Compile Include="Availability\CommandAvailability.vb" />
     <Compile Include="Availability\Handler.vb" />
     <Compile Include="Availability\ICommandAvilability.vb" />
+    <Compile Include="Command\CommandAllreadyMappedExcpetion.vb" />
     <Compile Include="Dto\ActionDescriptor.vb" />
     <Compile Include="EntityResolver\Handling.vb" />
+    <Compile Include="Query\AllreadeyConfiguredException.vb" />
     <Compile Include="Query\QueryMonitorData.vb" />
     <Compile Include="Security\ActionSecurity.vb" />
     <Compile Include="Security\ActionSecurityAuthorizationFaildException.vb" />
@@ -152,12 +152,6 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\LazyFramework.Reflection\LazyFramework.Reflection.vbproj">
-      <Project>{ccc53780-1804-4826-b51b-a4950a606e5b}</Project>
-      <Name>LazyFramework.Reflection</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>

@@ -1,5 +1,4 @@
 ﻿Imports System.Reflection
-Imports LazyFramework.Utils
 Imports LazyFramework.CQRS.Monitor
 Imports LazyFramework.CQRS.Security
 
@@ -7,58 +6,59 @@ Namespace Query
     Public Class Handling
 
         Private Shared ReadOnly PadLock As New Object
-        
-        Private Shared _queryList As Dictionary(Of String, Type)
+
+        Private Shared _queryList As New Dictionary(Of String, Type)
         Public Shared ReadOnly Property QueryList As Dictionary(Of String, Type)
             Get
-                If _queryList Is Nothing Then
-                    SyncLock PadLock
-                        If _queryList Is Nothing Then
-                            Dim temp As New Dictionary(Of String, Type)
-                            For Each t In Reflection.FindAllClassesOfTypeInApplication(GetType(IAmAQuery))
-                                If t.IsAbstract Then Continue For 'Do not map abstract queries. 
+                'If _queryList Is Nothing Then
+                '    SyncLock PadLock
+                '        If _queryList Is Nothing Then
+                '            Dim temp As New Dictionary(Of String, Type)
+                '            For Each t In Reflection.FindAllClassesOfTypeInApplication(GetType(IAmAQuery))
+                '                If t.IsAbstract Then Continue For 'Do not map abstract queries. 
 
-                                Dim c As IAmAQuery = CType(Activator.CreateInstance(t), IAmAQuery)
-                                temp.Add(c.ActionName, t)
-                            Next
-                            _queryList = temp
-                        End If
-                    End SyncLock
-                End If
+                '                Dim c As IAmAQuery = CType(Setup.ClassFactory.CreateInstance(t), IAmAQuery)
+                '                temp.Add(c.ActionName, t)
+                '            Next
+                '            _queryList = temp
+                '        End If
+                '    End SyncLock
+                'End If
 
                 Return _queryList
             End Get
         End Property
 
 
-        Public Shared HandlerClassFilter As Reflection.ClassFilter = Function( list As List(Of Type))
-                                                              return list.IsAssignableFrom(Of IHandleQuery).Union(list.NameEndsWith("QueryHandler")).ToList
-                                                          End Function  
+        Public Shared Sub AddQueryHandler(Of T As IAmAQuery)(handler As Func(Of T, Object))
+            Dim c As IAmAQuery = CType(Setup.ClassFactory.CreateInstance(Of T), IAmAQuery)
+            If _queryList.ContainsKey(c.ActionName) Then
+                Throw New AllreadeyConfiguredException(GetType(T))
+            Else
+                _queryList(c.ActionName) = c.GetType()
+            End If
 
-       Public Shared HandlerFunctionFilter As Reflection.MethodFilter = Function(list As List(Of MethodInfo))
-                                                                            Return list.NameEndsWith("Handler").IsFunction().SignatureIs(GetType(Object)).ToList
-                                                                        End Function
+            _handlers.Add(GetType(T), New Func(Of Object, Object)(Function(q) handler(CType(q, T))))
 
-                                                                            
+        End Sub
 
-       
+        Public Shared Sub ClearHandlers()
+            _queryList = New Dictionary(Of String, Type)
+            _handlers = New Dictionary(Of Type, Func(Of Object, Object))
+        End Sub
 
-        Private Shared _handlers As ActionHandlerMapper
+
+        Private Delegate Function InternalHandler(query As Object) As Object
+
+        Private Shared _handlers As New Dictionary(Of Type, Func(Of Object, Object))
         ''' <summary>
         ''' 
         ''' </summary>
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Private Shared ReadOnly Property Handlers() As ActionHandlerMapper
+        Private Shared ReadOnly Property Handlers() As Dictionary(Of Type, Func(Of Object, Object))
             Get
-                If _handlers Is Nothing Then
-                    SyncLock PadLock
-                        If _handlers Is Nothing Then
-                            _handlers = New ActionHandlerMapper( HandlerFunctionFilter( HandlerClassFilter(Reflection.AllTypes).AllMethods.ToList),False)
-                        End If
-                    End SyncLock
-                End If
                 Return _handlers
             End Get
         End Property
@@ -71,8 +71,8 @@ Namespace Query
 
         Public Shared Function ExecuteQuery(profile As ExecutionProfile.IExecutionProfile, q As IAmAQuery) As Object
 
-            If Not IsQueryAvailable(CType(q, QueryBase)) Then
-                 profile.Publish(profile.User, New NoAccess(q))
+            If Not Availability.Handler.ActionIsAvailable(profile, q) Then
+                profile.Publish(profile.User, New NoAccess(q))
                 Throw New ActionIsNotAvailableException(q, profile.User)
             End If
 
@@ -86,52 +86,20 @@ Namespace Query
 
 
             Validation.Handling.ValidateAction(profile, q)
-            Dim handler As MethodInfo = Nothing
+            Dim handler As Func(Of Object, Object) = Nothing
 
             'Standard queryhandling. 1->1 mapping 
-            If Handlers.TryFindHandler(q.GetType, handler) Then
+            If _handlers.TryGetValue(q.GetType, handler) Then
                 Try
-                    'Dim ctx = ExecutionContext.GetContextForAction(q)
-                    ''Try to find a wrapping context for this action, this is to be used for caching
-                    'If ctx IsNot Nothing Then
-                    '    ctx.StartSession(q)
-                    'End If
-                    '####REMOVED FOR NOW#####
-
                     q.HandlerStart()
+                    Dim result As Object = handler(q)
 
-                    If Not TypeInstanceCache.ContainsKey(handler.DeclaringType) Then
-                        SyncLock instanceLock
-                            If Not TypeInstanceCache.ContainsKey(handler.DeclaringType) Then
-                                TypeInstanceCache(handler.DeclaringType) = Setup.ClassFactory.CreateInstance(handler.DeclaringType)
-                            End If
-                        End SyncLock
-                    End If
-
-                    Dim invoke As Object = handler.Invoke(TypeInstanceCache(handler.DeclaringType), {q})
-                                                            
-                    invoke = Transform.Handling.TransformResult(profile, q, invoke)
-                    Sorting.Handler.SortResult(q, invoke)
+                    result = Transform.Handling.TransformResult(profile, q, result)
+                    Sorting.Handler.SortResult(q, result)
 
                     q.ActionComplete()
 
-                    'If ctx IsNot Nothing Then
-                    '    ctx.EndSession()
-                    'End If
-
-                    Dim info = CType(Attribute.GetCustomAttribute(q.GetType, GetType(Monitor.MonitorMaxTimeAttribute)), MonitorMaxTimeAttribute)
-                    If info IsNot Nothing AndAlso New TimeSpan(q.EndTimeStamp - q.HandlerStartTimeStamp).Milliseconds >= info.MaxTimeInMs Then
-                        Dim mon As New QueryMonitorData
-                        mon.StartTime = q.HandlerStartTimeStamp
-                        mon.EndTime = q.EndTimeStamp
-                        mon.HandlerName = Handlers(q.GetType)(0).Name
-                        mon.ActionName = q.GetType().FullName
-                        mon.Params = q
-                        mon.User() = profile.User.Identity.Name
-                        Monitor.Handling.AddToQueue(mon)
-                    End If
-
-                    Return invoke
+                    Return result
 
                 Catch ex As TargetInvocationException
                     Logging.Log.Error(q, ex)
@@ -149,20 +117,7 @@ Namespace Query
 
         End Function
 
-          Public Shared Function IsQueryAvailable(query As QueryBase) As Boolean
-            Return query.IsAvailable()
-        End Function
 
 
-        'Private Shared _multihandlers As Dictionary(Of Type, FindHandlers.MethodList)
-
-        'Public Shared ReadOnly Property MultiHandlers() As Dictionary(Of Type, FindHandlers.MethodList)
-        '    Get
-        '        If _multihandlers Is Nothing Then
-        '            _multihandlers = FindHandlers.FindAllMultiHandlers(Of IParalellQuery, IAmAQuery)()
-        '        End If
-        '        Return _multihandlers
-        '    End Get
-        'End Property
     End Class
 End Namespace

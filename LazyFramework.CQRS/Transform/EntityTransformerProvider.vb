@@ -3,34 +3,20 @@
 Namespace Transform
        Public Class EntityTransformerProvider
         Private Shared ReadOnly PadLock As New Object
-        Private Shared _allTransformers As Dictionary(Of Type, ITransformerFactory)
+        Private Shared _allTransformers As New Dictionary(Of Type, ITransformerFactory)
 
         Private Shared ReadOnly Property AllTransformers As Dictionary(Of Type, ITransformerFactory)
             Get
-                If _allTransformers Is Nothing Then
-                    SyncLock PadLock
-                        If _allTransformers Is Nothing Then
-                            Dim temp As New Dictionary(Of Type, ITransformerFactory)
-                            For Each t In Reflection.FindAllClassesOfTypeInApplication(GetType(ITransformerFactory))
-                                If Not t.IsAbstract Then
-                                    If t.BaseType.IsGenericType Then
-                                        Dim key = t.BaseType.GetGenericArguments()(0)
-                                        Dim value = Setup.ClassFactory.CreateInstance(t)
-                                        If temp.ContainsKey(key) Then
-                                            Throw New TransformerFactoryForActionAllreadyExists(key, t, temp(key))
-                                        End If
-                                        temp.Add(key, CType(value, ITransformerFactory))
-                                    End If
-                                End If
-                            Next
-                            _allTransformers = temp
-                        End If
-                    End SyncLock
-                End If
-
                 Return _allTransformers
             End Get
         End Property
+
+        Public Shared Sub AddFactory(Of TAction As IAmAnAction)(factory As ITransformerFactory)
+            If _allTransformers.ContainsKey(GetType(TAction)) Then
+                Throw New TransformerFactoryForActionAllreadyExists(GetType(TAction), _allTransformers(GetType(TAction)).GetType, factory)
+            End If
+            _allTransformers.Add(GetType(TAction), factory)
+        End Sub
 
         Private Shared ReadOnly DefaultFactory As New DefaultEntiyTransformerFactory
 
@@ -44,7 +30,6 @@ Namespace Transform
             End While
 
             Return DefaultFactory
-
 
         End Function
 

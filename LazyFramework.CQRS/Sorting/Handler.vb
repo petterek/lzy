@@ -1,29 +1,23 @@
 Namespace Sorting
     Public Class Handler
 
-        Private Shared _AllSorters As Dictionary(Of Type, ISortResult)
+        Private Shared _AllSorters As New Dictionary(Of Type, ISortResult)
         Private Shared _padlock As New Object
 
         Private Shared ReadOnly Property AllSorters As Dictionary(Of Type, ISortResult)
             Get
-                If _AllSorters Is Nothing Then
-                    SyncLock _padlock
-                        If _AllSorters Is Nothing Then
-                            Dim temp As New Dictionary(Of Type, ISortResult)
-                            For Each t In LazyFramework.Reflection.FindAllClassesOfTypeInApplication(GetType(ISortResult))
-                                Dim actionType = t.BaseType.GetGenericArguments(0)
-                                Dim dtoType = t.BaseType.GetGenericArguments(1)
-                                temp(actionType) = CType(Activator.CreateInstance(t), ISortResult)
-                            Next
-                            _AllSorters = temp
-                        End If
-                    End SyncLock
-
-                End If
                 Return _AllSorters
             End Get
 
         End Property
+
+        Public Shared Sub AddSorter(Of TAction As IAmAnAction)(sorter As ISortResult)
+            If sorter Is Nothing Then
+                Throw New System.ArgumentNullException(NameOf(sorter))
+            End If
+
+            AllSorters.Add(GetType(TAction), sorter)
+        End Sub
 
         Public Shared Sub SortResult(action As IAmAnAction, list As Object)
             If list Is Nothing Then Return

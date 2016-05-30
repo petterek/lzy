@@ -6,36 +6,10 @@ Imports LazyFramework.CQRS.Security
 
 Public Class ActionInfo
 
-    Private Shared _actionsForType As Dictionary(Of Type, List(Of Type))
-    Private Shared ReadOnly Pl As New Object
+    Private Shared _actionsForType As New Dictionary(Of Type, List(Of Type))
 
     Private Shared ReadOnly Property AllActions As Dictionary(Of Type, List(Of Type))
         Get
-            If _actionsForType Is Nothing Then
-                SyncLock Pl
-                    If _actionsForType Is Nothing Then
-                        Dim temp As New Dictionary(Of Type, List(Of Type))
-                        For Each el In Reflection.FindAllClassesOfTypeInApplication(GetType(IActionBase))
-                            If el.IsAbstract Then Continue For
-
-                            Dim basetype = el.BaseType
-                            'Have to find the common basetype
-                            While basetype IsNot Nothing AndAlso Not basetype.IsGenericType
-                                basetype = basetype.BaseType
-                            End While
-
-                            If basetype IsNot Nothing Then
-                                Dim getGenericArguments As Type = basetype.GetGenericArguments(0)
-                                If Not temp.ContainsKey(getGenericArguments) Then
-                                    temp.Add(getGenericArguments, New List(Of Type))
-                                End If
-                                temp(getGenericArguments).Add(el)
-                            End If
-                        Next
-                        _actionsForType = temp
-                    End If
-                End SyncLock
-            End If
             Return _actionsForType
         End Get
     End Property
@@ -45,7 +19,7 @@ Public Class ActionInfo
         Dim ret As New List(Of IActionBase)
         If AllActions.ContainsKey(ctxType) Then
             For Each t In _actionsForType(ctxType)
-                Dim createInstance As IActionBase = CType(Activator.CreateInstance(t), IActionBase)
+                Dim createInstance As IActionBase = CType(Setup.ClassFactory.CreateInstance(t), IActionBase)
                 ret.Add(createInstance)
             Next
         End If
@@ -57,7 +31,7 @@ Public Class ActionInfo
         Dim ret As New List(Of IActionBase)
         If AllActions.ContainsKey(entityType) Then
             For Each t In _actionsForType(entityType)
-                Dim createInstance As IActionBase = CType(Activator.CreateInstance(t), IActionBase)
+                Dim createInstance As IActionBase = CType(Setup.ClassFactory.CreateInstance(t), IActionBase)
                 If Availability.Handler.ActionIsAvailable(profile,createInstance) Then
                     ret.Add(createInstance)
                 End If
@@ -80,7 +54,7 @@ Public Class ActionInfo
                 For Each t In _actionsForType(entity.GetType)
                     If GetType(Query.QueryBase).IsAssignableFrom(t) Then Continue For 'We do not want quries in action list. 
 
-                    Dim createInstance As IActionBase = CType(Activator.CreateInstance(t), IActionBase)
+                    Dim createInstance As IActionBase = CType(Setup.ClassFactory.CreateInstance(t), IActionBase)
 
                     If CheckAvailability(entity, createInstance, profile) Then
                         ret.Add(createInstance)

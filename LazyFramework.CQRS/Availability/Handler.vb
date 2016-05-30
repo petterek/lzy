@@ -4,25 +4,11 @@ Imports LazyFramework.CQRS.ExecutionProfile
 Namespace Availability
     Public Class Handler
 
-        Private Shared _availabilityList As Dictionary(Of Type, ICommandAvilability)
+        Private Shared _availabilityList As New Dictionary(Of Type, ICommandAvilability)
 
         Private Shared padLock As New Object
         Public Shared ReadOnly Property AvailabilityList As Dictionary(Of Type, ICommandAvilability)
             Get
-                If _availabilityList Is Nothing Then
-                    SyncLock padLock
-                        If _availabilityList Is Nothing Then
-                            Dim temp As New Dictionary(Of Type, ICommandAvilability)
-                            For Each handler In Reflection.FindAllClassesOfTypeInApplication(GetType(ICommandAvilability))
-                                Dim key = handler.BaseType.GetGenericArguments()(0)
-                                If GetType(IAmACommand).IsAssignableFrom(key) Then
-                                    temp.Add(key, CType(Activator.CreateInstance(handler), ICommandAvilability))
-                                End If
-                            Next
-                            _availabilityList = temp
-                        End If
-                    End SyncLock
-                End If
                 Return _availabilityList
             End Get
         End Property

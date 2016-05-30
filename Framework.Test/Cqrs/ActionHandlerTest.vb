@@ -7,6 +7,7 @@ Namespace Cqrs
 
         <SetUp> Public Sub SetupFixture()
             LazyFramework.CQRS.Setup.ActionSecurity = New TestSecurity()
+            LazyFramework.CQRS.Setup.ClassFactory = New ClassFactoryImpl
         End Sub
 
         <TearDown> Public Sub TearDown()
@@ -18,6 +19,7 @@ Namespace Cqrs
             Dim p As New ImplementedQuery
             p.Id = 1000
 
+            LazyFramework.CQRS.Query.Handling.AddQueryHandler(Of ImplementedQuery)(AddressOf New QueryHandler().HandleQueryHandler)
 
             Dim executeQuery As Object = Nothing
             Assert.DoesNotThrow(Sub() executeQuery = LazyFramework.CQRS.Query.Handling.ExecuteQuery(New TestExecutionProfileProvider().GetExecutionProfile,p))
@@ -42,8 +44,8 @@ Namespace Cqrs
 
             Public Shared IsCalled As Boolean
 
-            Public shared Function HandleQueryHandler(param As IInterfacedQuery) As Object
-                
+            Public Function HandleQueryHandler(param As IInterfacedQuery) As Object
+
                 Return New Object
 
             End Function

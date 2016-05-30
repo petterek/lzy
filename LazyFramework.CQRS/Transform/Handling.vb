@@ -27,9 +27,7 @@ Namespace Transform
                     Next
                     Return ret.ToList
                 Else
-                    'Dim user = profile.User  'Have to copy this from outside of the loop
-                    'Dim s = profile.Storage
-                    'Dim cm = profile.ChickenMode
+
                     Dim Errors As New Concurrent.ConcurrentBag(Of Exception)
 
                     CType(result, IList).
@@ -58,8 +56,6 @@ Namespace Transform
                         End If
                     End If
 
-
-
                     Return retList
                 End If
             Else
@@ -84,9 +80,9 @@ Namespace Transform
             If TypeOf (transformEntity) Is ISupportActionList Then
                 CType(transformEntity, ISupportActionList).Actions.AddRange(ActionSecurity.Current.GetActionList(profile, action, e))
             End If
-            If TypeOf transformEntity Is ActionContext.ActionContext Then
+            'If TypeOf transformEntity Is ActionContext.ActionContext Then
 
-            End If
+            'End If
             Return transformEntity
         End Function
         Public Shared Function TransformAndAddAction(profile As IExecutionProfile, ByVal action As IAmAnAction, ByVal transformer As ITransformEntityToDto, e As IEnumerable) As IEnumerable(Of Object)

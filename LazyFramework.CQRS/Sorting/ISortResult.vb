@@ -1,5 +1,5 @@
 ﻿Namespace Sorting
-    Friend Interface ISortResult
+    Public Interface ISortResult
         Function CompareObjects(x As Object, y As Object) As Integer
     End Interface
 
