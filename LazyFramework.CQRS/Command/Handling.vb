@@ -4,7 +4,6 @@ Imports LazyFramework.CQRS.Security
 Namespace Command
     Public Class Handling
 
-        Private Shared ReadOnly PadLock As New Object
         Private Shared _handlers As New Dictionary(Of Type, Func(Of Object, Object))
         Private Shared _commadList As New Dictionary(Of String, Type)
 
@@ -40,6 +39,11 @@ Namespace Command
             End Get
         End Property
 
+        ''' <summary>
+        ''' Adds a mapping to a function for the given command. 
+        ''' </summary>
+        ''' <typeparam name="TCommand"></typeparam>
+        ''' <param name="run"></param>
         Public Shared Sub AddCommandHandler(Of TCommand As IAmACommand)(run As Action(Of TCommand))
             Dim cmdInstance = Setup.ClassFactory.CreateInstance(Of TCommand)
 
@@ -55,17 +59,7 @@ Namespace Command
                                                                  ))
 
         End Sub
-        Public Shared Sub AddCommandHandler(Of TCommand As IAmACommand)(run As Func(Of TCommand, Object))
-            Dim cmdInstance = Setup.ClassFactory.CreateInstance(Of TCommand)
 
-            If _commadList.ContainsKey(cmdInstance.ActionName) Then
-                Throw New CommandAllreadyMappedExcpetion(GetType(TCommand))
-            End If
-            _commadList.Add(cmdInstance.ActionName(), cmdInstance.GetType())
-
-            _handlers.Add(GetType(TCommand), New Func(Of Object, Object)(Function(cmd As Object) run(CType(cmd, TCommand))))
-
-        End Sub
 
         ''' <summary>
         ''' Executes a command by finding the mapping to the type of command passed in. 
@@ -74,40 +68,34 @@ Namespace Command
         ''' <remarks>Any command can have only 1 handler. An exception will be thrown if there is found more than one for any given command. </remarks>
         Public Shared Sub ExecuteCommand(profile As ExecutionProfile.IExecutionProfile, command As IAmACommand)
 
-            If AllHandlers.ContainsKey(command.GetType) Then
 
-                EntityResolver.Handling.ResolveEntity(command)
+            EntityResolver.Handling.ResolveEntity(command)
 
-                If Not Availability.Handler.CommandIsAvailable(profile, command) Then
-                    profile.Publish(profile.User, New NoAccess(command))
-                    Throw New ActionIsNotAvailableException(command, profile.User)
-                End If
-
-                If Not CanUserRunCommand(profile, CType(command, CommandBase)) Then
-                    profile.Publish(profile.User, New NoAccess(command))
-                    Throw New ActionSecurityAuthorizationFaildException(command, profile.User)
-                End If
-
-                Validation.Handling.ValidateAction(profile, command)
-
-                Try
-                    Dim temp = AllHandlers(command.GetType)(command)
-                    If temp IsNot Nothing Then
-                        command.SetResult(Transform.Handling.TransformResult(profile, command, temp))
-                    End If
-
-                Catch ex As TargetInvocationException
-                    Logging.Log.Error(command, ex)
-                    Throw ex.InnerException
-                Catch ex As Exception
-                    Logging.Log.Error(command, ex)
-                    Throw
-                End Try
-            Else
-                Dim implementedException = New NotImplementedException(command.ActionName)
-                Logging.Log.Error(command, implementedException)
-                Throw implementedException
+            If Not Availability.Handler.CommandIsAvailable(profile, command) Then
+                profile.Publish(profile.User, New NoAccess(command))
+                Throw New ActionIsNotAvailableException(command, profile.User)
             End If
+
+            If Not CanUserRunCommand(profile, CType(command, CommandBase)) Then
+                profile.Publish(profile.User, New NoAccess(command))
+                Throw New ActionSecurityAuthorizationFaildException(command, profile.User)
+            End If
+
+            Validation.Handling.ValidateAction(profile, command)
+
+            Try
+                Dim temp = AllHandlers(command.GetType)(command)
+                If temp IsNot Nothing Then
+                    command.SetResult(Transform.Handling.TransformResult(profile, command, temp))
+                End If
+
+            Catch ex As TargetInvocationException
+                Logging.Log.Error(command, ex)
+                Throw ex.InnerException
+            Catch ex As Exception
+                Logging.Log.Error(command, ex)
+                Throw
+            End Try
             command.ActionComplete()
         End Sub
 
@@ -116,6 +104,9 @@ Namespace Command
         End Function
 
         Public Shared Function CanUserRunCommand(profile As ExecutionProfile.IExecutionProfile, cmd As CommandBase) As Boolean
+            If Setup.ActionSecurity Is Nothing Then
+                Return True
+            End If
             If cmd.GetInnerEntity Is Nothing Then
                 Return Setup.ActionSecurity.UserCanRunThisAction(profile, cmd)
             Else
