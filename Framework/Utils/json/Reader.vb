@@ -30,7 +30,7 @@ Namespace Utils.Json
 
         Public Shared Function StringToObject(input As StreamReader, type As Type) As Object
 
-            Return StringToObject(New ReadStream(input),type)
+            Return StringToObject(New ReadStream(input), type)
 
         End Function
 
@@ -41,6 +41,8 @@ Namespace Utils.Json
                 builder = New ArrayBuilder()
             ElseIf GetType(IDictionary).IsAssignableFrom(type) Then
                 builder = New DictionaryBuilder()
+            ElseIf GetType(ICollection).IsAssignableFrom(type) Then
+                builder = New ArrayBuilder()
             Else
                 builder = New ObjectBuilder()
             End If

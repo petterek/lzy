@@ -2,10 +2,10 @@
     Friend Class ArrayBuilder
         Inherits Builder
 
-        
 
         Public Overrides Function Parse(nextChar As IReader,t As Type) As Object
 
+            TokenAcceptors.WhiteSpace(nextChar)
             TokenAcceptors.BufferLegalCharacters(nextChar,"nul" )
             Dim buffer = nextChar.Buffer
             If buffer="null" then return nothing
