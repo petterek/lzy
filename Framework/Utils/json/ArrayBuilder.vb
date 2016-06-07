@@ -3,29 +3,29 @@
         Inherits Builder
 
 
-        Public Overrides Function Parse(nextChar As IReader,t As Type) As Object
+        Public Overrides Function Parse(nextChar As IReader, t As Type) As Object
 
             TokenAcceptors.WhiteSpace(nextChar)
-            TokenAcceptors.BufferLegalCharacters(nextChar,"nul" )
+            TokenAcceptors.BufferLegalCharacters(nextChar, "nul")
             Dim buffer = nextChar.Buffer
-            If buffer="null" then return nothing
+            If buffer = "null" Then Return Nothing
 
-            TokenAcceptors.EatUntil(TokenAcceptors.ListStart, nextChar) 
-            
+            TokenAcceptors.EatUntil(TokenAcceptors.ListStart, nextChar)
+
             Dim strategy As IParseStrategy
             If t.IsArray Then
                 strategy = New ArrayParserStrategy(t)
             Else
                 strategy = New ListParseStrategy(t)
             End If
-            
+
             TokenAcceptors.WhiteSpace(nextChar)
-            
+
             Do
                 If strategy.InnerType.IsValueType Or strategy.InnerType = GetType(String) Then
                     TokenAcceptors.WhiteSpace(nextChar)
                     If nextChar.Peek <> TokenAcceptors.ListEnd Then
-                        strategy.ItemList.Add(TokenAcceptors.TypeParserMapper(strategy.InnerType).Parse(nextChar,t))
+                        strategy.ItemList.Add(TokenAcceptors.TypeParserMapper(strategy.InnerType).Parse(nextChar, t))
                     End If
                 Else
                     Dim v As Object = Reader.StringToObject(nextChar, strategy.InnerType)
@@ -89,12 +89,20 @@
             Private _innertype As Type
 
             Public Sub New(t As Type)
-                _ItemList = CType(Activator.CreateInstance(t), IList)
                 If t.IsGenericType Then
                     _innertype = t.GetGenericArguments(0)
                 Else
                     Throw New NonGenericListIsNotSupportedException
                 End If
+
+                If t.IsInterface Then
+                    Dim tempType = GetType(List(Of ))
+                    _ItemList = CType(Activator.CreateInstance(tempType.MakeGenericType(InnerType)), IList)
+                Else
+                    _ItemList = CType(Activator.CreateInstance(t), IList)
+                End If
+
+
             End Sub
 
             Public ReadOnly Property InnerType As Type Implements IParseStrategy.InnerType
@@ -116,7 +124,45 @@
             End Property
         End Class
 
+        'Private Class EnumerableParserStrategy
+        '    Implements IParseStrategy
 
+        '    Private _innerType As Type
+        '    Private _itemList As IList
+        '    Private _t As Type
+
+        '    ''' <summary>
+        '    ''' In this case when something is supose to become an enumerable, we choose to use a list. 
+        '    ''' </summary>
+        '    ''' <param name="t"></param>
+        '    Public Sub New(t As Type)
+        '        _t = t
+        '        If t.GetGenericArguments().Length = 0 Then
+        '            Throw New CanNotInferNonGenericListException
+        '        End If
+        '        _innerType = t.GetGenericArguments(0)
+        '        Dim tempType = GetType(List(Of ))
+        '        _itemList = CType(Activator.CreateInstance(tempType.MakeGenericType(InnerType)), IList)
+        '    End Sub
+
+        '    Public ReadOnly Property InnerType As Type Implements IParseStrategy.InnerType
+        '        Get
+        '            Return _innerType
+        '        End Get
+        '    End Property
+
+        '    Public ReadOnly Property ItemList As IList Implements IParseStrategy.ItemList
+        '        Get
+        '            Return _itemList
+        '        End Get
+        '    End Property
+
+        '    Public ReadOnly Property Result As Object Implements IParseStrategy.Result
+        '        Get
+        '            Return _itemList
+        '        End Get
+        '    End Property
+        'End Class
 
     End Class
 End Namespace

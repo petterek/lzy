@@ -33,11 +33,24 @@ Namespace Utils.Json
             Return StringToObject(New ReadStream(input), type)
 
         End Function
-
+        ''' <summary>
+        ''' This is the main function to parse the incomming stream of bytes. 
+        ''' It is important that the types is checked in the correct order. 
+        ''' 
+        ''' </summary>
+        ''' <param name="input"></param>
+        ''' <param name="type"></param>
+        ''' <returns></returns>
         Friend Shared Function StringToObject(input As IReader, type As Type) As Object
             Dim builder As Builder
 
-            If GetType(IList).IsAssignableFrom(type) Then
+
+
+            'we are trying to create something that is an interface. The we must guess what to create :) 
+            'This should boil down to IEnumerable of something.. :) 
+            If type.IsGenericType AndAlso type.GetGenericTypeDefinition() Is GetType(IEnumerable(Of)) Then
+                builder = New ArrayBuilder
+            ElseIf GetType(IList).IsAssignableFrom(type) Then
                 builder = New ArrayBuilder()
             ElseIf GetType(IDictionary).IsAssignableFrom(type) Then
                 builder = New DictionaryBuilder()
@@ -46,6 +59,7 @@ Namespace Utils.Json
             Else
                 builder = New ObjectBuilder()
             End If
+
 
             Return builder.Parse(input, type)
         End Function

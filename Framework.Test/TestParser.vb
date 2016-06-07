@@ -134,7 +134,7 @@ Imports NUnit.Framework
 
 
 
-    <Test> Public sub ClassWithArrayDoesNotThrow
+    <Test> Public Sub ClassWithArrayDoesNotThrow()
 
         'empty array
         Dim v = Reader.StringToObject(Of ClassWithArray)("{""Data"":[]}")
@@ -148,13 +148,20 @@ Imports NUnit.Framework
         v = Reader.StringToObject(Of ClassWithArray)("{""DataInt"":[1,2,3]}")
 
         v = Reader.StringToObject(Of ClassWithArray)("{""StringValue"": null }")
-        
+
         v = Reader.StringToObject(Of ClassWithArray)("{""Attributes"": null }")
 
         v = Reader.StringToObject(Of ClassWithArray)("{""Attributes"": {""Test"":""Value"",""Test2"":""Value2""} }")
-        
-        
-    End sub
+
+
+    End Sub
+
+    <Test> Public Sub ParseObjectWithIEnuerableDoesNotThrow()
+        Dim v = Reader.StringToObject(Of ClassWithArray)("{""AList"": [""String1"",""String2""] }")
+
+        Assert.AreEqual(2, v.AList.Count)
+
+    End Sub
 
 
     <Test>Public sub DeserializeEnums
@@ -204,8 +211,9 @@ Imports NUnit.Framework
     Public Class ClassWithArray
         Public Data As String()
         Public DataInt As Integer()
-        Public StringValue As string
-        Public Attributes As Dictionary(Of String,String)
+        Public StringValue As String
+        Public Attributes As Dictionary(Of String, String)
+        Public AList As IEnumerable(Of String)
     End Class
 
 End Class
