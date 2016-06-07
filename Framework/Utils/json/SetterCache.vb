@@ -5,11 +5,17 @@ Namespace Utils.Json
 
         Private Shared _setterlist As New Dictionary(Of String, NameInfo)
 
+        Private Shared padLock As New Object
+
         Public Shared Function GetInfo(mInfo As MemberInfo) As NameInfo
             Dim key = mInfo.DeclaringType.FullName & "-" & mInfo.Name
 
             If Not _setterlist.ContainsKey(key) Then
-                _setterlist(key) = New NameInfo(mInfo.DeclaringType.Name,mInfo.Name, Reflection.CreateSetter(mInfo))
+                SyncLock padLock
+                    If Not _setterlist.ContainsKey(key) Then
+                        _setterlist(key) = New NameInfo(mInfo.DeclaringType.Name, mInfo.Name, Reflection.CreateSetter(mInfo))
+                    End If
+                End SyncLock
             End If
             Return _setterlist(key)
 
