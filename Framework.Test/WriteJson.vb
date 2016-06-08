@@ -60,6 +60,7 @@ End Module
         Dim o = New BoolTest With {.ThisIsTrue = True, .ThisIsFalse = False}
         Dim o2 As BoolTest = Nothing
 
+        Assert.AreEqual("{""ThisIsTrue"":true,""ThisIsFalse"":false}", Writer.ObjectToString(o))
         Assert.DoesNotThrow(Sub() o2 = Newtonsoft.Json.JsonConvert.DeserializeObject(Of BoolTest)(Writer.ObjectToString(o)))
 
         Assert.AreEqual(o.ThisIsFalse, o2.ThisIsFalse)

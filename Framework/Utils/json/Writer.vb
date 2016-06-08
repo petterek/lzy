@@ -75,16 +75,15 @@ Namespace Utils.Json
             result.Write("{")
             Dim first As Boolean = True
             For Each value As DictionaryEntry In CType(o, IDictionary)
-
+                If Not first Then
+                    result.Write(",")
+                End If
                 result.Write(Chr(&H22) & value.Key.ToString & Chr(&H22))
                 result.Write(":")
                 ObjectToString(result, value.Value)
-                result.Write(",")
+                first = False
             Next
 
-            result.Flush()
-            'Removing the last , from the stream.. it's a hack but it's the easiest way to do it.. :) 
-            result.BaseStream.Position = result.BaseStream.Position - 1
             result.Write("}")
         End Sub
 
@@ -102,14 +101,20 @@ Namespace Utils.Json
         End Function
 
         Private Shared Sub WriteObject(result As StreamWriter, o As Object)
-            Dim first As Boolean = True
+
             result.Write("{"c)
+            Dim first As Boolean = True
 
             If AddTypeInfoForObjects Then
                 result.Write("""$type$"":""" & TypeInfoWriter(o.GetType) & """,")
+                first = False
             End If
 
             For Each m In GetMembers(o.GetType())
+                If Not first Then
+                    result.Write(",")
+                End If
+                first = False
                 result.Write(Chr(&H22) & m.Name & Chr(&H22) & ":")
                 Select Case m.MemberType
                     Case System.Reflection.MemberTypes.Field
@@ -119,15 +124,8 @@ Namespace Utils.Json
                         Dim prop = o.GetType.GetProperty(m.Name)
                         WriteValue(result, prop.PropertyType, prop.GetValue(o))
                 End Select
-
-                result.Write(",")
             Next
-
-            result.Flush()
-            'Removing the last , from the stream.. it's a hack but it's the easiest way to do it.. :) 
-            result.BaseStream.Position = result.BaseStream.Position - 1
             result.Write("}"c)
-
         End Sub
 
         Private Shared Sub WriteList(result As StreamWriter, o As Object)
