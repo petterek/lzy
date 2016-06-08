@@ -75,17 +75,16 @@ Namespace Utils.Json
             result.Write("{")
             Dim first As Boolean = True
             For Each value As DictionaryEntry In CType(o, IDictionary)
-                If Not first Then
-                    result.Write(",")
-                End If
-                result.Write(Chr(&H22))
-                result.Write(value.Key.ToString)
-                result.Write(Chr(&H22))
+
+                result.Write(Chr(&H22) & value.Key.ToString & Chr(&H22))
                 result.Write(":")
                 ObjectToString(result, value.Value)
-                first = False
+                result.Write(",")
             Next
 
+            result.Flush()
+            'Removing the last , from the stream.. it's a hack but it's the easiest way to do it.. :) 
+            result.BaseStream.Position = result.BaseStream.Position - 1
             result.Write("}")
         End Sub
 
@@ -106,39 +105,29 @@ Namespace Utils.Json
             Dim first As Boolean = True
             result.Write("{"c)
 
-            'Dim allProps As New System.Collections.Concurrent.ConcurrentStack(Of String)
-            Dim allProps As New Stack(Of String)
-
             If AddTypeInfoForObjects Then
-                allProps.Push("""$type$"":""" & TypeInfoWriter(o.GetType) & """")
+                result.Write("""$type$"":""" & TypeInfoWriter(o.GetType) & """,")
             End If
 
             For Each m In GetMembers(o.GetType())
-
-                Dim memoryStream1 As MemoryStream = New System.IO.MemoryStream
-                Dim res As New StreamWriter(memoryStream1)
-                res.Write(Chr(&H22))
-                res.Write(m.Name)
-                res.Write(Chr(&H22))
-                res.Write(":"c)
-
+                result.Write(Chr(&H22) & m.Name & Chr(&H22) & ":")
                 Select Case m.MemberType
                     Case System.Reflection.MemberTypes.Field
                         Dim fld = o.GetType.GetField(m.Name)
-                        WriteValue(res, fld.FieldType, fld.GetValue(o))
+                        WriteValue(result, fld.FieldType, fld.GetValue(o))
                     Case System.Reflection.MemberTypes.Property
                         Dim prop = o.GetType.GetProperty(m.Name)
-                        WriteValue(res, prop.PropertyType, prop.GetValue(o))
+                        WriteValue(result, prop.PropertyType, prop.GetValue(o))
                 End Select
 
-                res.Flush()
-
-                memoryStream1.Seek(0, SeekOrigin.Begin)
-                allProps.Push(New StreamReader(memoryStream1).ReadToEnd)
+                result.Write(",")
             Next
 
-            result.Write(Join(allProps.ToArray, ","))
+            result.Flush()
+            'Removing the last , from the stream.. it's a hack but it's the easiest way to do it.. :) 
+            result.BaseStream.Position = result.BaseStream.Position - 1
             result.Write("}"c)
+
         End Sub
 
         Private Shared Sub WriteList(result As StreamWriter, o As Object)
