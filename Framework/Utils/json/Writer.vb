@@ -106,36 +106,37 @@ Namespace Utils.Json
             Dim first As Boolean = True
             result.Write("{"c)
 
-            Dim allProps As New System.Collections.Concurrent.ConcurrentStack(Of String)
+            'Dim allProps As New System.Collections.Concurrent.ConcurrentStack(Of String)
+            Dim allProps As New Stack(Of String)
 
             If AddTypeInfoForObjects Then
                 allProps.Push("""$type$"":""" & TypeInfoWriter(o.GetType) & """")
             End If
 
-            GetMembers(o.GetType()).AsParallel.ForAll(
-                Sub(m As System.Reflection.MemberInfo)
-                    Dim memoryStream1 As MemoryStream = New System.IO.MemoryStream
-                    Dim res As New StreamWriter(memoryStream1)
-                    res.Write(Chr(&H22))
-                    res.Write(m.Name)
-                    res.Write(Chr(&H22))
-                    res.Write(":"c)
+            For Each m In GetMembers(o.GetType())
 
-                    Select Case m.MemberType
-                        Case System.Reflection.MemberTypes.Field
-                            Dim fld = o.GetType.GetField(m.Name)
-                            WriteValue(res, fld.FieldType, fld.GetValue(o))
-                        Case System.Reflection.MemberTypes.Property
-                            Dim prop = o.GetType.GetProperty(m.Name)
-                            WriteValue(res, prop.PropertyType, prop.GetValue(o))
-                    End Select
+                Dim memoryStream1 As MemoryStream = New System.IO.MemoryStream
+                Dim res As New StreamWriter(memoryStream1)
+                res.Write(Chr(&H22))
+                res.Write(m.Name)
+                res.Write(Chr(&H22))
+                res.Write(":"c)
 
-                    res.Flush()
+                Select Case m.MemberType
+                    Case System.Reflection.MemberTypes.Field
+                        Dim fld = o.GetType.GetField(m.Name)
+                        WriteValue(res, fld.FieldType, fld.GetValue(o))
+                    Case System.Reflection.MemberTypes.Property
+                        Dim prop = o.GetType.GetProperty(m.Name)
+                        WriteValue(res, prop.PropertyType, prop.GetValue(o))
+                End Select
 
-                    memoryStream1.Seek(0, SeekOrigin.Begin)
-                    allProps.Push(New StreamReader(memoryStream1).ReadToEnd)
+                res.Flush()
 
-                End Sub)
+                memoryStream1.Seek(0, SeekOrigin.Begin)
+                allProps.Push(New StreamReader(memoryStream1).ReadToEnd)
+            Next
+
             result.Write(Join(allProps.ToArray, ","))
             result.Write("}"c)
         End Sub
