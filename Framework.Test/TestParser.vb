@@ -156,10 +156,14 @@ Imports NUnit.Framework
 
     End Sub
 
-    <Test> Public Sub ParseObjectWithIEnuerableDoesNotThrow()
+    <Test> Public Sub ParseObjectWithIEnumerableOfStringDoesNotThrow()
         Dim v = Reader.StringToObject(Of ClassWithArray)("{""AList"": [""String1"",""String2""] }")
-
         Assert.AreEqual(2, v.AList.Count)
+
+    End Sub
+    <Test> Public Sub ParseObjectWithIEnumerableOfSomeObjectTypeDoesNotThrow()
+        Dim v = Reader.StringToObject(Of ClassWithArray)("{""AnotherList"": [{""A"":""String1"",""B"":15},{""A"":""String1"",""B"":15}] }")
+        Assert.AreEqual(2, v.AnotherList.Count)
 
     End Sub
 
@@ -214,6 +218,7 @@ Imports NUnit.Framework
         Public StringValue As String
         Public Attributes As Dictionary(Of String, String)
         Public AList As IEnumerable(Of String)
+        Public AnotherList As IEnumerable(Of SmallType)
     End Class
 
 End Class

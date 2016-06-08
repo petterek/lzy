@@ -89,6 +89,19 @@ Namespace Utils.Json
             result.Write("}")
         End Sub
 
+        Private Shared padLock As New Object
+        Private Shared typeinfoCache As New Dictionary(Of Type, List(Of System.Reflection.MemberInfo))
+        Private Shared Function GetMembers(t As Type) As IEnumerable(Of System.Reflection.MemberInfo)
+            If Not typeinfoCache.ContainsKey(t) Then
+                SyncLock padLock
+                    If Not typeinfoCache.ContainsKey(t) Then
+                        typeinfoCache.Add(t, t.GetMembers(System.Reflection.BindingFlags.Public Or System.Reflection.BindingFlags.Instance).Where(Function(v) v.MemberType = System.Reflection.MemberTypes.Field Or v.MemberType = System.Reflection.MemberTypes.Property).ToList)
+                    End If
+                End SyncLock
+            End If
+            Return typeinfoCache(t)
+        End Function
+
         Private Shared Sub WriteObject(result As StreamWriter, o As Object)
             Dim first As Boolean = True
             result.Write("{"c)
@@ -99,7 +112,7 @@ Namespace Utils.Json
                 allProps.Push("""$type$"":""" & TypeInfoWriter(o.GetType) & """")
             End If
 
-            o.GetType().GetMembers(System.Reflection.BindingFlags.Public Or System.Reflection.BindingFlags.Instance).Where(Function(v) v.MemberType = System.Reflection.MemberTypes.Field Or v.MemberType = System.Reflection.MemberTypes.Property).AsParallel.ForAll(
+            GetMembers(o.GetType()).AsParallel.ForAll(
                 Sub(m As System.Reflection.MemberInfo)
                     Dim memoryStream1 As MemoryStream = New System.IO.MemoryStream
                     Dim res As New StreamWriter(memoryStream1)

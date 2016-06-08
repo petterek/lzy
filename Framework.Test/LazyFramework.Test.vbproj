@@ -106,6 +106,7 @@
     <Compile Include="Query.vb" />
     <Compile Include="Reflection.vb" />
     <Compile Include="ResponseThread.vb" />
+    <Compile Include="SmallType.vb" />
     <Compile Include="SpawnThread.vb" />
     <Compile Include="TestParser.vb" />
     <Compile Include="WriteJson.vb" />
