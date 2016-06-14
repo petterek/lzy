@@ -9,3 +9,9 @@
         Public MustOverride Function GetProvider() As IDataAccessProvider
 
     End Class
+
+
+Public Interface IConnectionInfoProvider
+    Function ConnectionInfo() As LazyFramework.Data.ServerConnectionInfo
+End Interface
+
