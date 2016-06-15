@@ -3,16 +3,12 @@ Imports NUnit.Framework
 
 <TestFixture> Public Class NewLzyTest
 
-    Public Shared Connection As New MSSqlServer.ServerConnectionInfo With {.Address = "10.151.46.52", .Database = "hr", .UserName = "loginFor_HR", .Password = "AsDfGhJkL12345"}
-       
+    Public Shared Connection As Data.ServerConnectionInfo = New MSSqlServer.ServerConnectionInfo With {.Address = "10.151.46.52", .Database = "hr", .UserName = "loginFor_HR", .Password = "AsDfGhJkL12345"}
 
 
     <SetUp> Public Sub SetUp()
         Runtime.Context.Current = New Runtime.WinThread
         LazyFramework.ClassFactory.Clear()
-
-            
-
     End Sub
 
     <TearDown> Public Sub Tear()
@@ -22,13 +18,11 @@ Imports NUnit.Framework
     <Test> Public Sub FillObject()
 
         Dim cmd As New Data.CommandInfo
-
         Dim a = New With {.a = 123}
 
         cmd.CommandText = "select * from Hrunit where id = @Id"
         cmd.TypeOfCommand = Data.CommandTypeEnum.Read
         cmd.Parameters.Add("Id", DbType.Int32, False, 27)
-
 
         Dim ret As New DataObject
         Store.Exec(Connection, cmd, ret)
@@ -38,7 +32,6 @@ Imports NUnit.Framework
         For Each t In LazyFramework.Utils.ResponseThread.Current.Timer.Timings
             Debug.Print(t.Key & t.Value.List(0))
         Next
-
 
     End Sub
 

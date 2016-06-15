@@ -53,7 +53,7 @@ Namespace Cqrs
             Dim toTest As New CommandForA
             LazyFramework.CQRS.Command.Handling.AddCommandHandler(Of CommandForA)(Function(c) Nothing)
 
-            Assert.AreEqual(toTest.ActionName, Handling.CommandList(toTest.ActionName).FullName.Replace("."c, ""))
+            Assert.AreEqual(toTest.ActionName, Handling.CommandList(toTest.ActionName).FullName)
 
         End Sub
 
