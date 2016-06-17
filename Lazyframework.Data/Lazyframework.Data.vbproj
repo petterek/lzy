@@ -118,10 +118,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Framework\LazyFramework.vbproj">
-      <Project>{D72CA321-6426-4493-BCC5-961284F1C51A}</Project>
-      <Name>LazyFramework</Name>
-    </ProjectReference>
     <ProjectReference Include="..\LazyFramework.Reflection\LazyFramework.Reflection.vbproj">
       <Project>{ccc53780-1804-4826-b51b-a4950a606e5b}</Project>
       <Name>LazyFramework.Reflection</Name>
