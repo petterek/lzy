@@ -256,7 +256,6 @@ Public Class Store
 
 End Class
 
-
 Public Interface IDataStore
     Sub Exec(Of T As New)(command As CommandInfo, data As List(Of T))
     Sub Exec(Of T As New)(command As CommandInfo, data As FillStatus(Of T))
@@ -264,7 +263,6 @@ Public Interface IDataStore
     Sub Exec(command As CommandInfo)
     Sub Exec(Of T As Structure)(command As CommandInfo, data As ICollection(Of T), colName As String)
     Sub GetStream(Of T As {New, WillDisposeThoseForU})(command As CommandInfo, data As T)
-
 End Interface
 
 Public Class DataStoreInstance
