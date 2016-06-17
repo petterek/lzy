@@ -258,39 +258,49 @@ End Class
 
 
 Public Interface IDataStore
-    Sub Exec(Of T As New)(connectionInfo As ServerConnectionInfo, command As CommandInfo, data As List(Of T))
-    Sub Exec(Of T As New)(connectionInfo As ServerConnectionInfo, command As CommandInfo, data As FillStatus(Of T))
-    Sub Exec(connectionInfo As ServerConnectionInfo, command As CommandInfo, data As Object)
-    Sub Exec(connectionInfo As ServerConnectionInfo, command As CommandInfo)
-    Sub Exec(Of T As Structure)(connectionInfo As ServerConnectionInfo, command As CommandInfo, data As ICollection(Of T), colName As String)
-    Sub GetStream(Of T As {New, WillDisposeThoseForU})(connectionInfo As ServerConnectionInfo, command As CommandInfo, data As T)
+    Sub Exec(Of T As New)(command As CommandInfo, data As List(Of T))
+    Sub Exec(Of T As New)(command As CommandInfo, data As FillStatus(Of T))
+    Sub Exec(command As CommandInfo, data As Object)
+    Sub Exec(command As CommandInfo)
+    Sub Exec(Of T As Structure)(command As CommandInfo, data As ICollection(Of T), colName As String)
+    Sub GetStream(Of T As {New, WillDisposeThoseForU})(command As CommandInfo, data As T)
 
 End Interface
 
 Public Class DataStoreInstance
     Implements IDataStore
 
-    Public Sub Exec(connectionInfo As ServerConnectionInfo, command As CommandInfo) Implements IDataStore.Exec
+    Private connectionInfo As ServerConnectionInfo
+    Public Sub New(connectionInfo As ServerConnectionInfo)
+        If connectionInfo Is Nothing Then
+            Throw New System.ArgumentNullException(NameOf(connectionInfo))
+        End If
+
+        Me.connectionInfo = connectionInfo
+
+    End Sub
+
+    Public Sub Exec(command As CommandInfo) Implements IDataStore.Exec
         Store.Exec(connectionInfo, command)
     End Sub
 
-    Public Sub Exec(connectionInfo As ServerConnectionInfo, command As CommandInfo, data As Object) Implements IDataStore.Exec
+    Public Sub Exec(command As CommandInfo, data As Object) Implements IDataStore.Exec
         Store.Exec(connectionInfo, command, data)
     End Sub
 
-    Public Sub Exec(Of T As New)(connectionInfo As ServerConnectionInfo, command As CommandInfo, data As FillStatus(Of T)) Implements IDataStore.Exec
+    Public Sub Exec(Of T As New)(command As CommandInfo, data As FillStatus(Of T)) Implements IDataStore.Exec
         Store.Exec(connectionInfo, command, data)
     End Sub
 
-    Public Sub Exec(Of T As New)(connectionInfo As ServerConnectionInfo, command As CommandInfo, data As List(Of T)) Implements IDataStore.Exec
+    Public Sub Exec(Of T As New)(command As CommandInfo, data As List(Of T)) Implements IDataStore.Exec
         Store.Exec(connectionInfo, command, data)
     End Sub
 
-    Public Sub Exec(Of T As Structure)(connectionInfo As ServerConnectionInfo, command As CommandInfo, data As ICollection(Of T), colName As String) Implements IDataStore.Exec
+    Public Sub Exec(Of T As Structure)(command As CommandInfo, data As ICollection(Of T), colName As String) Implements IDataStore.Exec
         Store.Exec(connectionInfo, command, data, colName)
     End Sub
 
-    Public Sub GetStream(Of T As {WillDisposeThoseForU, New})(connectionInfo As ServerConnectionInfo, command As CommandInfo, data As T) Implements IDataStore.GetStream
+    Public Sub GetStream(Of T As {WillDisposeThoseForU, New})(command As CommandInfo, data As T) Implements IDataStore.GetStream
         Store.GetStream(connectionInfo, command, data)
     End Sub
 End Class
