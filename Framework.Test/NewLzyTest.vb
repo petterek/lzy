@@ -258,7 +258,7 @@ Imports NUnit.Framework
     End Sub
 
 
-    <Test> Public Sub ReadStreamFromTable()
+    <Test, Ignore> Public Sub ReadStreamFromTable()
 
         Dim cmd2 As New Data.CommandInfo
         cmd2.CommandText = "select * from HrFile where id = @Id"

@@ -67,6 +67,15 @@ Public Class Reflection
     End Function
 
 
+    Public Shared Function GetMethodInfo(expression As Expression(Of Action)) As MethodInfo
+        Dim member As MethodCallExpression = CType(expression.Body, MethodCallExpression)
+        If member IsNot Nothing Then
+            Return member.Method
+        End If
+
+        Throw New ArgumentException("Expression is not a method", NameOf(expression))
+    End Function
+
     Private Shared _allTypes As List(Of Type) = Nothing
     Private Shared _guidmap As New Dictionary(Of Guid, Type)
 

@@ -203,7 +203,7 @@ End Module
         toWrite.Value = 12
         Writer.AddTypeInfoForObjects = True
 
-        StringAssert.Contains("$type$", Writer.ObjectToString(toWrite))
+        StringAssert.Contains("$type$"":""LazyFramework.Test.ClassWithLong""", Writer.ObjectToString(toWrite))
 
         Writer.AddTypeInfoForObjects = False
     End Sub
@@ -228,9 +228,9 @@ End Module
 
         Assert.AreEqual("{""Test"":""Value"",""Test2"":""Value2""}", Utils.Json.Writer.ObjectToString(dic))
 
-    End sub
+    End Sub
 
-    <test> Public sub WriteEnumValues
+    <test> Public Sub WriteEnumValues()
         Dim v As New TestParser.ClassWithEnum
 
         v.Value = TestParser.MyEnum.Value1
@@ -238,7 +238,25 @@ End Module
         Assert.AreEqual("{""Value"":1}", Utils.Json.Writer.ObjectToString(v))
 
 
-    End sub
+    End Sub
+
+
+
+    <Test> Public Sub ExpressionIsCreated()
+        Dim ex = LazyFramework.Utils.Json.Writer.Serializer(GetType(ClassWithLong))
+        Dim toSerialize = New ClassWithLong
+        Dim sw As New System.IO.StreamWriter(New System.IO.MemoryStream)
+
+        toSerialize.Value = 10
+        ex(sw, toSerialize)
+
+        sw.Flush()
+        sw.BaseStream.Position = 0
+
+        Assert.AreEqual("{""Value"":10}", New System.IO.StreamReader(sw.BaseStream).ReadToEnd)
+
+    End Sub
+
 End Class
 
 
@@ -298,3 +316,5 @@ Public Class ExcavationTripDate
     Public StartDate As Date
     Public EndDate As Date
 End Class
+
+
