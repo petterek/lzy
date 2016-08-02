@@ -148,8 +148,11 @@ Namespace Utils.Json
                 parserType = GetType(EnumParser)
             End If
 
+            If fType.IsGenericType AndAlso fType.GetGenericTypeDefinition() Is GetType(Nullable(Of)) Then
+                parserType = GetType(NullableParser)
+            End If
 
-            
+
             Dim value As Object = ParseValue(fType, nextChar, parserType)
             Dim parsedValue = value
             If fInfo IsNot Nothing Then
@@ -195,7 +198,8 @@ Namespace Utils.Json
                                                                             {GetType(Guid), New GuidParser},
                                                                             {GetType(Boolean), New BoolanParser},
                                                                             {GetType(UnknownFieldParser), New UnknownFieldParser},
-                                                                            {GetType(EnumParser), New EnumParser}
+                                                                            {GetType(EnumParser), New EnumParser},
+                                                                            {GetType(NullableParser), New NullableParser}
                                                                         }
 
         Friend Shared Function CanFindValueSeparator(ByVal nextChar As IReader) As Boolean

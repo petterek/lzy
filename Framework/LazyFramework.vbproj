@@ -155,6 +155,7 @@
     <Compile Include="Utils\Json\JSonConfig.vb" />
     <Compile Include="Utils\Json\LongParser.vb" />
     <Compile Include="Utils\Json\NonGenericListIsNotSupportedException.vb" />
+    <Compile Include="Utils\Json\NullableParser.vb" />
     <Compile Include="Utils\Json\ObjectBuilder.vb" />
     <Compile Include="Utils\Json\Reader.vb" />
     <Compile Include="Utils\Json\ReadStream.vb" />

@@ -257,11 +257,45 @@ End Module
 
     End Sub
 
+
+    <Test> Public Sub WriteNonObjects()
+
+        Assert.AreEqual("""MyString""", Utils.Json.Writer.ObjectToString("MyString"))
+        Assert.AreEqual("1", Utils.Json.Writer.ObjectToString(1))
+        Assert.AreEqual("1.23", Utils.Json.Writer.ObjectToString(1.23))
+    End Sub
+
+    <Test> Public Sub WriteDictionaryOfValues()
+        Dim dic As New Dictionary(Of String, Object)
+        dic.Add("Int", 1)
+        dic.Add("Float", 1.23)
+        dic.Add("String", "str")
+
+        Assert.AreEqual("{""Int"":1,""Float"":1.23,""String"":""str""}", Utils.Json.Writer.ObjectToString(dic))
+    End Sub
+
+    <Test> Public Sub NullableValuesIsParsed()
+
+        Dim res = Reader.StringToObject(Of ClassWithNullable)("{""Intvalue"":1}")
+        Assert.AreEqual(1, res.Intvalue)
+
+    End Sub
+
+    <Test> Public Sub NullableValuesIsParsedWithNullValue()
+
+        Dim res = Reader.StringToObject(Of ClassWithNullable)("{""Intvalue"":NULL}")
+        Assert.AreEqual(False, res.Intvalue.HasValue)
+
+    End Sub
+
+
 End Class
 
 
 
-
+Public Class ClassWithNullable
+    Public Intvalue As Integer?
+End Class
 
 
 Public Class ClassWithLong
