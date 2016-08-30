@@ -71,7 +71,7 @@ Namespace Command
 
             EntityResolver.Handling.ResolveEntity(command)
 
-            If Not Availability.Handler.CommandIsAvailable(profile, command) Then
+            If Not Availability.Handler.IsCommandAvailable(profile, CType(command, CommandBase)) Then
                 profile.Publish(profile.User, New NoAccess(command))
                 Throw New ActionIsNotAvailableException(command, profile.User)
             End If
@@ -99,9 +99,6 @@ Namespace Command
             command.ActionComplete()
         End Sub
 
-        Public Shared Function IsCommandAvailable(profile As ExecutionProfile.IExecutionProfile, cmd As CommandBase) As Boolean
-            Return Availability.Handler.CommandIsAvailable(profile, cmd)
-        End Function
 
         Public Shared Function CanUserRunCommand(profile As ExecutionProfile.IExecutionProfile, cmd As CommandBase) As Boolean
             If Setup.ActionSecurity Is Nothing Then

@@ -32,7 +32,7 @@ Public Class ActionInfo
         If AllActions.ContainsKey(entityType) Then
             For Each t In _actionsForType(entityType)
                 Dim createInstance As IActionBase = CType(Setup.ClassFactory.CreateInstance(t), IActionBase)
-                If Availability.Handler.ActionIsAvailable(profile,createInstance) Then
+                If Availability.Handler.IsActionAvailable(profile,createInstance) Then
                     ret.Add(createInstance)
                 End If
             Next

@@ -89,11 +89,7 @@ Namespace Cqrs
 
     Public Class CommandAvaialability
         Inherits LazyFramework.CQRS.Availability.CommandAvailability(Of ThisCommandIsNotAvailableIfIdIs0, Entity)
-
-        Public Overrides Function IsAvailable(profile As IExecutionProfile, commad As ThisCommandIsNotAvailableIfIdIs0) As Boolean
-            Return commad.Id <> 0
-        End Function
-
+        
         Public Overrides Function IsAvailable(profile As IExecutionProfile, commad As ThisCommandIsNotAvailableIfIdIs0, entity As Entity) As Boolean
             Return False
         End Function

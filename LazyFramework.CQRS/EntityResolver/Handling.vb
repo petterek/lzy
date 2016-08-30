@@ -12,7 +12,7 @@ Namespace EntityResolver
             End Get
         End Property
 
-        Public Sub AddResolver(Of TCommand As IAmACommand)(resolver As IResolveEntity)
+        Public Shared Sub AddResolver(Of TCommand As IAmACommand)(resolver As IResolveEntity)
             _entityResolvers.Add(GetType(TCommand), resolver)
         End Sub
 
@@ -29,15 +29,13 @@ Namespace EntityResolver
 
     End Interface
 
-    'Public MustInherit Class ResolveEntityBase(Of T)
-    '    Implements IResolveEntity
+    Public MustInherit Class ResolveEntityBase(Of T)
+        Implements IResolveEntity
 
-    '    Friend Sub Resolve(action As IAmACommand) Implements IResolveEntity.Resolve
-    '        Resolve(DirectCast(action, T))
-    '    End Sub
+        Friend Sub Resolve(action As IAmACommand) Implements IResolveEntity.Resolve
+            Resolve(DirectCast(action, T))
+        End Sub
 
-    '    Public MustOverride Sub Resolve(action As T)
-    'End Class
-
-
+        Public MustOverride Sub Resolve(action As T)
+    End Class
 End Namespace
