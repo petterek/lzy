@@ -21,6 +21,9 @@ Namespace Transform
                 If Not transformerFactory.RunAsParallel OrElse Setup.ChickenMode Then
                     For Each e In CType(result, IList)
                         res = Transform(profile, action, If(transformer Is Nothing, transformerFactory.GetTransformer(action, e), transformer), e)
+                        If TypeOf (res) Is ISupportActionList Then
+                            CType(res, ISupportActionList).Actions.AddRange(Setup.ActionSecurity.GetActionList(profile, action, e))
+                        End If
                         If res IsNot Nothing Then
                             ret.Enqueue(res)
                         End If
@@ -36,7 +39,7 @@ Namespace Transform
                                               Try
                                                   Dim temp = Transform(profile, action, If(transformer Is Nothing, transformerFactory.GetTransformer(action, o), transformer), o)
                                                   If TypeOf (temp) Is ISupportActionList Then
-                                                      CType(temp, ISupportActionList).Actions.AddRange(Setup.ActionSecurity.GetActionList(profile, action, temp))
+                                                      CType(temp, ISupportActionList).Actions.AddRange(Setup.ActionSecurity.GetActionList(profile, action, o))
                                                   End If
 
                                                   If temp IsNot Nothing Then
@@ -63,7 +66,11 @@ Namespace Transform
                     Return retList
                 End If
             Else
-                Return Transform(profile, action, If(transformer Is Nothing, transformerFactory.GetTransformer(action, result), transformer), result)
+                Dim temp = Transform(profile, action, If(transformer Is Nothing, transformerFactory.GetTransformer(action, result), transformer), result)
+                If TypeOf (temp) Is ISupportActionList Then
+                    CType(temp, ISupportActionList).Actions.AddRange(Setup.ActionSecurity.GetActionList(profile, action, result))
+                End If
+                Return temp
             End If
         End Function
 
