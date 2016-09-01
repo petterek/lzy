@@ -49,7 +49,7 @@ Namespace Command
                                                                                      Return Nothing
                                                                                  End Function
                                                                  ))
-
+            _commadList.Add(GetType(TCommand).FullName, GetType(TCommand))
         End Sub
 
 
