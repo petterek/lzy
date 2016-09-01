@@ -43,7 +43,6 @@ Namespace Command
         ''' <typeparam name="TCommand"></typeparam>
         ''' <param name="run"></param>
         Public Shared Sub AddCommandHandler(Of TCommand As IAmACommand)(run As Action(Of Object, TCommand))
-            Dim cmdInstance = Setup.ClassFactory.CreateInstance(Of TCommand)
 
             _handlers.Add(GetType(TCommand), New Func(Of Object, Object, Object)(Function(ctx As Object, cmd As Object)
                                                                                      run(ctx, CType(cmd, TCommand))
