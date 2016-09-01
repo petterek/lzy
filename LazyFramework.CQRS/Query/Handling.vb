@@ -71,7 +71,7 @@ Namespace Query
 
         Public Shared Function ExecuteQuery(profile As ExecutionProfile.IExecutionProfile, q As IAmAQuery) As Object
 
-            If Not Availability.Handler.ActionIsAvailable(profile, q) Then
+            If Not Availability.Handler.IsActionAvailable(profile, q) Then
                 profile.Publish(profile.User, New NoAccess(q))
                 Throw New ActionIsNotAvailableException(q, profile.User)
             End If

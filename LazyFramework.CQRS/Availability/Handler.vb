@@ -4,28 +4,28 @@ Imports LazyFramework.CQRS.ExecutionProfile
 Namespace Availability
     Public Class Handler
 
-        Private Shared _availabilityList As New Dictionary(Of Type, ICommandAvilability)
+        Private Shared _availabilityList As New Dictionary(Of Type, ICommandAvailability)
 
         Private Shared padLock As New Object
-        Public Shared ReadOnly Property AvailabilityList As Dictionary(Of Type, ICommandAvilability)
+        Public Shared ReadOnly Property AvailabilityList As Dictionary(Of Type, ICommandAvailability)
             Get
                 Return _availabilityList
             End Get
         End Property
 
-        Public Shared Function EntityIsAvailableForCommand(profile As ExecutionProfile.IExecutionProfile, command As IAmACommand, entity As Object) As Boolean
+        Public Shared Sub AddAvilabilityHandler(Of TCommand As IAmACommand)(handler As ICommandAvailability)
+            _availabilityList.Add(GetType(TCommand), handler)
+        End Sub
 
-        End Function
-
-        Public Shared Function CommandIsAvailable(profile As ExecutionProfile.IExecutionProfile, commandBase As IAmACommand) As Boolean
+        Public Shared Function IsCommandAvailable(profile As ExecutionProfile.IExecutionProfile, commandBase As CommandBase) As Boolean
             If AvailabilityList.ContainsKey(commandBase.GetType) Then
-                Return AvailabilityList(commandBase.GetType).IsAvailable(profile, commandBase)
+                Return AvailabilityList(commandBase.GetType).IsAvailable(profile, commandBase, commandBase.GetInnerEntity())
             Else
                 Return True
             End If
         End Function
 
-        Public Shared Function ActionIsAvailable(executionProfile As IExecutionProfile, action As IActionBase) As Boolean
+        Public Shared Function IsActionAvailable(executionProfile As IExecutionProfile, action As IActionBase) As Boolean
 
             Return True
 
