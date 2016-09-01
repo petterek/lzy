@@ -4,13 +4,11 @@ Imports LazyFramework.CQRS.Security
 Namespace Command
     Public Class Handling
 
-        Private Shared _handlers As New Dictionary(Of Type, Func(Of Object, Object))
+        Private Shared _handlers As New Dictionary(Of Type, Func(Of Object, Object, Object))
         Private Shared _commadList As New Dictionary(Of String, Type)
 
-        Public Shared Property UserAutoDiscoveryForHandlers As Boolean = True
-
         Public Shared Sub ClearMapping()
-            _handlers = New Dictionary(Of Type, Func(Of Object, Object))
+            _handlers = New Dictionary(Of Type, Func(Of Object, Object, Object))
             _commadList = New Dictionary(Of String, Type)
         End Sub
 
@@ -33,7 +31,7 @@ Namespace Command
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Private Shared ReadOnly Property AllHandlers() As Dictionary(Of Type, Func(Of Object, Object))
+        Private Shared ReadOnly Property AllHandlers() As Dictionary(Of Type, Func(Of Object, Object, Object))
             Get
                 Return _handlers
             End Get
@@ -44,18 +42,13 @@ Namespace Command
         ''' </summary>
         ''' <typeparam name="TCommand"></typeparam>
         ''' <param name="run"></param>
-        Public Shared Sub AddCommandHandler(Of TCommand As IAmACommand)(run As Action(Of TCommand))
+        Public Shared Sub AddCommandHandler(Of TCommand As IAmACommand)(run As Action(Of Object, TCommand))
             Dim cmdInstance = Setup.ClassFactory.CreateInstance(Of TCommand)
 
-            If _commadList.ContainsKey(cmdInstance.ActionName) Then
-                Throw New CommandAllreadyMappedExcpetion(GetType(TCommand))
-            End If
-            _commadList.Add(cmdInstance.ActionName(), cmdInstance.GetType())
-
-            _handlers.Add(GetType(TCommand), New Func(Of Object, Object)(Function(cmd As Object)
-                                                                             run(CType(cmd, TCommand))
-                                                                             Return Nothing
-                                                                         End Function
+            _handlers.Add(GetType(TCommand), New Func(Of Object, Object, Object)(Function(ctx As Object, cmd As Object)
+                                                                                     run(ctx, CType(cmd, TCommand))
+                                                                                     Return Nothing
+                                                                                 End Function
                                                                  ))
 
         End Sub
@@ -84,7 +77,7 @@ Namespace Command
             Validation.Handling.ValidateAction(profile, command)
 
             Try
-                Dim temp = AllHandlers(command.GetType)(command)
+                Dim temp = AllHandlers(command.GetType)(profile, command)
                 If temp IsNot Nothing Then
                     command.SetResult(Transform.Handling.TransformResult(profile, command, temp))
                 End If

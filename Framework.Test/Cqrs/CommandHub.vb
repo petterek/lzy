@@ -47,7 +47,7 @@ Namespace Cqrs
 
         <Test> Public Sub CommandIsMappedToName()
             Dim toTest As New CommandForA
-            LazyFramework.CQRS.Command.Handling.AddCommandHandler(Of CommandForA)(Function(c) Nothing)
+            LazyFramework.CQRS.Command.Handling.AddCommandHandler(Of CommandForA)(Function(a, c) Nothing)
 
             Assert.AreEqual(toTest.ActionName, Handling.CommandList(toTest.ActionName).FullName)
 
@@ -166,7 +166,7 @@ Namespace Cqrs
 
         Public Shared Found As Boolean = False
 
-        Public Sub CommandHandler(cmd As ThisCommandIsNotAvailableIfIdIs0)
+        Public Sub CommandHandler(ctx As Object, cmd As ThisCommandIsNotAvailableIfIdIs0)
 
         End Sub
 
@@ -181,7 +181,7 @@ Namespace Cqrs
 
         End Sub
 
-        Public Shared Sub CommandHandler(command As TestCommand)
+        Public Shared Sub CommandHandler(ctx As Object, command As TestCommand)
             Found = True
         End Sub
 
@@ -243,7 +243,7 @@ Namespace Cqrs
     Public Class Another
         Implements IHandleCommand
 
-        Public Shared Sub HandleSomethingElseCommandHandler(cmd As AnotherCommand)
+        Public Shared Sub HandleSomethingElseCommandHandler(ctx As Object, cmd As AnotherCommand)
             Dim a = cmd.ActionName
         End Sub
 
@@ -254,7 +254,7 @@ Namespace Cqrs
             cmd.Called = True
         End Sub
 
-        Public Shared Sub ExceptionIsThrownCommandHandler(cmd As ExceptionIsThrownCommand)
+        Public Shared Sub ExceptionIsThrownCommandHandler(ctx As Object, cmd As ExceptionIsThrownCommand)
 
             Throw New InnerException
 
