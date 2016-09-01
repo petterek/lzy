@@ -5,9 +5,9 @@ Namespace Availability
     Public MustInherit Class CommandAvailabilityBase(Of T)
         Implements ICommandAvailability
 
-        Public MustOverride Function IsAvailable(profile As IExecutionProfile, action As T, entity As Object) As Boolean
+        Public MustOverride Function IsAvailable(profile As Object, action As T, entity As Object) As Boolean
 
-        Public Function IsAvailable(profile As IExecutionProfile, cmd As IAmACommand, entity As Object) As Boolean Implements ICommandAvailability.IsAvailable
+        Public Function IsAvailable(profile As Object, cmd As IAmACommand, entity As Object) As Boolean Implements ICommandAvailability.IsAvailable
             Return IsAvailable(profile, DirectCast(cmd, T), entity)
         End Function
     End Class

@@ -1,6 +1,4 @@
-﻿Imports LazyFramework.CQRS.ExecutionProfile
-Imports LazyFramework.CQRS.Security
-Imports NUnit.Framework
+﻿Imports NUnit.Framework
 
 Namespace Cqrs
     <TestFixture> Public Class ActionHandlerTest
@@ -22,7 +20,7 @@ Namespace Cqrs
             LazyFramework.CQRS.Query.Handling.AddQueryHandler(Of ImplementedQuery)(AddressOf New QueryHandler().HandleQueryHandler)
 
             Dim executeQuery As Object = Nothing
-            Assert.DoesNotThrow(Sub() executeQuery = LazyFramework.CQRS.Query.Handling.ExecuteQuery(New TestExecutionProfileProvider().GetExecutionProfile,p))
+            Assert.DoesNotThrow(Sub() executeQuery = LazyFramework.CQRS.Query.Handling.ExecuteQuery(New Object, p))
 
             Assert.IsNotNull(executeQuery)
 
@@ -36,7 +34,7 @@ Namespace Cqrs
         Public Class ImplementedQuery
             Inherits LazyFramework.CQRS.Query.QueryBase(Of Object)
             Implements IInterfacedQuery
-            Public Property Id As Integer Implements IInterfacedQuery.Id    
+            Public Property Id As Integer Implements IInterfacedQuery.Id
         End Class
 
         Public Class QueryHandler

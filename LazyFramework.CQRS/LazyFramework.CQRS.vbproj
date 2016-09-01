@@ -71,6 +71,7 @@
     <Compile Include="Command\CommandAllreadyMappedExcpetion.vb" />
     <Compile Include="Dto\ActionDescriptor.vb" />
     <Compile Include="EntityResolver\Handling.vb" />
+    <Compile Include="ExecutionProfile.vb" />
     <Compile Include="Query\AllreadeyConfiguredException.vb" />
     <Compile Include="Query\QueryMonitorData.vb" />
     <Compile Include="Security\ActionSecurity.vb" />
@@ -85,11 +86,8 @@
     <Compile Include="Dto\IActionDescriptor.vb" />
     <Compile Include="Dto\ISupportActionList.vb" />
     <Compile Include="IActionBase.vb" />
-    <Compile Include="ExecutionProfile\IExecutionProfile.vb" />
     <Compile Include="Security\IActionSecurity.vb" />
     <Compile Include="IAmAnAction.vb" />
-    <Compile Include="ExecutionProfile\IApplicationInfo.vb" />
-    <Compile Include="ExecutionProfile\IExecutionProfileProvider.vb" />
     <Compile Include="Security\IProvideSecurityContext.vb" />
     <Compile Include="Logging\CommandInfo.vb" />
     <Compile Include="Logging\ErrorInfo.vb" />

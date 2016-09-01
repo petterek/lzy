@@ -1,5 +1,5 @@
 ﻿Imports System.Security.Principal
-Imports LazyFramework.CQRS.ExecutionProfile
+
 
 Public MustInherit Class ActionBase
     Implements IAmAnAction
@@ -7,7 +7,6 @@ Public MustInherit Class ActionBase
     Private ReadOnly _GUID As Guid
     Private ReadOnly _TimeStamp As Long
     Private _EndTimeStamp As Long
-    Protected _profile As IExecutionProfile
 
     Public Sub New()
         _GUID = System.Guid.NewGuid

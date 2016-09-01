@@ -19,7 +19,7 @@ Namespace Validation
             _allValidators(GetType(TAction)).Add(validator)
         End Sub
 
-        Public Shared Sub ValidateAction(profile As ExecutionProfile.IExecutionProfile, action As IAmAnAction)
+        Public Shared Sub ValidateAction(profile As Object, action As IAmAnAction)
             Dim t = action.GetType
             While t IsNot Nothing
                 If AllValidators.ContainsKey(t) Then

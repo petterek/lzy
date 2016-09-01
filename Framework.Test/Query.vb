@@ -1,8 +1,6 @@
 ﻿Imports LazyFramework.CQRS
 Imports NUnit.Framework
 Imports LazyFramework.CQRS.Transform
-Imports System.Security.Principal
-Imports LazyFramework.CQRS.ExecutionProfile
 Imports LazyFramework.Test.Cqrs
 
 Public Class DebugLogger
@@ -58,7 +56,7 @@ End Class
 
         LazyFramework.CQRS.Query.Handling.AddQueryHandler(Of TestQuery)(AddressOf New QueryHandler(New SomeInfoClass).DummyQueryHandler)
 
-        res = LazyFramework.CQRS.Query.Handling.ExecuteQuery(New TestExecutionProfileProvider().GetExecutionProfile, q)
+        res = LazyFramework.CQRS.Query.Handling.ExecuteQuery(New Object, q)
 
         Assert.IsInstanceOf(Of QueryResultDto)(res)
 
@@ -72,7 +70,7 @@ End Class
         LazyFramework.CQRS.Transform.EntityTransformerProvider.AddFactory(Of TestQuery2)(New TransformFactory)
         LazyFramework.CQRS.Sorting.Handler.AddSorter(Of TestQuery2)(New SortResult)
 
-        Dim res = LazyFramework.CQRS.Query.Handling.ExecuteQuery(New TestExecutionProfileProvider().GetExecutionProfile, q)
+        Dim res = LazyFramework.CQRS.Query.Handling.ExecuteQuery(New Object, q)
 
         Assert.IsInstanceOf(Of QueryResultDto)(CType(res, IEnumerable)(0))
 
@@ -87,7 +85,7 @@ End Class
         LazyFramework.CQRS.Transform.EntityTransformerProvider.AddFactory(Of TestQuery)(New TransformFactory)
 
 
-        Dim res As QueryResultDto = CType(LazyFramework.CQRS.Query.Handling.ExecuteQuery(New TestExecutionProfileProvider().GetExecutionProfile, q), QueryResultDto)
+        Dim res As QueryResultDto = CType(LazyFramework.CQRS.Query.Handling.ExecuteQuery(New Object, q), QueryResultDto)
 
         Assert.AreEqual(1, res.Id)
         StringAssert.StartsWith("jhjhhjk", res.NameAndDate)
@@ -95,90 +93,6 @@ End Class
 
     End Sub
 End Class
-
-Public Class TestExecutionProfileProvider
-    Implements IExecutionProfileProvider
-
-    Public Function GetExecutionProfile() As IExecutionProfile Implements IExecutionProfileProvider.GetExecutionProfile
-        Return New TestExecutionProfile(1)
-    End Function
-End Class
-
-Public Class TestExecutionProfile
-    Implements IExecutionProfile
-
-    Private v As Integer
-    Private profileStore As IDictionary(Of String, Object) = New Dictionary(Of String, Object)
-
-    Private eventLIst As New List(Of Object)
-
-    Public Property Storage As IDictionary(Of String, Object) Implements IExecutionProfile.Storage
-        Get
-            Return profileStore
-        End Get
-        Set(value As IDictionary(Of String, Object))
-            profileStore = value
-        End Set
-    End Property
-
-    Public Sub New(v As Integer)
-        Me.v = v
-    End Sub
-
-    Public Sub Publish(currentUser As IPrincipal, [event] As Object) Implements IExecutionProfile.Publish
-        eventLIst.Add([event])
-    End Sub
-
-    Public Function Application() As IApplicationInfo Implements IExecutionProfile.Application
-        Return New ApplicationInfo(v)
-    End Function
-
-    Public Function User() As IPrincipal Implements IExecutionProfile.User
-        Return System.Threading.Thread.CurrentPrincipal
-    End Function
-
-
-    Public Sub Log(level As Integer, message As String) Implements IExecutionProfile.Log
-        Throw New NotImplementedException()
-    End Sub
-
-    Public Function Time() As Date Implements IExecutionProfile.Time
-        Return Now
-    End Function
-End Class
-
-Public Class ApplicationInfo
-    Implements IApplicationInfo
-
-    Private ReadOnly _i As Integer
-
-    Public Sub New(i As Integer)
-        _i = i
-    End Sub
-
-    Public Function Id() As String Implements IApplicationInfo.Id
-        Return CType(_i, String)
-    End Function
-
-    Public Function Name() As String Implements IApplicationInfo.Name
-        Return "lkløkl"
-    End Function
-End Class
-
-
-
-
-'Public Class TestQueryContext
-'    Inherits LazyFramework.CQRS.ExecutionContext.Context(Of TestQuery)
-
-'    Public Overrides Sub SetupCache(action As TestQuery)
-'        MyBase.SetupCache(action)
-
-'        action.Id = 100
-'    End Sub
-
-'End Class
-
 
 
 
@@ -274,7 +188,7 @@ End Class
 Friend Class Transformers
     Inherits TransformerBase(Of QueryResult, QueryResultDto)
 
-    Public Overrides Function TransformToDto(ent As QueryResult) As QueryResultDto
+    Public Overrides Function TransformToDto(profile As Object, ent As QueryResult) As QueryResultDto
 
         Dim ret As New QueryResultDto
         ret.Id = ent.Id

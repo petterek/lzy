@@ -7,7 +7,7 @@ Imports LazyFramework.CQRS.Security
 Namespace Transform
     Public Class Handling
 
-        Public Shared Function TransformResult(profile As IExecutionProfile, ByVal action As IAmAnAction, ByVal result As Object, Optional ByVal transformer As ITransformEntityToDto = Nothing) As Object
+        Public Shared Function TransformResult(profile As Object, ByVal action As IAmAnAction, ByVal result As Object, Optional ByVal transformer As ITransformEntityToDto = Nothing) As Object
             Dim transformerFactory As ITransformerFactory = EntityTransformerProvider.GetFactory(action)
 
             'Hmmmm skal vi ha logikk her som sjekker om det er noe factory, og hvis det ikke er det bare returnere det den fikk inn. 
@@ -74,7 +74,7 @@ Namespace Transform
             End If
         End Function
 
-        Public Shared Function Transform(profile As IExecutionProfile, ByVal action As IAmAnAction, ByVal transformer As ITransformEntityToDto, e As Object) As Object
+        Public Shared Function Transform(profile As Object, ByVal action As IAmAnAction, ByVal transformer As ITransformEntityToDto, e As Object) As Object
             Dim securityContext As Object
             If transformer Is Nothing Then Return Nothing
             If TypeOf (e) Is IProvideSecurityContext Then
@@ -87,13 +87,13 @@ Namespace Transform
                 If Not Setup.ActionSecurity.EntityIsAvailableForUser(profile, action, securityContext) Then Return Nothing
             End If
 
-            Dim transformEntity As Object = transformer.TransformEntity(e)
+            Dim transformEntity As Object = transformer.TransformEntity(profile, e)
             If transformEntity Is Nothing Then Return Nothing
 
 
             Return transformEntity
         End Function
-        Public Shared Function Transform(profile As IExecutionProfile, ByVal action As IAmAnAction, ByVal transformer As ITransformEntityToDto, e As IEnumerable) As IEnumerable(Of Object)
+        Public Shared Function Transform(profile As Object, ByVal action As IAmAnAction, ByVal transformer As ITransformEntityToDto, e As IEnumerable) As IEnumerable(Of Object)
             Dim ret = New List(Of Object)
             For Each res In e
                 Dim transRes = Transform(profile, action, transformer, res)

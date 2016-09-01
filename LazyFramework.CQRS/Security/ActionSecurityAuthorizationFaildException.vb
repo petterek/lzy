@@ -5,7 +5,7 @@ Namespace Security
 
     Public Class ActionSecurityAuthorizationFaildException
         Inherits ActionValidationBaseException
-        Public Sub New(action As IAmAnAction, user As IPrincipal)
+        Public Sub New(action As IAmAnAction, user As Object)
             MyBase.New(action, user)
         End Sub
 

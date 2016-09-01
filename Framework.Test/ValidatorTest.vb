@@ -1,7 +1,4 @@
 ﻿Imports NUnit.Framework
-Imports System.Security.Principal
-Imports LazyFramework.CQRS
-Imports LazyFramework.CQRS.ExecutionProfile
 
 <TestFixture> Public Class ValidatorTest
 

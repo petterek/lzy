@@ -12,8 +12,6 @@ Imports System.Threading
 Public Class EventHub
     Private Shared _handlers As New Dictionary(Of Type, List(Of Action(Of Object, Object)))
 
-    Private Shared ReadOnly PadLock As New Object
-
     ''' <summary>
     ''' 
     ''' </summary>
@@ -28,9 +26,11 @@ Public Class EventHub
 
     Public Shared Sub RegisterHandler(Of T)(handler As Action(Of Object, T))
         Dim handlerLIst As List(Of Action(Of Object, Object))
+
         If Not _handlers.ContainsKey(GetType(T)) Then
             _handlers.Add(GetType(T), New List(Of Action(Of Object, Object)))
         End If
+
         handlerLIst = _handlers(GetType(T))
         handlerLIst.Add(Sub(sender, e) handler(sender, DirectCast(e, T)))
     End Sub

@@ -6,7 +6,7 @@ Namespace Validation
 
         Public Overridable ReadOnly Property DetailedExceptionInfo As Boolean = False
 
-        Friend Sub InternalValidate(ByVal executionProfile As IExecutionProfile, ByVal action As IAmAnAction) Implements IValidateAction.InternalValidate
+        Friend Sub InternalValidate(ByVal executionProfile As Object, ByVal action As IAmAnAction) Implements IValidateAction.InternalValidate
             '    ValidatAction(CType(action, TAction))
             Dim val As New ValidationException
             Dim exList As New Dictionary(Of String, Exception)
@@ -14,7 +14,7 @@ Namespace Validation
 
             Dim [getType] As Type = Me.GetType
 
-            For Each p In [getType].GetMethods(System.Reflection.BindingFlags.DeclaredOnly Or system.Reflection.BindingFlags.Public Or system.Reflection.BindingFlags.Instance)
+            For Each p In [getType].GetMethods(System.Reflection.BindingFlags.DeclaredOnly Or System.Reflection.BindingFlags.Public Or System.Reflection.BindingFlags.Instance)
                 Try
                     If p.GetParameters.Count = 1 AndAlso p.GetParameters(0).ParameterType.IsAssignableFrom(action.GetType) Then
                         p.Invoke(Me, {action})

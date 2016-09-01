@@ -1,8 +1,5 @@
-﻿Imports System.Security.Principal
-Imports LazyFramework.CQRS.Command
-Imports LazyFramework.CQRS.ExecutionProfile
+﻿Imports LazyFramework.CQRS.Command
 Imports LazyFramework.CQRS.Security
-
 
 Public Class ActionInfo
 
@@ -27,12 +24,12 @@ Public Class ActionInfo
     End Function
 
 
-    Public Shared Function GetAvailableActionsForType(profile As IExecutionProfile, entityType As Type) As List(Of IActionBase)
+    Public Shared Function GetAvailableActionsForType(profile As Object, entityType As Type) As List(Of IActionBase)
         Dim ret As New List(Of IActionBase)
         If AllActions.ContainsKey(entityType) Then
             For Each t In _actionsForType(entityType)
                 Dim createInstance As IActionBase = CType(Setup.ClassFactory.CreateInstance(t), IActionBase)
-                If Availability.Handler.IsActionAvailable(profile,createInstance) Then
+                If Availability.Handler.ActionIsAvailable(profile, createInstance, Nothing) Then
                     ret.Add(createInstance)
                 End If
             Next
@@ -40,7 +37,7 @@ Public Class ActionInfo
         Return ret
     End Function
 
-    Public Shared Function GetAvailableActionsForEntity(profile As IExecutionProfile, entity As Object) As List(Of IActionBase)
+    Public Shared Function GetAvailableActionsForEntity(profile As Object, entity As Object) As List(Of IActionBase)
         Dim ret As New List(Of IActionBase)
 
         If TypeOf entity Is ActionContext.ActionContext Then
@@ -67,9 +64,9 @@ Public Class ActionInfo
         Return ret
     End Function
 
-    Private Shared Function CheckAvailability(ByVal entity As Object, ByVal action As IActionBase, profile As IExecutionProfile) As Boolean
+    Private Shared Function CheckAvailability(ByVal entity As Object, ByVal action As IActionBase, profile As Object) As Boolean
 
-        If Availability.Handler.ActionIsAvailable(profile,action, entity) Then
+        If Availability.Handler.ActionIsAvailable(profile, action, entity) Then
             If TypeOf (action) Is CommandBase Then
                 CType(action, CommandBase).SetInnerEntity(entity)
             End If
@@ -80,5 +77,5 @@ Public Class ActionInfo
         End If
         Return False
     End Function
-    
+
 End Class

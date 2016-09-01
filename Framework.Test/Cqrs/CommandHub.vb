@@ -1,9 +1,5 @@
-﻿
-Imports System.Security.Principal
-Imports LazyFramework.CQRS
-Imports LazyFramework.CQRS.Availability
+﻿Imports LazyFramework.CQRS
 Imports LazyFramework.CQRS.Command
-Imports LazyFramework.CQRS.ExecutionProfile
 Imports LazyFramework.CQRS.Security
 Imports NUnit.Framework
 
@@ -32,11 +28,11 @@ Namespace Cqrs
 
         <Test> Public Sub CommandIsRunned()
 
-            Dim testExecutionProfileProvider = New TestExecutionProfileProvider()
+
             LazyFramework.CQRS.Command.Handling.AddCommandHandler(Of TestCommand)(AddressOf CommandHandler.CommandHandler)
             LazyFramework.CQRS.Command.Handling.AddCommandHandler(Of AnotherCommand)(AddressOf Another.HandleSomethingElseCommandHandler)
-            Handling.ExecuteCommand(testExecutionProfileProvider.GetExecutionProfile, New TestCommand)
-            Handling.ExecuteCommand(testExecutionProfileProvider.GetExecutionProfile, New AnotherCommand)
+            Handling.ExecuteCommand(New Object, New TestCommand)
+            Handling.ExecuteCommand(New Object, New AnotherCommand)
             Assert.IsTrue(CommandHandler.Found)
 
         End Sub
@@ -44,7 +40,7 @@ Namespace Cqrs
 
         <Test> Public Sub ExecptionIsHandledCorrectly()
             LazyFramework.CQRS.Command.Handling.AddCommandHandler(Of ExceptionIsThrownCommand)(AddressOf Another.ExceptionIsThrownCommandHandler)
-            Assert.Throws(Of InnerException)(Sub() Handling.ExecuteCommand(New TestExecutionProfileProvider().GetExecutionProfile, New ExceptionIsThrownCommand))
+            Assert.Throws(Of InnerException)(Sub() Handling.ExecuteCommand(New Object, New ExceptionIsThrownCommand))
 
         End Sub
 
@@ -71,15 +67,15 @@ Namespace Cqrs
         <Test> Public Sub NotAvailableCommandIsStopped()
             LazyFramework.CQRS.Command.Handling.AddCommandHandler(Of ThisCommandIsNotAvailableIfIdIs0)(AddressOf New CommandHandler().CommandHandler)
             LazyFramework.CQRS.Availability.Handler.AvailabilityList.Add(GetType(ThisCommandIsNotAvailableIfIdIs0), New CommandAvaialability)
-            Assert.Throws(Of ActionIsNotAvailableException)(Sub() Handling.ExecuteCommand(New TestExecutionProfileProvider().GetExecutionProfile, New ThisCommandIsNotAvailableIfIdIs0 With {.Id = 0}))
-            
+            Assert.Throws(Of ActionIsNotAvailableException)(Sub() Handling.ExecuteCommand(New Object, New ThisCommandIsNotAvailableIfIdIs0 With {.Id = 0}))
+
         End Sub
 
-        <Test> Public Sub CommandAvailabilityIsCalled
+        <Test> Public Sub CommandAvailabilityIsCalled()
 
             LazyFramework.CQRS.Command.Handling.AddCommandHandler(Of ThisCommandIsNotAvailableIfIdIs0)(AddressOf New CommandHandler().CommandHandler)
-            Assert.DoesNotThrow(Sub() Handling.ExecuteCommand(New TestExecutionProfileProvider().GetExecutionProfile, New ThisCommandIsNotAvailableIfIdIs0 With {.Id= 1}))
-            
+            Assert.DoesNotThrow(Sub() Handling.ExecuteCommand(New Object, New ThisCommandIsNotAvailableIfIdIs0 With {.Id = 1}))
+
         End Sub
 
 
@@ -89,15 +85,15 @@ Namespace Cqrs
 
     Public Class CommandAvaialability
         Inherits LazyFramework.CQRS.Availability.CommandAvailability(Of ThisCommandIsNotAvailableIfIdIs0, Entity)
-        
-        Public Overrides Function IsAvailable(profile As IExecutionProfile, commad As ThisCommandIsNotAvailableIfIdIs0, entity As Entity) As Boolean
-            Return False
+
+        Public Overrides Function IsAvailable(profile As Object, commad As ThisCommandIsNotAvailableIfIdIs0, entity As Entity) As Boolean
+            Return commad.Id <> 0
         End Function
     End Class
 
     Public Class ThisCommandIsNotAvailableIfIdIs0
         Inherits BaseCommand(Of Entity)
-        
+
         Public Property Id As Integer
 
 
@@ -141,25 +137,25 @@ Namespace Cqrs
 
         End Function
 
-        
+
     End Class
 
     Public Class TestSecurity
         Implements IActionSecurity
 
-        Public Function EntityIsAvailableForUser(profile As IExecutionProfile, action As IAmAnAction, entity As Object) As Boolean Implements IActionSecurity.EntityIsAvailableForUser
+        Public Function EntityIsAvailableForUser(profile As Object, action As IAmAnAction, entity As Object) As Boolean Implements IActionSecurity.EntityIsAvailableForUser
             Return True
         End Function
 
-        Public Function GetActionList(profile As IExecutionProfile, action As IActionBase, entity As Object) As List(Of IActionDescriptor) Implements IActionSecurity.GetActionList
+        Public Function GetActionList(profile As Object, action As IActionBase, entity As Object) As List(Of IActionDescriptor) Implements IActionSecurity.GetActionList
             Return New List(Of IActionDescriptor)
         End Function
 
-        Public Function UserCanRunThisAction(profile As IExecutionProfile, c As IActionBase) As Boolean Implements IActionSecurity.UserCanRunThisAction
+        Public Function UserCanRunThisAction(profile As Object, c As IActionBase) As Boolean Implements IActionSecurity.UserCanRunThisAction
             Return True
         End Function
 
-        Public Function UserCanRunThisAction(profile As IExecutionProfile, action As IActionBase, entity As Object) As Boolean Implements IActionSecurity.UserCanRunThisAction
+        Public Function UserCanRunThisAction(profile As Object, action As IActionBase, entity As Object) As Boolean Implements IActionSecurity.UserCanRunThisAction
             Return True
         End Function
     End Class
@@ -170,9 +166,9 @@ Namespace Cqrs
 
         Public Shared Found As Boolean = False
 
-        Public  sub CommandHandler(cmd As ThisCommandIsNotAvailableIfIdIs0)
+        Public Sub CommandHandler(cmd As ThisCommandIsNotAvailableIfIdIs0)
 
-        End sub
+        End Sub
 
         Public Shared Sub CommandHandler(cmd As CalculateKm)
 
@@ -205,7 +201,7 @@ Namespace Cqrs
 
         End Function
 
-  
+
     End Class
 
     Public Class AnotherCommand
@@ -215,7 +211,7 @@ Namespace Cqrs
             Return "jbjkbkjb"
         End Function
 
-  
+
     End Class
 
     Public Class ByrefCommand
@@ -228,7 +224,7 @@ Namespace Cqrs
             Return ""
 
         End Function
-        
+
     End Class
 
     Public Class TestCommand
@@ -240,7 +236,7 @@ Namespace Cqrs
 
         End Function
 
-        
+
     End Class
 
 

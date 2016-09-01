@@ -69,16 +69,15 @@ Namespace Query
         Private Shared ReadOnly TypeInstanceCache As New Dictionary(Of Type, Object)
 
 
-        Public Shared Function ExecuteQuery(profile As ExecutionProfile.IExecutionProfile, q As IAmAQuery) As Object
+        Public Shared Function ExecuteQuery(profile As Object, q As IAmAQuery) As Object
 
-            If Not Availability.Handler.IsActionAvailable(profile, q) Then
-                profile.Publish(profile.User, New NoAccess(q))
-                Throw New ActionIsNotAvailableException(q, profile.User)
+            If Not Availability.Handler.ActionIsAvailable(profile, q, Nothing) Then
+                Throw New ActionIsNotAvailableException(q, profile)
             End If
 
             If Setup.ActionSecurity IsNot Nothing Then
                 If Not Setup.ActionSecurity.UserCanRunThisAction(profile, q) Then
-                    Dim actionSecurityAuthorizationFaildException As ActionSecurityAuthorizationFaildException = New ActionSecurityAuthorizationFaildException(q, profile.User)
+                    Dim actionSecurityAuthorizationFaildException As ActionSecurityAuthorizationFaildException = New ActionSecurityAuthorizationFaildException(q, profile)
                     Logging.Log.Error(q, actionSecurityAuthorizationFaildException)
                     Throw actionSecurityAuthorizationFaildException
                 End If

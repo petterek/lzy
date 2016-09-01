@@ -48,7 +48,7 @@ Namespace Transform
             Public Class DoNothingWithTheEntityTransformer
                 Implements ITransformEntityToDto
 
-                Public Function TransformEntity(ByVal ent As Object) As Object Implements ITransformEntityToDto.TransformEntity
+                Public Function TransformEntity(ctx As Object, ByVal ent As Object) As Object Implements ITransformEntityToDto.TransformEntity
                     Return ent
                 End Function
 

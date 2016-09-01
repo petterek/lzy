@@ -66,19 +66,19 @@ Namespace Command
         ''' </summary>
         ''' <param name="command"></param>
         ''' <remarks>Any command can have only 1 handler. An exception will be thrown if there is found more than one for any given command. </remarks>
-        Public Shared Sub ExecuteCommand(profile As ExecutionProfile.IExecutionProfile, command As IAmACommand)
+        Public Shared Sub ExecuteCommand(profile As Object, command As IAmACommand)
 
 
             EntityResolver.Handling.ResolveEntity(command)
 
-            If Not Availability.Handler.IsCommandAvailable(profile, CType(command, CommandBase)) Then
-                profile.Publish(profile.User, New NoAccess(command))
-                Throw New ActionIsNotAvailableException(command, profile.User)
+
+
+            If Not Availability.Handler.CommandIsAvailable(profile, command) Then
+                Throw New ActionIsNotAvailableException(command, profile)
             End If
 
             If Not CanUserRunCommand(profile, CType(command, CommandBase)) Then
-                profile.Publish(profile.User, New NoAccess(command))
-                Throw New ActionSecurityAuthorizationFaildException(command, profile.User)
+                Throw New ActionSecurityAuthorizationFaildException(command, profile)
             End If
 
             Validation.Handling.ValidateAction(profile, command)
@@ -99,8 +99,11 @@ Namespace Command
             command.ActionComplete()
         End Sub
 
+        Public Shared Function IsCommandAvailable(profile As Object, cmd As CommandBase) As Boolean
+            Return Availability.Handler.CommandIsAvailable(profile, cmd)
+        End Function
 
-        Public Shared Function CanUserRunCommand(profile As ExecutionProfile.IExecutionProfile, cmd As CommandBase) As Boolean
+        Public Shared Function CanUserRunCommand(profile As Object, cmd As CommandBase) As Boolean
             If Setup.ActionSecurity Is Nothing Then
                 Return True
             End If

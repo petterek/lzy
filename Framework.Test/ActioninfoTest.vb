@@ -1,8 +1,5 @@
 ﻿Imports LazyFramework.CQRS
 Imports NUnit.Framework
-Imports System.Security.Principal
-Imports LazyFramework.CQRS.ExecutionProfile
-Imports LazyFramework.CQRS.Security
 Imports LazyFramework.Test.Cqrs
 
 <TestFixture> Public Class ActioninfoTest
@@ -21,14 +18,14 @@ Imports LazyFramework.Test.Cqrs
 
         '  LazyFramework.CQRS.ActionInfo.AddActionForType(Of ActionEntity)
 
-        Assert.AreEqual(2, LazyFramework.CQRS.ActionInfo.GetAvailableActionsForEntity(New TestExecutionProfileProvider().GetExecutionProfile, New ActionEntity).Count)
+        Assert.AreEqual(2, LazyFramework.CQRS.ActionInfo.GetAvailableActionsForEntity(New Object, New ActionEntity).Count)
         'Ikke en god test, men det får holde for nå..
-        Assert.IsInstanceOf(Of AcionForActionEntity)(ActionInfo.GetAvailableActionsForEntity(New TestExecutionProfileProvider().GetExecutionProfile, New ActionEntity)(1))
+        Assert.IsInstanceOf(Of AcionForActionEntity)(ActionInfo.GetAvailableActionsForEntity(New Object, New ActionEntity)(1))
 
     End Sub
 
     <Test> Public Sub WiredActionIsFoundForEntity()
-        Assert.IsInstanceOf(Of MenuAction)(ActionInfo.GetAvailableActionsForEntity(New TestExecutionProfileProvider().GetExecutionProfile, New ActionEntity)(0))
+        Assert.IsInstanceOf(Of MenuAction)(ActionInfo.GetAvailableActionsForEntity(New Object, New ActionEntity)(0))
     End Sub
 
 End Class
@@ -36,7 +33,6 @@ End Class
 Public Class SomeOtherActionBase(Of T)
     Implements IActionBase
 
-    Private _profile as IExecutionProfile
 
     Public Function ActionName() As String Implements IActionBase.ActionName
         Return "m.m"
