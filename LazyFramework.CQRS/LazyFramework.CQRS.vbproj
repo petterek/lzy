@@ -62,7 +62,6 @@
     <Compile Include="ActionBase.vb" />
     <Compile Include="ActionContext\ActionContext.vb" />
     <Compile Include="ActionContext\Handling.vb" />
-    <Compile Include="ActionInfo.vb" />
     <Compile Include="ActionIsNotAvailableException.vb" />
     <Compile Include="Availability\CommandAvailability.vb" />
     <Compile Include="Availability\Handler.vb" />

@@ -10,32 +10,17 @@ Namespace Query
         Private Shared _queryList As New Dictionary(Of String, Type)
         Public Shared ReadOnly Property QueryList As Dictionary(Of String, Type)
             Get
-                'If _queryList Is Nothing Then
-                '    SyncLock PadLock
-                '        If _queryList Is Nothing Then
-                '            Dim temp As New Dictionary(Of String, Type)
-                '            For Each t In Reflection.FindAllClassesOfTypeInApplication(GetType(IAmAQuery))
-                '                If t.IsAbstract Then Continue For 'Do not map abstract queries. 
-
-                '                Dim c As IAmAQuery = CType(Setup.ClassFactory.CreateInstance(t), IAmAQuery)
-                '                temp.Add(c.ActionName, t)
-                '            Next
-                '            _queryList = temp
-                '        End If
-                '    End SyncLock
-                'End If
-
                 Return _queryList
             End Get
         End Property
 
 
         Public Shared Sub AddQueryHandler(Of T As IAmAQuery)(handler As Func(Of T, Object))
-            Dim c As IAmAQuery = CType(Setup.ClassFactory.CreateInstance(Of T), IAmAQuery)
-            If _queryList.ContainsKey(c.ActionName) Then
+
+            If _queryList.ContainsKey(GetType(T).FullName) Then
                 Throw New AllreadeyConfiguredException(GetType(T))
             Else
-                _queryList(c.ActionName) = c.GetType()
+                _queryList(GetType(T).FullName) = GetType(T)
             End If
 
             _handlers.Add(GetType(T), New Func(Of Object, Object)(Function(q) handler(CType(q, T))))
