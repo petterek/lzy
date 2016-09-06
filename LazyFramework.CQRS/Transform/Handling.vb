@@ -12,6 +12,7 @@ Namespace Transform
                 Dim ret As New Concurrent.ConcurrentQueue(Of Object)
                 Dim res As Object
 
+                If context.Transformer Is Nothing Then Return result
 
                 If Not context.Transformer.RunAsParallel OrElse Setup.ChickenMode Then
 
