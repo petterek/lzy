@@ -1,5 +1,4 @@
-﻿Imports LazyFramework.CQRS.QueryExecutionProfile
-
+﻿
 Namespace Validation
   Public MustInherit Class ValidateActionBase(Of TAction As IAmAnAction)
         Implements IValidateAction

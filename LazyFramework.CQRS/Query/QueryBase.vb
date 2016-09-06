@@ -1,7 +1,4 @@
-﻿Imports System.Security.Principal
-Imports LazyFramework.CQRS.QueryExecutionProfile
-
-Namespace Query
+﻿Namespace Query
     Public MustInherit Class QueryBase
         Inherits ActionBase
         Implements IAmAQuery
