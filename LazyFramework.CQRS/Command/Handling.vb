@@ -4,11 +4,11 @@ Imports LazyFramework.CQRS.Security
 Namespace Command
     Public Class Handling
 
-        Private Shared _handlers As New Dictionary(Of Type, Func(Of Object, Object, Object))
+        Private Shared _handlers As New Dictionary(Of Type, Func(Of Object, IAmACommand, ExecutionProfile))
         Private Shared _commadList As New Dictionary(Of String, Type)
 
         Public Shared Sub ClearMapping()
-            _handlers = New Dictionary(Of Type, Func(Of Object, Object, Object))
+            _handlers = New Dictionary(Of Type, Func(Of Object, IAmACommand, ExecutionProfile))
             _commadList = New Dictionary(Of String, Type)
         End Sub
 
@@ -31,7 +31,7 @@ Namespace Command
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Private Shared ReadOnly Property AllHandlers() As Dictionary(Of Type, Func(Of Object, Object, Object))
+        Private Shared ReadOnly Property AllHandlers() As Dictionary(Of Type, Func(Of Object, IAmACommand, ExecutionProfile))
             Get
                 Return _handlers
             End Get
@@ -42,13 +42,9 @@ Namespace Command
         ''' </summary>
         ''' <typeparam name="TCommand"></typeparam>
         ''' <param name="run"></param>
-        Public Shared Sub AddCommandHandler(Of TCommand As IAmACommand)(run As Action(Of Object, TCommand))
+        Public Shared Sub AddCommandHandler(Of TCommand As IAmACommand)(run As Func(Of Object, IAmACommand, ExecutionProfile))
 
-            _handlers.Add(GetType(TCommand), New Func(Of Object, Object, Object)(Function(ctx As Object, cmd As Object)
-                                                                                     run(ctx, CType(cmd, TCommand))
-                                                                                     Return Nothing
-                                                                                 End Function
-                                                                 ))
+            _handlers.Add(GetType(TCommand), run)
             _commadList.Add(GetType(TCommand).FullName, GetType(TCommand))
         End Sub
 
@@ -58,29 +54,24 @@ Namespace Command
         ''' </summary>
         ''' <param name="command"></param>
         ''' <remarks>Any command can have only 1 handler. An exception will be thrown if there is found more than one for any given command. </remarks>
-        Public Shared Sub ExecuteCommand(profile As Object, command As IAmACommand)
-
-
-            EntityResolver.Handling.ResolveEntity(command)
-
-
-
-            If Not Availability.Handler.CommandIsAvailable(profile, command) Then
-                Throw New ActionIsNotAvailableException(command, profile)
-            End If
-
-            If Not CanUserRunCommand(profile, CType(command, CommandBase)) Then
-                Throw New ActionSecurityAuthorizationFaildException(command, profile)
-            End If
-
-            Validation.Handling.ValidateAction(profile, command)
+        Public Shared Function ExecuteCommand(profile As Object, command As IAmACommand) As Object
 
             Try
-                Dim temp = AllHandlers(command.GetType)(profile, command)
-                If temp IsNot Nothing Then
-                    command.SetResult(Transform.Handling.TransformResult(profile, command, temp))
+                Dim commandExecProfile = AllHandlers(command.GetType)(profile, command)
+
+                If commandExecProfile.ActionIsAvailable IsNot Nothing AndAlso Not commandExecProfile.ActionIsAvailable.IsAvailable(CType(commandExecProfile, CommandExecutionBase).Entity) Then
+                    Throw New ActionIsNotAvailableException(command, profile)
                 End If
 
+                If Not CanUserRunCommand(CType(commandExecProfile, CommandExecutionBase), CType(command, CommandBase)) Then
+                    Throw New ActionSecurityAuthorizationFaildException(command, profile)
+                End If
+
+                If commandExecProfile.ValidateAction IsNot Nothing Then commandExecProfile.ValidateAction.InternalValidate(command)
+                Dim commandResult = Transform.Handling.TransformResult(commandExecProfile, commandExecProfile.ActionHandler(command))
+                command.SetResult(commandResult)
+                Return commandResult
+                command.ActionComplete()
             Catch ex As TargetInvocationException
                 Logging.Log.Error(command, ex)
                 Throw ex.InnerException
@@ -88,22 +79,15 @@ Namespace Command
                 Logging.Log.Error(command, ex)
                 Throw
             End Try
-            command.ActionComplete()
-        End Sub
-
-        Public Shared Function IsCommandAvailable(profile As Object, cmd As CommandBase) As Boolean
-            Return Availability.Handler.CommandIsAvailable(profile, cmd)
         End Function
 
-        Public Shared Function CanUserRunCommand(profile As Object, cmd As CommandBase) As Boolean
-            If Setup.ActionSecurity Is Nothing Then
+        Public Shared Function CanUserRunCommand(profile As CommandExecutionBase, cmd As CommandBase) As Boolean
+            If profile.ActionSecurity Is Nothing Then
                 Return True
             End If
-            If cmd.GetInnerEntity Is Nothing Then
-                Return Setup.ActionSecurity.UserCanRunThisAction(profile, cmd)
-            Else
-                Return Setup.ActionSecurity.UserCanRunThisAction(profile, cmd, cmd.GetInnerEntity)
-            End If
+
+            Return profile.ActionSecurity.UserCanRunThisAction()
+
         End Function
 
 

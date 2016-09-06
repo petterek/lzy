@@ -1,7 +1,7 @@
-﻿Imports LazyFramework.CQRS.ExecutionProfile
+﻿Imports LazyFramework.CQRS.QueryExecutionProfile
 
 Namespace Validation
     Public Interface IValidateAction
-        Sub InternalValidate(ByVal executionProfile As Object, ByVal action As IAmAnAction)
+        Sub InternalValidate(ByVal action As IAmAnAction)
     End Interface
 End Namespace

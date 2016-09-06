@@ -1,5 +1,5 @@
 ﻿Imports LazyFramework.CQRS.Command
-Imports LazyFramework.CQRS.ExecutionProfile
+Imports LazyFramework.CQRS.QueryExecutionProfile
 
 Namespace Availability
     Public Class Handler
@@ -25,7 +25,7 @@ Namespace Availability
         Public Shared Function CommandIsAvailable(profile As Object, commandBase As IAmACommand) As Boolean
             If AvailabilityList.ContainsKey(commandBase.GetType) Then
                 If TypeOf (commandBase) Is CommandBase Then
-                    Return AvailabilityList(commandBase.GetType).IsAvailable(profile, commandBase, DirectCast(commandBase, CommandBase).GetInnerEntity())
+                    Return AvailabilityList(commandBase.GetType).IsAvailable(commandBase, DirectCast(commandBase, CommandBase).GetInnerEntity())
                 Else
                     Return AvailabilityList(commandBase.GetType).IsAvailable(profile, commandBase, Nothing)
                 End If

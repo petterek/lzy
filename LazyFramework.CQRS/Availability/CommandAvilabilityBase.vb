@@ -1,14 +1,14 @@
 ﻿Imports LazyFramework.CQRS.Command
-Imports LazyFramework.CQRS.ExecutionProfile
 
 Namespace Availability
     Public MustInherit Class CommandAvailabilityBase(Of T)
         Implements ICommandAvailability
 
-        Public MustOverride Function IsAvailable(profile As Object, action As T, entity As Object) As Boolean
+        Public MustOverride Function IsAvailable(entity As Object) As Boolean Implements ICommandAvailability.IsAvailable
 
-        Public Function IsAvailable(profile As Object, cmd As IAmACommand, entity As Object) As Boolean Implements ICommandAvailability.IsAvailable
-            Return IsAvailable(profile, DirectCast(cmd, T), entity)
+        Public Function IsAvailable(entity As T) As Boolean
+            Return IsAvailable(entity)
         End Function
+
     End Class
 End Namespace

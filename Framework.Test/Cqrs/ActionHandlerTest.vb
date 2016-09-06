@@ -5,26 +5,25 @@ Namespace Cqrs
 
         <SetUp> Public Sub SetupFixture()
             LazyFramework.CQRS.Setup.ActionSecurity = New TestSecurity()
-            LazyFramework.CQRS.Setup.ClassFactory = New ClassFactoryImpl
         End Sub
 
         <TearDown> Public Sub TearDown()
             LazyFramework.ClassFactory.Clear()
         End Sub
 
-        <Test> Public Sub ActionHandlerWithInterfaceParamterIsFound()
+        '<Test> Public Sub ActionHandlerWithInterfaceParamterIsFound()
 
-            Dim p As New ImplementedQuery
-            p.Id = 1000
+        '    Dim p As New ImplementedQuery
+        '    p.Id = 1000
 
-            LazyFramework.CQRS.Query.Handling.AddQueryHandler(Of ImplementedQuery)(AddressOf New QueryHandler().HandleQueryHandler)
+        '    LazyFramework.CQRS.Query.Handling.AddQueryHandler(Of ImplementedQuery)(AddressOf New QueryHandler().HandleQueryHandler)
 
-            Dim executeQuery As Object = Nothing
-            Assert.DoesNotThrow(Sub() executeQuery = LazyFramework.CQRS.Query.Handling.ExecuteQuery(New Object, p))
+        '    Dim executeQuery As Object = Nothing
+        '    Assert.DoesNotThrow(Sub() executeQuery = LazyFramework.CQRS.Query.Handling.ExecuteQuery(New Object, p))
 
-            Assert.IsNotNull(executeQuery)
+        '    Assert.IsNotNull(executeQuery)
 
-        End Sub
+        'End Sub
 
 
         Public Interface IInterfacedQuery

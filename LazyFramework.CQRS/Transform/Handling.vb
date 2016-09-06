@@ -1,14 +1,9 @@
-﻿
-Imports LazyFramework.CQRS.Dto
-Imports System.Linq
-Imports LazyFramework.CQRS.ExecutionProfile
-Imports LazyFramework.CQRS.Security
+﻿Imports LazyFramework.CQRS.Dto
 
 Namespace Transform
     Public Class Handling
 
-        Public Shared Function TransformResult(profile As Object, ByVal action As IAmAnAction, ByVal result As Object, Optional ByVal transformer As ITransformEntityToDto = Nothing) As Object
-            Dim transformerFactory As ITransformerFactory = EntityTransformerProvider.GetFactory(action)
+        Public Shared Function TransformResult(context As ExecutionProfile, ByVal result As Object) As Object
 
             'Hmmmm skal vi ha logikk her som sjekker om det er noe factory, og hvis det ikke er det bare returnere det den fikk inn. 
             'Egentlig er det jo bare commands som trenger dette. Queries bør jo gjøre dette selv.. Kanskje. 
@@ -18,11 +13,12 @@ Namespace Transform
                 Dim res As Object
 
 
-                If Not transformerFactory.RunAsParallel OrElse Setup.ChickenMode Then
+                If Not context.Transformer.RunAsParallel OrElse Setup.ChickenMode Then
+
                     For Each e In CType(result, IList)
-                        res = Transform(profile, action, If(transformer Is Nothing, transformerFactory.GetTransformer(action, e), transformer), e)
+                        res = Transform(context, e)
                         If TypeOf (res) Is ISupportActionList Then
-                            CType(res, ISupportActionList).Actions.AddRange(Setup.ActionSecurity.GetActionList(profile, action, e))
+                            CType(res, ISupportActionList).Actions.AddRange(context.ActionSecurity.GetActionList(e))
                         End If
                         If res IsNot Nothing Then
                             ret.Enqueue(res)
@@ -37,9 +33,9 @@ Namespace Transform
                         Cast(Of Object).
                         AsParallel.ForAll(Sub(o As Object)
                                               Try
-                                                  Dim temp = Transform(profile, action, If(transformer Is Nothing, transformerFactory.GetTransformer(action, o), transformer), o)
+                                                  Dim temp = Transform(context, o)
                                                   If TypeOf (temp) Is ISupportActionList Then
-                                                      CType(temp, ISupportActionList).Actions.AddRange(Setup.ActionSecurity.GetActionList(profile, action, o))
+                                                      CType(temp, ISupportActionList).Actions.AddRange(Setup.ActionSecurity.GetActionList(o))
                                                   End If
 
                                                   If temp IsNot Nothing Then
@@ -55,53 +51,41 @@ Namespace Transform
                     End If
 
                     Dim retList = ret.ToList
-                    If transformerFactory.SortingFunc(action) IsNot Nothing Then
-                        retList.Sort(transformerFactory.SortingFunc(action))
-                    Else
-                        If transformer IsNot Nothing AndAlso TypeOf (transformer) Is ISortingFunction AndAlso CType(transformer, ISortingFunction).SortingFunc(action) IsNot Nothing Then
-                            retList.Sort(CType(transformer, ISortingFunction).SortingFunc(action))
-                        End If
+                    If context.Transformer.ObjectComparer IsNot Nothing Then
+                        retList.Sort(context.Transformer.ObjectComparer)
                     End If
 
                     Return retList
                 End If
             Else
-                Dim temp = Transform(profile, action, If(transformer Is Nothing, transformerFactory.GetTransformer(action, result), transformer), result)
+                Dim temp = Transform(context, result)
                 If TypeOf (temp) Is ISupportActionList Then
-                    CType(temp, ISupportActionList).Actions.AddRange(Setup.ActionSecurity.GetActionList(profile, action, result))
+                    CType(temp, ISupportActionList).Actions.AddRange(Setup.ActionSecurity.GetActionList(result))
                 End If
                 Return temp
             End If
         End Function
 
-        Public Shared Function Transform(profile As Object, ByVal action As IAmAnAction, ByVal transformer As ITransformEntityToDto, e As Object) As Object
-            Dim securityContext As Object
-            If transformer Is Nothing Then Return Nothing
-            If TypeOf (e) Is IProvideSecurityContext Then
-                securityContext = DirectCast(e, IProvideSecurityContext).Context
-            Else
-                securityContext = e
+        Public Shared Function Transform(ctx As ExecutionProfile, e As Object) As Object
+            'Dim securityContext As Object
+
+            If ctx.Transformer Is Nothing OrElse ctx.Transformer.GetTransformer(e) Is Nothing Then Return e
+
+            'If TypeOf (e) Is IProvideSecurityContext Then
+            '    securityContext = DirectCast(e, IProvideSecurityContext).Context
+            'Else
+            '    securityContext = e
+            'End If
+
+            If ctx.ActionSecurity IsNot Nothing Then
+                If Not ctx.ActionSecurity.EntityIsAvailableForUser(e) Then Return Nothing
             End If
 
-            If Setup.ActionSecurity IsNot Nothing Then
-                If Not Setup.ActionSecurity.EntityIsAvailableForUser(profile, action, securityContext) Then Return Nothing
-            End If
-
-            Dim transformEntity As Object = transformer.TransformEntity(profile, e)
+            Dim transformEntity As Object = ctx.Transformer.GetTransformer(e).TransformEntity(e)
             If transformEntity Is Nothing Then Return Nothing
 
 
             Return transformEntity
-        End Function
-        Public Shared Function Transform(profile As Object, ByVal action As IAmAnAction, ByVal transformer As ITransformEntityToDto, e As IEnumerable) As IEnumerable(Of Object)
-            Dim ret = New List(Of Object)
-            For Each res In e
-                Dim transRes = Transform(profile, action, transformer, res)
-                If transRes IsNot Nothing Then
-                    ret.Add(transRes)
-                End If
-            Next
-            Return ret
         End Function
     End Class
 End Namespace

@@ -64,13 +64,14 @@
     <Compile Include="ActionContext\Handling.vb" />
     <Compile Include="ActionIsNotAvailableException.vb" />
     <Compile Include="Availability\CommandAvailability.vb" />
-    <Compile Include="Availability\Handler.vb" />
     <Compile Include="Availability\CommandAvilabilityBase.vb" />
     <Compile Include="Availability\ICommandAvailability.vb" />
     <Compile Include="Command\CommandAllreadyMappedExcpetion.vb" />
     <Compile Include="Dto\ActionDescriptor.vb" />
     <Compile Include="EntityResolver\Handling.vb" />
     <Compile Include="ExecutionProfile.vb" />
+    <Compile Include="QueryExecutionProfile.vb" />
+    <Compile Include="QueryExecutionProfile1.vb" />
     <Compile Include="Query\AllreadeyConfiguredException.vb" />
     <Compile Include="Query\QueryMonitorData.vb" />
     <Compile Include="Security\ActionSecurity.vb" />

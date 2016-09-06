@@ -1,5 +1,5 @@
 ﻿Imports System.Security.Principal
-Imports LazyFramework.CQRS.ExecutionProfile
+Imports LazyFramework.CQRS.QueryExecutionProfile
 
 Namespace Command
     Public MustInherit Class CommandBase

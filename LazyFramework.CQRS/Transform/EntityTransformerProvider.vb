@@ -41,14 +41,23 @@ Namespace Transform
 
             Public Property RunAsParallel As Boolean = true Implements ITransformerFactory.RunAsParallel
 
-            Public Function GetTransformer(someAction As IAmAnAction, ent As Object) As ITransformEntityToDto Implements ITransformerFactory.GetTransformer
+            Public Property ObjectComparer As Comparison(Of Object) Implements ITransformerFactory.ObjectComparer
+                Get
+                    Throw New NotImplementedException()
+                End Get
+                Set(value As Comparison(Of Object))
+                    Throw New NotImplementedException()
+                End Set
+            End Property
+
+            Public Function GetTransformer(ent As Object) As ITransformEntityToDto Implements ITransformerFactory.GetTransformer
                 Return _Trans
             End Function
 
             Public Class DoNothingWithTheEntityTransformer
                 Implements ITransformEntityToDto
 
-                Public Function TransformEntity(ctx As Object, ByVal ent As Object) As Object Implements ITransformEntityToDto.TransformEntity
+                Public Function TransformEntity(ByVal ent As Object) As Object Implements ITransformEntityToDto.TransformEntity
                     Return ent
                 End Function
 
@@ -56,9 +65,7 @@ Namespace Transform
             End Class
 
 
-            Public Function SortingFunc(action As IAmAnAction) As Comparison(Of Object) Implements ISortingFunction.SortingFunc
-                Return Nothing
-            End Function
+
         End Class
 
     End Class

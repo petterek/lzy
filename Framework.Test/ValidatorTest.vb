@@ -5,10 +5,10 @@
     <Test> Public Sub ValidatorsIsCalled()
 
         LazyFramework.CQRS.Validation.Handling.AddValidator(Of ToValidate)(New ToValidateValidator)
-        Assert.Throws(Of LazyFramework.CQRS.Validation.ValidationException)(Sub() LazyFramework.CQRS.Validation.Handling.ValidateAction(Nothing, New ToValidate))
+        Assert.Throws(Of LazyFramework.CQRS.Validation.ValidationException)(Sub() LazyFramework.CQRS.Validation.Handling.ValidateAction(New ToValidate))
 
         Try
-            LazyFramework.CQRS.Validation.Handling.ValidateAction(Nothing, New ToValidate)
+            LazyFramework.CQRS.Validation.Handling.ValidateAction(New ToValidate)
         Catch ex As LazyFramework.CQRS.Validation.ValidationException
             Assert.AreEqual(2, ex.ExceptionList.Count)
         End Try

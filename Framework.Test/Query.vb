@@ -2,6 +2,7 @@
 Imports NUnit.Framework
 Imports LazyFramework.CQRS.Transform
 Imports LazyFramework.Test.Cqrs
+Imports LazyFramework.Test
 
 Public Class DebugLogger
     Implements LazyFramework.CQRS.Monitor.IMonitorWriter
@@ -16,24 +17,11 @@ Public Class DebugLogger
     Public Property IsSuspended As Boolean Implements Monitor.IMonitorWriter.IsSuspended
 End Class
 
-Public Class ClassFactoryImpl
-    Implements LazyFramework.CQRS.IClassFactory
-
-    Public Function CreateInstance(type As Type) As Object Implements IClassFactory.CreateInstance
-        Return LazyFramework.ClassFactory.Construct(type)
-    End Function
-
-    Public Function CreateInstance(Of T)() As T Implements IClassFactory.CreateInstance
-        Return LazyFramework.ClassFactory.Construct(Of T)()
-    End Function
-End Class
-
 <TestFixture> Public Class Query
 
     <SetUp> Public Sub First()
 
         LazyFramework.CQRS.Setup.ActionSecurity = New TestSecurity
-        LazyFramework.CQRS.Setup.ClassFactory = New ClassFactoryImpl
 
         LazyFramework.CQRS.Query.Handling.ClearHandlers()
 
@@ -54,7 +42,13 @@ End Class
         Dim q As New TestQuery With {.Id = 1}
         Dim res As Object
 
-        LazyFramework.CQRS.Query.Handling.AddQueryHandler(Of TestQuery)(AddressOf New QueryHandler(New SomeInfoClass).DummyQueryHandler)
+        LazyFramework.CQRS.Query.Handling.AddQueryHandler(Of TestQuery)(
+            Function(o, action)
+                Dim queryExecutionProfile1 = New QueryExecutionProfile(Of TestQuery, QueryResult, QueryResultDto)(AddressOf New QueryHandler(New SomeInfoClass).DummyQueryHandler)
+                queryExecutionProfile1.ResultTransformer = New TransformFactory()
+
+                Return queryExecutionProfile1
+            End Function)
 
         res = LazyFramework.CQRS.Query.Handling.ExecuteQuery(New Object, q)
 
@@ -66,9 +60,12 @@ End Class
     <Test> Public Sub ListIsConvertedCorrectlyAndSorted()
 
         Dim q As New TestQuery2 With {.Id = 1, .Startdate = Now}
-        LazyFramework.CQRS.Query.Handling.AddQueryHandler(Of TestQuery2)(AddressOf New QueryHandler(New SomeInfoClass).Dummy2QueryHandler)
-        LazyFramework.CQRS.Transform.EntityTransformerProvider.AddFactory(Of TestQuery2)(New TransformFactory)
-        LazyFramework.CQRS.Sorting.Handler.AddSorter(Of TestQuery2)(New SortResult)
+        LazyFramework.CQRS.Query.Handling.AddQueryHandler(Of TestQuery2)(Function(o, action)
+                                                                             Dim qEP = New QueryExecutionProfile(Of TestQuery2, QueryResult, QueryResultDto)(AddressOf New QueryHandler(New SomeInfoClass).Dummy2QueryHandler)
+                                                                             qEP.ResultTransformer = New TransformFactory
+                                                                             qEP.ResultTransformer.Sorting = New Comparison(Of QueryResultDto)(Function(a, b) CType(b, QueryResultDto).Id - CType(a, QueryResultDto).Id)
+                                                                             Return qEP
+                                                                         End Function)
 
         Dim res = LazyFramework.CQRS.Query.Handling.ExecuteQuery(New Object, q)
 
@@ -81,8 +78,13 @@ End Class
 
     <Test> Public Sub ContextSetupIsFound()
         Dim q As New TestQuery With {.Id = 1}
-        LazyFramework.CQRS.Query.Handling.AddQueryHandler(Of TestQuery)(AddressOf New QueryHandler(New SomeInfoClass).DummyQueryHandler)
-        LazyFramework.CQRS.Transform.EntityTransformerProvider.AddFactory(Of TestQuery)(New TransformFactory)
+
+        LazyFramework.CQRS.Query.Handling.AddQueryHandler(Of TestQuery)(Function(o, action)
+                                                                            Dim qEP = New QueryExecutionProfile(Of TestQuery, QueryResult, QueryResultDto)(AddressOf New QueryHandler(New SomeInfoClass).DummyQueryHandler)
+                                                                            qEP.ResultTransformer = New TransformFactory()
+                                                                            Return qEP
+
+                                                                        End Function)
 
 
         Dim res As QueryResultDto = CType(LazyFramework.CQRS.Query.Handling.ExecuteQuery(New Object, q), QueryResultDto)
@@ -132,7 +134,6 @@ Public Class SomeInfoClass
 End Class
 
 Public Class QueryHandler
-    Implements LazyFramework.CQRS.Query.IHandleQuery
 
     Private ReadOnly _someExternalInjection As SomeInfoClass
 
@@ -154,14 +155,6 @@ Public Class QueryHandler
 
 End Class
 
-Public Class SortResult
-    Inherits LazyFramework.CQRS.Sorting.SortResultBase(Of TestQuery2, QueryResultDto)
-
-    Public Overrides Function Compare(x As QueryResultDto, y As QueryResultDto) As Integer
-        Return y.Id - x.Id
-    End Function
-End Class
-
 Public Class QueryResult
     Public Id As Integer
     Public Name As String
@@ -176,11 +169,11 @@ End Class
 
 
 Public Class TransformFactory
-    Inherits TransformerFactoryBase(Of TestQuery, QueryResult)
+    Inherits TransformerFactoryBase(Of QueryResult, QueryResultDto)
 
-    Dim trans As New Transformers
+    Dim trans As New Transformers()
 
-    Public Overrides Function GetTransformer(action As TestQuery, ent As QueryResult) As ITransformEntityToDto
+    Public Overrides Function GetTransformer(ent As QueryResult) As ITransformEntityToDto
         Return trans
     End Function
 End Class
@@ -188,7 +181,7 @@ End Class
 Friend Class Transformers
     Inherits TransformerBase(Of QueryResult, QueryResultDto)
 
-    Public Overrides Function TransformToDto(profile As Object, ent As QueryResult) As QueryResultDto
+    Public Overrides Function TransformToDto(ent As QueryResult) As QueryResultDto
 
         Dim ret As New QueryResultDto
         ret.Id = ent.Id
