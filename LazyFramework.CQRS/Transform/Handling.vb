@@ -36,7 +36,7 @@ Namespace Transform
                                               Try
                                                   Dim temp = Transform(context, o)
                                                   If TypeOf (temp) Is ISupportActionList Then
-                                                      CType(temp, ISupportActionList).Actions.AddRange(Setup.ActionSecurity.GetActionList(o))
+                                                      CType(temp, ISupportActionList).Actions.AddRange(context.ActionSecurity.GetActionList(o))
                                                   End If
 
                                                   If temp IsNot Nothing Then
@@ -61,7 +61,7 @@ Namespace Transform
             Else
                 Dim temp = Transform(context, result)
                 If TypeOf (temp) Is ISupportActionList Then
-                    CType(temp, ISupportActionList).Actions.AddRange(Setup.ActionSecurity.GetActionList(result))
+                    CType(temp, ISupportActionList).Actions.AddRange(context.ActionSecurity.GetActionList(result))
                 End If
                 Return temp
             End If
