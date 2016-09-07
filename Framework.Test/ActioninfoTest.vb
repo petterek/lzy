@@ -5,7 +5,7 @@ Imports LazyFramework.Test.Cqrs
 <TestFixture> Public Class ActioninfoTest
 
     <SetUp> Public Sub SetupFixture()
-        LazyFramework.CQRS.Setup.ActionSecurity = New TestSecurity()
+
     End Sub
 
     <TearDown> Public Sub TearDown()
@@ -30,12 +30,8 @@ Imports LazyFramework.Test.Cqrs
 End Class
 
 Public Class SomeOtherActionBase(Of T)
-    Implements IActionBase
+    Inherits ActionBase
 
-
-    Public Function ActionName() As String Implements IActionBase.ActionName
-        Return "m.m"
-    End Function
 
 End Class
 

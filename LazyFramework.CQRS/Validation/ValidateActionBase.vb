@@ -1,11 +1,11 @@
 ﻿
 Namespace Validation
-  Public MustInherit Class ValidateActionBase(Of TAction As IAmAnAction)
+    Public MustInherit Class ValidateActionBase(Of TAction As IActionBase)
         Implements IValidateAction
 
         Public Overridable ReadOnly Property DetailedExceptionInfo As Boolean = False
 
-        Friend Sub InternalValidate(ByVal action As IAmAnAction) Implements IValidateAction.InternalValidate
+        Friend Sub InternalValidate(ByVal action As IActionBase) Implements IValidateAction.InternalValidate
             '    ValidatAction(CType(action, TAction))
             Dim val As New ValidationException
             Dim exList As New Dictionary(Of String, Exception)

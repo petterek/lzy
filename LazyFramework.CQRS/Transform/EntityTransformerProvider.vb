@@ -11,7 +11,7 @@ Namespace Transform
             End Get
         End Property
 
-        Public Shared Sub AddFactory(Of TAction As IAmAnAction)(factory As ITransformerFactory)
+        Public Shared Sub AddFactory(Of TAction As IActionBase)(factory As ITransformerFactory)
             If _allTransformers.ContainsKey(GetType(TAction)) Then
                 Throw New TransformerFactoryForActionAllreadyExists(GetType(TAction), _allTransformers(GetType(TAction)).GetType, factory)
             End If
@@ -20,7 +20,7 @@ Namespace Transform
 
         Private Shared ReadOnly DefaultFactory As New DefaultEntiyTransformerFactory
 
-        Public Shared Function GetFactory(ByVal action As IAmAnAction) As ITransformerFactory
+        Public Shared Function GetFactory(ByVal action As IActionBase) As ITransformerFactory
             Dim t = action.GetType
             While t IsNot Nothing
                 If AllTransformers.ContainsKey(t) Then
@@ -61,7 +61,7 @@ Namespace Transform
                     Return ent
                 End Function
 
-                Public Property Action As IAmAnAction Implements ITransformEntityToDto.Action
+                Public Property Action As IActionBase Implements ITransformEntityToDto.Action
             End Class
 
 

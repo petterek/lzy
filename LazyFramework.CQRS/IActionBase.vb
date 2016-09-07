@@ -1,15 +1,10 @@
-﻿Imports System.Security.Principal
-
-
-''' <summary>
+﻿''' <summary>
 ''' Marker interface for all actions. 
 ''' 
 ''' </summary>
 ''' <remarks></remarks>
 Public Interface IActionBase
-
-    Function ActionName() As String
-
+    ReadOnly Property Guid As Guid
 End Interface
 
 

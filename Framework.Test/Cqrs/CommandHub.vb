@@ -8,8 +8,6 @@ Namespace Cqrs
     <TestFixture> Public Class CommandHub
 
         <SetUp> Public Sub SetupFixture()
-            LazyFramework.CQRS.Setup.ActionSecurity = New TestSecurity
-
             LazyFramework.CQRS.Command.Handling.ClearMapping()
         End Sub
 
@@ -52,7 +50,7 @@ Namespace Cqrs
             Dim toTest As New CommandForA
             LazyFramework.CQRS.Command.Handling.AddCommandHandler(Of CommandForA)(Function(a, c) Nothing)
 
-            Assert.AreEqual(toTest.ActionName, Handling.CommandList(toTest.ActionName).FullName)
+            Assert.AreEqual(toTest.GetType.FullName, Handling.CommandList(toTest.GetType.FullName).FullName)
 
         End Sub
 
@@ -148,11 +146,7 @@ Namespace Cqrs
         Public KmDrive As Integer
         Public DateDriven As DateTime
 
-        Public Overrides Function ActionName() As String
 
-            Return "Kalkuler km sats"
-
-        End Function
 
 
     End Class
@@ -200,11 +194,7 @@ Namespace Cqrs
     Public Class ExceptionIsThrownCommand
         Inherits CommandBase
 
-        Public Overrides Function ActionName() As String
 
-            Return "Exception"
-
-        End Function
 
 
     End Class
@@ -212,9 +202,6 @@ Namespace Cqrs
     Public Class AnotherCommand
         Inherits CommandBase
 
-        Public Overrides Function ActionName() As String
-            Return "jbjkbkjb"
-        End Function
 
 
     End Class
@@ -224,22 +211,14 @@ Namespace Cqrs
 
         Public Called As Boolean = False
 
-        Public Overrides Function ActionName() As String
 
-            Return ""
-
-        End Function
 
     End Class
 
     Public Class TestCommand
         Inherits CommandBase
 
-        Public Overrides Function ActionName() As String
 
-            Return "Name"
-
-        End Function
 
 
     End Class
@@ -248,7 +227,6 @@ Namespace Cqrs
     Public Class Another
 
         Public Function HandleSomethingElseCommandHandler(cmd As AnotherCommand) As Object
-            Dim a = cmd.ActionName
             Return Nothing
         End Function
 

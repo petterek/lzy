@@ -21,8 +21,6 @@ End Class
 
     <SetUp> Public Sub First()
 
-        LazyFramework.CQRS.Setup.ActionSecurity = New TestSecurity
-
         LazyFramework.CQRS.Query.Handling.ClearHandlers()
 
         'Debug.Print(Now.Ticks.ToString)

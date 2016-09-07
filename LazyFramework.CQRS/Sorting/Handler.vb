@@ -11,7 +11,7 @@ Namespace Sorting
 
         End Property
 
-        Public Shared Sub AddSorter(Of TAction As IAmAnAction)(sorter As ISortResult)
+        Public Shared Sub AddSorter(Of TAction As IActionBase)(sorter As ISortResult)
             If sorter Is Nothing Then
                 Throw New System.ArgumentNullException(NameOf(sorter))
             End If
@@ -19,14 +19,14 @@ Namespace Sorting
             AllSorters.Add(GetType(TAction), sorter)
         End Sub
 
-        Public Shared Sub SortResult(action As IAmAnAction, list As Object)
+        Public Shared Sub SortResult(action As IActionBase, list As Object)
             If list Is Nothing Then Return
             If Not TypeOf (list) Is IList Then Return
             If Not AllSorters.ContainsKey(action.GetType) Then Return
 
             Dim sorter As ISortResult = AllSorters(action.GetType)
-            DirectCast(list, List(Of Object)).Sort(addressof sorter.CompareObjects)
-            
+            DirectCast(list, List(Of Object)).Sort(AddressOf sorter.CompareObjects)
+
         End Sub
 
     End Class

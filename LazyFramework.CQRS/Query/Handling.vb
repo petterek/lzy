@@ -59,6 +59,9 @@ Namespace Query
 
                 Dim context = handler(profile, q)
 
+                context.Start()
+                context.Action = q
+
                 If context.ActionIsAvailable IsNot Nothing AndAlso Not context.ActionIsAvailable.IsAvailable(q) Then
                     Throw New ActionIsNotAvailableException(q, profile)
                 End If
@@ -66,7 +69,7 @@ Namespace Query
                 If context.ActionSecurity IsNot Nothing Then
                     If Not context.ActionSecurity.UserCanRunThisAction() Then
                         Dim actionSecurityAuthorizationFaildException As ActionSecurityAuthorizationFaildException = New ActionSecurityAuthorizationFaildException(q, profile)
-                        Logging.Log.Error(q, actionSecurityAuthorizationFaildException)
+                        Logging.Log.Error(context, actionSecurityAuthorizationFaildException)
                         Throw actionSecurityAuthorizationFaildException
                     End If
                 End If
@@ -75,29 +78,27 @@ Namespace Query
                 If context.ValidateAction IsNot Nothing Then context.ValidateAction.InternalValidate(q)
 
                 Try
-                        q.HandlerStart()
-                        Dim result As Object = context.ActionHandler(q)
 
-                        result = Transform.Handling.TransformResult(context, result)
-                        Sorting.Handler.SortResult(q, result)
+                    Dim result As Object = context.ActionHandler(q)
+                    result = Transform.Handling.TransformResult(context, result)
+                    context.Stopp()
+                    Logging.Log.Context(context)
 
-                        q.ActionComplete()
+                    Return result
 
-                        Return result
+                Catch ex As TargetInvocationException
+                    Logging.Log.Error(context, ex)
+                    Throw ex.InnerException
+                Catch ex As AggregateException
+                    Logging.Log.Error(context, ex)
+                    Throw
+                Catch ex As Exception
+                    Logging.Log.Error(context, ex)
+                    Throw
+                End Try
+            End If
 
-                    Catch ex As TargetInvocationException
-                        Logging.Log.Error(q, ex)
-                        Throw ex.InnerException
-                    Catch ex As AggregateException
-                        Logging.Log.Error(q, ex)
-                        Throw
-                    Catch ex As Exception
-                        Logging.Log.Error(q, ex)
-                        Throw
-                    End Try
-                End If
-
-                Throw New NotSupportedException("Query handler not found")
+            Throw New NotSupportedException("Query handler not found")
 
         End Function
 

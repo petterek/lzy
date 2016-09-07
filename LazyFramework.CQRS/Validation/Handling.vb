@@ -12,14 +12,14 @@ Namespace Validation
             End Get
         End Property
 
-        Public Shared Sub AddValidator(Of TAction As IAmAnAction)(validator As IValidateAction)
+        Public Shared Sub AddValidator(Of TAction As IActionBase)(validator As IValidateAction)
             If Not _allValidators.ContainsKey(GetType(TAction)) Then
                 _allValidators(GetType(TAction)) = New List(Of IValidateAction)
             End If
             _allValidators(GetType(TAction)).Add(validator)
         End Sub
 
-        Public Shared Sub ValidateAction(action As IAmAnAction)
+        Public Shared Sub ValidateAction(action As IActionBase)
             Dim t = action.GetType
             While t IsNot Nothing
                 If AllValidators.ContainsKey(t) Then

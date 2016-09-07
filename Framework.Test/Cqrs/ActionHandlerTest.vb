@@ -4,7 +4,7 @@ Namespace Cqrs
     <TestFixture> Public Class ActionHandlerTest
 
         <SetUp> Public Sub SetupFixture()
-            LazyFramework.CQRS.Setup.ActionSecurity = New TestSecurity()
+
         End Sub
 
         <TearDown> Public Sub TearDown()

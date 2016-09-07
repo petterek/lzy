@@ -56,8 +56,12 @@ Namespace Command
         ''' <remarks>Any command can have only 1 handler. An exception will be thrown if there is found more than one for any given command. </remarks>
         Public Shared Function ExecuteCommand(profile As Object, command As IAmACommand) As Object
 
+            Dim commandExecProfile As ExecutionProfile = Nothing
             Try
-                Dim commandExecProfile = AllHandlers(command.GetType)(profile, command)
+                commandExecProfile = AllHandlers(command.GetType)(profile, command)
+
+                commandExecProfile.Start()
+                commandExecProfile.Action = command
 
                 If commandExecProfile.ActionIsAvailable IsNot Nothing AndAlso Not commandExecProfile.ActionIsAvailable.IsAvailable(CType(commandExecProfile, CommandExecutionBase).Entity) Then
                     Throw New ActionIsNotAvailableException(command, profile)
@@ -70,14 +74,19 @@ Namespace Command
                 If commandExecProfile.ValidateAction IsNot Nothing Then commandExecProfile.ValidateAction.InternalValidate(command)
                 Dim commandResult = Transform.Handling.TransformResult(commandExecProfile, commandExecProfile.ActionHandler(command))
                 command.SetResult(commandResult)
+
+                commandExecProfile.Stopp()
+                Logging.Log.Context(commandExecProfile)
                 Return commandResult
-                command.ActionComplete()
+
             Catch ex As TargetInvocationException
-                Logging.Log.Error(command, ex)
+                Logging.Log.Error(commandExecProfile, ex)
                 Throw ex.InnerException
             Catch ex As Exception
-                Logging.Log.Error(command, ex)
+                Logging.Log.Error(commandExecProfile, ex)
                 Throw
+            Finally
+                Logging.Log.Context(commandExecProfile)
             End Try
         End Function
 

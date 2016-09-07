@@ -1,6 +1,6 @@
 ﻿Namespace Query
     Public Interface IAmAQuery
-        Inherits IAmAnAction
+        Inherits IActionBase
 
     End Interface
 

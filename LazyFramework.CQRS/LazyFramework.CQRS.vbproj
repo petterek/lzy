@@ -85,7 +85,6 @@
     <Compile Include="Dto\ISupportActionList.vb" />
     <Compile Include="IActionBase.vb" />
     <Compile Include="Security\IActionSecurity.vb" />
-    <Compile Include="IAmAnAction.vb" />
     <Compile Include="Security\IProvideSecurityContext.vb" />
     <Compile Include="Logging\CommandInfo.vb" />
     <Compile Include="Logging\ErrorInfo.vb" />

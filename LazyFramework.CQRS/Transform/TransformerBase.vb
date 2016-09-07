@@ -10,7 +10,7 @@ Namespace Transform
 
         End Sub
 
-        Public Sub New(context As ExecutionProfile, action As IAmAnAction)
+        Public Sub New(context As ExecutionProfile, action As IActionBase)
             If context Is Nothing Then
                 Throw New System.ArgumentNullException(NameOf(context))
             End If
@@ -27,7 +27,7 @@ Namespace Transform
 
         Public MustOverride Function TransformToDto(ent As TEntity) As TDto
 
-        Public Property Action As IAmAnAction Implements ITransformEntityToDto.Action
+        Public Property Action As IActionBase Implements ITransformEntityToDto.Action
 
     End Class
 End Namespace
