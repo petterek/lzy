@@ -3,12 +3,13 @@ Public MustInherit Class ExecutionProfile
     Public Property Action As IActionBase
     Public Property ClientContext As Object
     Friend Property ActionHandler As Func(Of Object, Object)
-    Friend Property Transformer As Transform.ITransformerFactory
-    Public Property ActionIsAvailable As Availability.ICommandAvailability
+    Friend Property Transformer As Func(Of Object, Object)
     Public Property ActionSecurity As Security.IActionSecurity
     Public Property ValidateAction As Validation.IValidateAction
     Public Property RequestStart As Long
     Public Property RequestEnd As Long
+    Public Property Sorter As Comparison(Of Object)
+    Public Property RunAsParallel As Boolean = True
 
     Public Sub Start()
         RequestStart = Now().Ticks
@@ -36,19 +37,25 @@ Public Class QueryExecutionProfile(Of TQuery, TBo, TDto)
     End Sub
 
 
-    Private _localTransformer As Transform.TransformerFactoryBase(Of TBo, TDto)
-    Public Property ResultTransformer As Transform.TransformerFactoryBase(Of TBo, TDto)
+    Private _localTransformer As Func(Of TBo, TDto)
+    Public Property ResultTransformer As Func(Of TBo, TDto)
         Get
             Return _localTransformer
         End Get
-        Set(value As Transform.TransformerFactoryBase(Of TBo, TDto))
+        Set(value As Func(Of TBo, TDto))
 
             If value Is Nothing Then
                 Throw New System.ArgumentNullException(NameOf(value))
             End If
 
-            Transformer = value
+            Transformer = New Func(Of Object, Object)(Function(f) value(CType(f, TBo)))
             _localTransformer = value
+        End Set
+    End Property
+
+    Public WriteOnly Property ResultSorter As Func(Of TDto, TDto, Integer)
+        Set(value As Func(Of TDto, TDto, Integer))
+            Sorter = New Comparison(Of Object)(Function(o1, o2) value(CType(o1, TDto), CType(o2, TDto)))
         End Set
     End Property
 
@@ -61,14 +68,14 @@ Public Class CommandExecutionBase
 
 End Class
 
-Public Class CommandExecutionProfile(Of TCommand As Command.IAmACommand, TBusinessObject, TDto)
+Public Class CommandExecutionProfile(Of TCommand As Command.IAmACommand, TBo, TDto)
     Inherits CommandExecutionBase
 
-    Public Property BusinessObject As TBusinessObject
+    Public Property BusinessObject As TBo
         Get
-            Return CType(Me.Entity, TBusinessObject)
+            Return CType(Me.Entity, TBo)
         End Get
-        Set(value As TBusinessObject)
+        Set(value As TBo)
             Me.Entity = value
         End Set
     End Property
@@ -78,21 +85,21 @@ Public Class CommandExecutionProfile(Of TCommand As Command.IAmACommand, TBusine
     End Sub
 
 
-    Private _localTransformer As Transform.TransformerFactoryBase(Of TBusinessObject, TDto)
-    Public Property ResultTransformer As Transform.TransformerFactoryBase(Of TBusinessObject, TDto)
+    Private _localTransformer As Func(Of TBo, TDto)
+    Public Property ResultTransformer As Func(Of TBo, TDto)
         Get
             Return _localTransformer
         End Get
-        Set(value As Transform.TransformerFactoryBase(Of TBusinessObject, TDto))
+        Set(value As Func(Of TBo, TDto))
 
             If value Is Nothing Then
                 Throw New System.ArgumentNullException(NameOf(value))
             End If
-            Transformer = value
+
+            Transformer = New Func(Of Object, Object)(Function(f) value(CType(f, TBo)))
             _localTransformer = value
         End Set
     End Property
-
 
 End Class
 

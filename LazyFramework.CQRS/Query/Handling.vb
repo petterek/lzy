@@ -62,23 +62,14 @@ Namespace Query
                 context.Start()
                 context.Action = q
 
-                If context.ActionIsAvailable IsNot Nothing AndAlso Not context.ActionIsAvailable.IsAvailable(q) Then
-                    Throw New ActionIsNotAvailableException(q, profile)
+                If context.ActionSecurity IsNot Nothing AndAlso Not context.ActionSecurity.UserCanRunThisAction(q) Then
+                    Dim actionSecurityAuthorizationFaildException As ActionSecurityAuthorizationFaildException = New ActionSecurityAuthorizationFaildException(q, profile)
+                    Logging.Log.Error(context, actionSecurityAuthorizationFaildException)
+                    Throw actionSecurityAuthorizationFaildException
                 End If
-
-                If context.ActionSecurity IsNot Nothing Then
-                    If Not context.ActionSecurity.UserCanRunThisAction() Then
-                        Dim actionSecurityAuthorizationFaildException As ActionSecurityAuthorizationFaildException = New ActionSecurityAuthorizationFaildException(q, profile)
-                        Logging.Log.Error(context, actionSecurityAuthorizationFaildException)
-                        Throw actionSecurityAuthorizationFaildException
-                    End If
-                End If
-
 
                 If context.ValidateAction IsNot Nothing Then context.ValidateAction.InternalValidate(q)
-
                 Try
-
                     Dim result As Object = context.ActionHandler(q)
                     result = Transform.Handling.TransformResult(context, result)
                     context.Stopp()

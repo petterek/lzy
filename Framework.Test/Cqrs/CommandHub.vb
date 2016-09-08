@@ -162,10 +162,13 @@ Namespace Cqrs
             Return New List(Of IActionDescriptor)
         End Function
 
-        Public Function UserCanRunThisAction() As Boolean Implements IActionSecurity.UserCanRunThisAction
-            Return True
+        Public Function UserCanRunThisAction(action As IActionBase) As Boolean Implements IActionSecurity.UserCanRunThisAction
+            Throw New NotImplementedException()
         End Function
 
+        Public Function UserCanRunThisAction(action As IActionBase, entity As Object) As Boolean Implements IActionSecurity.UserCanRunThisAction
+            Throw New NotImplementedException()
+        End Function
     End Class
 
 

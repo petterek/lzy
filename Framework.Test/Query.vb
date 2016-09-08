@@ -43,7 +43,7 @@ End Class
         LazyFramework.CQRS.Query.Handling.AddQueryHandler(Of TestQuery)(
             Function(o, action)
                 Dim queryExecutionProfile1 = New QueryExecutionProfile(Of TestQuery, QueryResult, QueryResultDto)(AddressOf New QueryHandler(New SomeInfoClass).DummyQueryHandler)
-                queryExecutionProfile1.ResultTransformer = New TransformFactory()
+                queryExecutionProfile1.ResultTransformer = Function(a) New QueryResultDto()
 
                 Return queryExecutionProfile1
             End Function)
@@ -60,8 +60,8 @@ End Class
         Dim q As New TestQuery2 With {.Id = 1, .Startdate = Now}
         LazyFramework.CQRS.Query.Handling.AddQueryHandler(Of TestQuery2)(Function(o, action)
                                                                              Dim qEP = New QueryExecutionProfile(Of TestQuery2, QueryResult, QueryResultDto)(AddressOf New QueryHandler(New SomeInfoClass).Dummy2QueryHandler)
-                                                                             qEP.ResultTransformer = New TransformFactory
-                                                                             qEP.ResultTransformer.Sorting = New Comparison(Of QueryResultDto)(Function(a, b) CType(b, QueryResultDto).Id - CType(a, QueryResultDto).Id)
+                                                                             qEP.ResultTransformer = Function(a) New QueryResultDto() With {.Id = a.Id}
+                                                                             qEP.ResultSorter = Function(a, b) b.Id - a.Id
                                                                              Return qEP
                                                                          End Function)
 
@@ -79,7 +79,12 @@ End Class
 
         LazyFramework.CQRS.Query.Handling.AddQueryHandler(Of TestQuery)(Function(o, action)
                                                                             Dim qEP = New QueryExecutionProfile(Of TestQuery, QueryResult, QueryResultDto)(AddressOf New QueryHandler(New SomeInfoClass).DummyQueryHandler)
-                                                                            qEP.ResultTransformer = New TransformFactory()
+                                                                            qEP.ResultTransformer = Function(bo)
+                                                                                                        Dim ret As New QueryResultDto
+                                                                                                        ret.Id = bo.Id
+                                                                                                        ret.NameAndDate = String.Format("{0} har bursdag på {1}", bo.Name, bo.SomeDate.ToShortDateString)
+                                                                                                        Return ret
+                                                                                                    End Function
                                                                             Return qEP
 
                                                                         End Function)

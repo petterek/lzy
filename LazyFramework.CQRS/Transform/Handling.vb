@@ -12,9 +12,7 @@ Namespace Transform
                 Dim ret As New Concurrent.ConcurrentQueue(Of Object)
                 Dim res As Object
 
-                If context.Transformer Is Nothing Then Return result
-
-                If Not context.Transformer.RunAsParallel OrElse Setup.ChickenMode Then
+                If Not context.RunAsParallel OrElse Setup.ChickenMode Then
 
                     For Each e In CType(result, IList)
                         res = Transform(context, e)
@@ -25,7 +23,6 @@ Namespace Transform
                             ret.Enqueue(res)
                         End If
                     Next
-                    Return ret.ToList
                 Else
 
                     Dim Errors As New Concurrent.ConcurrentBag(Of Exception)
@@ -50,14 +47,13 @@ Namespace Transform
                     If Errors.Count > 0 Then
                         Throw Errors(0)
                     End If
-
-                    Dim retList = ret.ToList
-                    If context.Transformer.ObjectComparer IsNot Nothing Then
-                        retList.Sort(context.Transformer.ObjectComparer)
-                    End If
-
-                    Return retList
                 End If
+
+                Dim retList = ret.ToList
+                If context.Sorter IsNot Nothing Then
+                    retList.Sort(context.Sorter)
+                End If
+                Return retList
             Else
                 Dim temp = Transform(context, result)
                 If TypeOf (temp) Is ISupportActionList Then
@@ -68,23 +64,15 @@ Namespace Transform
         End Function
 
         Public Shared Function Transform(ctx As ExecutionProfile, e As Object) As Object
-            'Dim securityContext As Object
-
-            If ctx.Transformer Is Nothing OrElse ctx.Transformer.GetTransformer(e) Is Nothing Then Return e
-
-            'If TypeOf (e) Is IProvideSecurityContext Then
-            '    securityContext = DirectCast(e, IProvideSecurityContext).Context
-            'Else
-            '    securityContext = e
-            'End If
 
             If ctx.ActionSecurity IsNot Nothing Then
                 If Not ctx.ActionSecurity.EntityIsAvailableForUser(e) Then Return Nothing
             End If
 
-            Dim transformEntity As Object = ctx.Transformer.GetTransformer(e).TransformEntity(e)
-            If transformEntity Is Nothing Then Return Nothing
+            If ctx.Transformer Is Nothing Then Return e
 
+            Dim transformEntity As Object = ctx.Transformer(e)
+            If transformEntity Is Nothing Then Return Nothing
 
             Return transformEntity
         End Function

@@ -63,10 +63,6 @@ Namespace Command
                 commandExecProfile.Start()
                 commandExecProfile.Action = command
 
-                If commandExecProfile.ActionIsAvailable IsNot Nothing AndAlso Not commandExecProfile.ActionIsAvailable.IsAvailable(CType(commandExecProfile, CommandExecutionBase).Entity) Then
-                    Throw New ActionIsNotAvailableException(command, profile)
-                End If
-
                 If Not CanUserRunCommand(CType(commandExecProfile, CommandExecutionBase), CType(command, CommandBase)) Then
                     Throw New ActionSecurityAuthorizationFaildException(command, profile)
                 End If
@@ -95,7 +91,7 @@ Namespace Command
                 Return True
             End If
 
-            Return profile.ActionSecurity.UserCanRunThisAction()
+            Return profile.ActionSecurity.UserCanRunThisAction(profile.Action, profile.Entity)
 
         End Function
 
