@@ -63,7 +63,7 @@ Namespace Transform
             If transformEntity Is Nothing Then Return Nothing
 
             If TypeOf (transformEntity) Is ISupportActionList AndAlso ctx.ActionSecurity IsNot Nothing Then
-                CType(transformEntity, ISupportActionList).Actions.AddRange(ctx.ActionSecurity.GetActionList(transformEntity))
+                CType(transformEntity, ISupportActionList).Actions.AddRange(ctx.ActionSecurity.GetActionList(e))
             End If
 
             Return transformEntity
