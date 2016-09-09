@@ -16,26 +16,17 @@ Namespace Transform
 
                     For Each e In CType(result, IList)
                         res = Transform(context, e)
-                        If TypeOf (res) Is ISupportActionList Then
-                            CType(res, ISupportActionList).Actions.AddRange(context.ActionSecurity.GetActionList(e))
-                        End If
                         If res IsNot Nothing Then
                             ret.Enqueue(res)
                         End If
                     Next
                 Else
-
                     Dim Errors As New Concurrent.ConcurrentBag(Of Exception)
-
                     CType(result, IList).
                         Cast(Of Object).
                         AsParallel.ForAll(Sub(o As Object)
                                               Try
                                                   Dim temp = Transform(context, o)
-                                                  If TypeOf (temp) Is ISupportActionList Then
-                                                      CType(temp, ISupportActionList).Actions.AddRange(context.ActionSecurity.GetActionList(o))
-                                                  End If
-
                                                   If temp IsNot Nothing Then
                                                       ret.Enqueue(temp)
                                                   End If
@@ -56,9 +47,6 @@ Namespace Transform
                 Return retList
             Else
                 Dim temp = Transform(context, result)
-                If TypeOf (temp) Is ISupportActionList Then
-                    CType(temp, ISupportActionList).Actions.AddRange(context.ActionSecurity.GetActionList(result))
-                End If
                 Return temp
             End If
         End Function
@@ -73,6 +61,10 @@ Namespace Transform
 
             Dim transformEntity As Object = ctx.Transformer(e)
             If transformEntity Is Nothing Then Return Nothing
+
+            If TypeOf (transformEntity) Is ISupportActionList AndAlso ctx.ActionSecurity IsNot Nothing Then
+                CType(transformEntity, ISupportActionList).Actions.AddRange(ctx.ActionSecurity.GetActionList(transformEntity))
+            End If
 
             Return transformEntity
         End Function
