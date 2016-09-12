@@ -39,6 +39,16 @@ Namespace Cqrs
         End Sub
 
 
+        <Test> Public Sub AddCommandWithoutReturnValue()
+
+            Handling.AddCommandHandler(Of CommandWithoutRetValue)(Function(o, a) New CommandExecutionProfile(Of CommandWithoutRetValue, Object)(AddressOf New CommandHandler().HandleCommandWithoutRetValue))
+
+        End Sub
+
+
+
+
+
         <Test> Public Sub ExecptionIsHandledCorrectly()
             LazyFramework.CQRS.Command.Handling.AddCommandHandler(Of ExceptionIsThrownCommand)(Function(o, a) New CommandExecutionProfile(Of ExceptionIsThrownCommand, Object, Object)(AddressOf New Another().ExceptionIsThrownCommandHandler))
             Assert.Throws(Of InnerException)(Sub() Handling.ExecuteCommand(New Object, New ExceptionIsThrownCommand))
@@ -172,10 +182,19 @@ Namespace Cqrs
     End Class
 
 
+    Public Class CommandWithoutRetValue
+        Inherits CommandBase
+    End Class
+
+
     Public Class CommandHandler
         Public Function CommandHandler(cmd As ThisCommandIsNotAvailableIfIdIs0) As Object
 
         End Function
+
+        Public Sub HandleCommandWithoutRetValue(cmd As CommandWithoutRetValue)
+
+        End Sub
 
         Public Function CommandHandler(cmd As CalculateKm) As Single
 

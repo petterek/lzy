@@ -68,6 +68,18 @@ Public Class CommandExecutionBase
 
 End Class
 
+
+Public Class CommandExecutionProfile(Of TCommand As Command.IAmACommand, TBo)
+    Inherits CommandExecutionBase
+
+    Public Sub New(handler As Action(Of TCommand))
+        ActionHandler = New Func(Of Object, Object)(Function()
+                                                        handler(CType(Action, TCommand))
+                                                        Return Nothing
+                                                    End Function)
+    End Sub
+End Class
+
 Public Class CommandExecutionProfile(Of TCommand As Command.IAmACommand, TBo, TDto)
     Inherits CommandExecutionBase
 
