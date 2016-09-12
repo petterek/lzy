@@ -15,17 +15,15 @@ Namespace Query
 
         ''Public Shared Sub AddQueryHandler(Of T As IAmAQuery)(handler As Func(Of T, Object))
 
-        Public Shared Sub AddQueryHandler(Of T As IAmAQuery)(handler As Func(Of Object, T, ExecutionProfile))
+        Public Shared Sub AddQueryHandler(Of TQuery As IAmAQuery, TBo, TDto)(handler As Func(Of Object, TQuery, QueryExecutionProfile(Of TQuery, TBo, TDto)))
 
-            If _queryList.ContainsKey(GetType(T).FullName) Then
-                Throw New AllreadeyConfiguredException(GetType(T))
+            If _queryList.ContainsKey(GetType(TQuery).FullName) Then
+                Throw New AllreadeyConfiguredException(GetType(TQuery))
             Else
-                _queryList(GetType(T).FullName) = GetType(T)
+                _queryList(GetType(TQuery).FullName) = GetType(TQuery)
             End If
 
-            _handlers.Add(GetType(T), New Func(Of Object, IAmAQuery, ExecutionProfile)(Function(o, a) handler(o, CType(a, T))))
-
-            'New Func(Of Object, Object)(Function(q) handler(CType(q, T)))
+            _handlers.Add(GetType(TQuery), New Func(Of Object, IAmAQuery, ExecutionProfile)(Function(o, a) handler(o, CType(a, TQuery))))
         End Sub
 
         Public Shared Sub ClearHandlers()

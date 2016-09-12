@@ -40,7 +40,7 @@ End Class
         Dim q As New TestQuery With {.Id = 1}
         Dim res As Object
 
-        LazyFramework.CQRS.Query.Handling.AddQueryHandler(Of TestQuery)(
+        LazyFramework.CQRS.Query.Handling.AddQueryHandler(Of TestQuery, QueryResult, QueryResultDto)(
             Function(o, action)
                 Dim queryExecutionProfile1 = New QueryExecutionProfile(Of TestQuery, QueryResult, QueryResultDto)(AddressOf New QueryHandler(New SomeInfoClass).DummyQueryHandler)
                 queryExecutionProfile1.ResultTransformer = Function(a) New QueryResultDto()
@@ -58,12 +58,12 @@ End Class
     <Test> Public Sub ListIsConvertedCorrectlyAndSorted()
 
         Dim q As New TestQuery2 With {.Id = 1, .Startdate = Now}
-        LazyFramework.CQRS.Query.Handling.AddQueryHandler(Of TestQuery2)(Function(o, action)
-                                                                             Dim qEP = New QueryExecutionProfile(Of TestQuery2, QueryResult, QueryResultDto)(AddressOf New QueryHandler(New SomeInfoClass).Dummy2QueryHandler)
-                                                                             qEP.ResultTransformer = Function(a) New QueryResultDto() With {.Id = a.Id}
-                                                                             qEP.ResultSorter = Function(a, b) b.Id - a.Id
-                                                                             Return qEP
-                                                                         End Function)
+        LazyFramework.CQRS.Query.Handling.AddQueryHandler(Of TestQuery2, QueryResult, QueryResultDto)(Function(o, action)
+                                                                                                          Dim qEP = New QueryExecutionProfile(Of TestQuery2, QueryResult, QueryResultDto)(AddressOf New QueryHandler(New SomeInfoClass).Dummy2QueryHandler)
+                                                                                                          qEP.ResultTransformer = Function(a) New QueryResultDto() With {.Id = a.Id}
+                                                                                                          qEP.ResultSorter = Function(a, b) b.Id - a.Id
+                                                                                                          Return qEP
+                                                                                                      End Function)
 
         Dim res = LazyFramework.CQRS.Query.Handling.ExecuteQuery(New Object, q)
 
@@ -77,17 +77,17 @@ End Class
     <Test> Public Sub ContextSetupIsFound()
         Dim q As New TestQuery With {.Id = 1}
 
-        LazyFramework.CQRS.Query.Handling.AddQueryHandler(Of TestQuery)(Function(o, action)
-                                                                            Dim qEP = New QueryExecutionProfile(Of TestQuery, QueryResult, QueryResultDto)(AddressOf New QueryHandler(New SomeInfoClass).DummyQueryHandler)
-                                                                            qEP.ResultTransformer = Function(bo)
-                                                                                                        Dim ret As New QueryResultDto
-                                                                                                        ret.Id = bo.Id
-                                                                                                        ret.NameAndDate = String.Format("{0} har bursdag på {1}", bo.Name, bo.SomeDate.ToShortDateString)
-                                                                                                        Return ret
-                                                                                                    End Function
-                                                                            Return qEP
+        LazyFramework.CQRS.Query.Handling.AddQueryHandler(Of TestQuery, QueryResult, QueryResultDto)(Function(o, action)
+                                                                                                         Dim qEP = New QueryExecutionProfile(Of TestQuery, QueryResult, QueryResultDto)(AddressOf New QueryHandler(New SomeInfoClass).DummyQueryHandler)
+                                                                                                         qEP.ResultTransformer = Function(bo)
+                                                                                                                                     Dim ret As New QueryResultDto
+                                                                                                                                     ret.Id = bo.Id
+                                                                                                                                     ret.NameAndDate = String.Format("{0} har bursdag på {1}", bo.Name, bo.SomeDate.ToShortDateString)
+                                                                                                                                     Return ret
+                                                                                                                                 End Function
+                                                                                                         Return qEP
 
-                                                                        End Function)
+                                                                                                     End Function)
 
 
         Dim res As QueryResultDto = CType(LazyFramework.CQRS.Query.Handling.ExecuteQuery(New Object, q), QueryResultDto)
