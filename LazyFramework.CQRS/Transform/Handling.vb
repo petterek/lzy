@@ -8,6 +8,10 @@ Namespace Transform
             'Hmmmm skal vi ha logikk her som sjekker om det er noe factory, og hvis det ikke er det bare returnere det den fikk inn. 
             'Egentlig er det jo bare commands som trenger dette. Queries bør jo gjøre dette selv.. Kanskje. 
 
+            If result Is Nothing Then
+                Return Nothing
+            End If
+
             If TypeOf result Is IList Then
                 Dim ret As New Concurrent.ConcurrentQueue(Of Object)
                 Dim res As Object
