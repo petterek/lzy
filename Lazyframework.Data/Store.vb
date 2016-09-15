@@ -90,29 +90,24 @@ Public Class Store
     End Sub
 
     Public Shared Function ExecScalar(connectionInfo As ServerConnectionInfo, command As CommandInfo) As Object
-        Dim provider = connectionInfo.GetProvider
-        Dim sw As New Stopwatch
-        sw.Start()
         Dim executeScalar As Object
+        Dim pluginCollection As List(Of DataModificationPluginBase) = Nothing
+        Dim data = New FillStatus(Of Object)(Nothing)
+        Dim provider = connectionInfo.GetProvider
 
-        Try
-            Using cmd = provider.CreateCommand(command)
-                Using conn = provider.CreateConnection(connectionInfo)
-                    cmd.Connection = conn
-                    conn.Open()
-                    executeScalar = cmd.ExecuteScalar()
-                End Using
+        Using cmd = provider.CreateCommand(command)
+            FillParameters(provider, command, Nothing, data.Value, cmd)
+
+            FirePlugin(pluginCollection, PluginExecutionPointEnum.Pre, connectionInfo, command, data.Value)
+
+            Using conn = provider.CreateConnection(connectionInfo)
+                cmd.Connection = conn
+                conn.Open()
+                executeScalar = cmd.ExecuteScalar()
             End Using
-            sw.Stop()
 
-            'Dim loginfo As New DbRequestOkLog With {.DbName = connectionInfo, .Command = command, .Took = sw.ElapsedMilliseconds}
-            'LazyFramework.Logging.Log.Write(Of DbRequestLog)(loginfo, Logging.LogLevelEnum.Info)
-        Catch ex As Exception
-            sw.Stop()
-            'Dim loginfo As New DbRequestFaildLog With {.DbName = connectionInfo, .Command = command, .Took = sw.ElapsedMilliseconds, .Error = ex}
-            'LazyFramework.Logging.Log.Write(Of DbRequestFaildLog)(loginfo, Logging.LogLevelEnum.Info)
-            Throw
-        End Try
+            FirePlugin(pluginCollection, PluginExecutionPointEnum.Post, connectionInfo, command, data.Value)
+        End Using
 
         Return executeScalar
     End Function

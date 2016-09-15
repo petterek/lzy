@@ -7,7 +7,7 @@
     <id>$id$</id>
     <title>Reflection helpers</title>
     <version>$version$</version>
-    <authors></authors>
+    <authors>PEtter Ekrann</authors>
     <owners>PEtter Ekrann</owners>
     <description>Find classes in your assemblies through refelction</description>
     <language>en-US</language>
