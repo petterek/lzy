@@ -46,6 +46,6 @@ Public Class ActionEntity
 End Class
 
 Public Class AcionForActionEntity
-    Inherits BaseCommand(Of ActionEntity)
+    Inherits LazyFramework.CQRS.Command.CommandBase
 
 End Class

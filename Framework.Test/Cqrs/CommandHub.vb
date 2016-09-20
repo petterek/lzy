@@ -117,7 +117,7 @@ Namespace Cqrs
     End Class
 
     Public Class ThisCommandIsNotAvailableIfIdIs0
-        Inherits BaseCommand(Of Entity)
+        Inherits CommandBase
 
         Public Property Id As Integer
 
@@ -130,14 +130,9 @@ Namespace Cqrs
     End Class
 
 
-    Public MustInherit Class BaseCommand(Of T)
-        Inherits CommandBase(Of T)
-
-
-    End Class
 
     Public Class CommandForA
-        Inherits BaseCommand(Of Entity)
+        Inherits CommandBase
 
         Public MyParam As Integer = 1
 

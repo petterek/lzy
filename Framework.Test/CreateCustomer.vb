@@ -3,7 +3,7 @@ Imports LazyFramework.EventHandling
 
 
 Public Class CustomerCommandBase
-    Inherits CommandBase(Of Customer)
+    Inherits CommandBase
 
     Public Id As Guid
 
