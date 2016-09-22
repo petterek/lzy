@@ -29,16 +29,16 @@ Namespace Utils.Json
         Public Class NameInfo
             Private ReadOnly _typename As String
             Private ReadOnly _name As String
-            Private ReadOnly _setter As Action(Of Object, Object)
+            Private ReadOnly _setter As Func(Of Object, Object, Object)
 
 
-            Public Sub New(typename As String, name As String, setter As Action(Of Object, Object))
+            Public Sub New(typename As String, name As String, setter As Func(Of Object, Object, Object))
                 _typename = typename
                 _name = name
                 _setter = setter
             End Sub
 
-            Public ReadOnly Property Setter As Action(Of Object, Object)
+            Public ReadOnly Property Setter As Func(Of Object, Object, Object)
                 Get
                     Return _setter
                 End Get

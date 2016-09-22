@@ -24,48 +24,37 @@ Public Class Reflection
         Return ret
     End Function
 
-    Public Shared Function CreateSetter(type As Type, name As String) As Action(Of Object, Object)
-        Dim mInfo As MemberInfo
-        mInfo = SearchForSetterInfo(type, name)
-        If mInfo Is Nothing Then
-            mInfo = SearchForFieldInfo(type, name)
-        End If
 
-        If mInfo IsNot Nothing Then
-            Return CreateSetter(mInfo)
-        Else
-            Return Nothing
-        End If
-    End Function
+    Public Shared Function CreateSetter(memberInfo As MemberInfo) As Func(Of Object, Object, Object)
 
-    Public Shared Function CreateSetter(memberInfo As MemberInfo) As Action(Of Object, Object)
         Dim targetType = memberInfo.DeclaringType
-        Dim exTarget = Expression.Parameter(GetType(Object), "t")
-        Dim exValue = Expression.Parameter(GetType(Object), "p")
+        Dim memberType As System.Type
 
-        Dim res As Action(Of Object, Object)
-
-        Dim exBody As Expression
         If TypeOf (memberInfo) Is FieldInfo Then
-            exBody = Expression.Assign(Expression.Field(Expression.Convert(exTarget, targetType), DirectCast(memberInfo, FieldInfo)), Expression.Convert(exValue, DirectCast(memberInfo, FieldInfo).FieldType))
+            memberType = DirectCast(memberInfo, FieldInfo).FieldType
         ElseIf TypeOf (memberInfo) Is PropertyInfo Then
-            exBody = Expression.Assign(Expression.Property(Expression.Convert(exTarget, targetType), CType(memberInfo, PropertyInfo)), Expression.Convert(exValue, CType(memberInfo, PropertyInfo).PropertyType))
+            memberType = DirectCast(memberInfo, PropertyInfo).PropertyType
         Else
             Throw New NotSupportedException
         End If
 
-        res = Expression.Lambda(Of Action(Of Object, Object))(exBody, exTarget, exValue).Compile()
 
-        Return res
+        'Inner expression
+        Dim exTarget = Expression.Parameter(targetType, "t")
+        Dim exValue As ParameterExpression = Expression.Parameter(GetType(Object))
+        Dim exBody = Expression.Lambda(Expression.Block(
+                Expression.Assign(Expression.PropertyOrField(exTarget, memberInfo.Name), Expression.Convert(exValue, memberType)),
+                exTarget), exTarget, exValue)
+
+        'Wrapper expression
+        Dim wrapperTarget = Expression.Parameter(GetType(Object))
+        Dim wrapperValue = Expression.Parameter(GetType(Object))
+        Dim wrapper = Expression.Lambda(Of Func(Of Object, Object, Object))(Expression.Convert(Expression.Invoke(
+            exBody, Expression.Convert(wrapperTarget, targetType), wrapperValue), GetType(Object)), wrapperTarget, wrapperValue).Compile
+
+
+        Return New Func(Of Object, Object, Object)(Function(target, value) wrapper(target, value))
     End Function
-
-    Public Shared Function CreateAction(memberInfo As MethodInfo) As Action
-        'Dim ex = Expression.Call(memberInfo, Expression.Parameter(GetType(T), "value"))
-        'Dim res As Action(Of T) = Expression.Lambda(Of Action(Of T))(ex).Compile
-
-        'Return res
-    End Function
-
 
     Public Shared Function GetMethodInfo(expression As Expression(Of Action)) As MethodInfo
         Dim member As MethodCallExpression = CType(expression.Body, MethodCallExpression)

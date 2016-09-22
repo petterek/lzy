@@ -133,6 +133,25 @@ Imports NUnit.Framework
     End Sub
 
 
+    <Test> Public Sub ParseStruct()
+
+        Dim toParse = "{""SomeThing"":1,""ADate"":{""Year"":2016,""Month"":10,""Day"":9}}"
+
+        Dim retValue = Reader.StringToObject(Of ClassWithStruct)(toParse)
+
+        'Dim retValue = New ClassWithStruct
+
+        'SetTheValue(retValue.ADate)
+
+
+        Assert.AreEqual(2016, retValue.ADate.Year)
+
+    End Sub
+
+    Sub SetTheValue(ByRef s As DateHolder)
+        s.Year = 2016
+    End Sub
+
 
     <Test> Public Sub ClassWithArrayDoesNotThrow()
 
@@ -220,5 +239,16 @@ Imports NUnit.Framework
         Public AList As IEnumerable(Of String)
         Public AnotherList As IEnumerable(Of SmallType)
     End Class
+
+    Public Class ClassWithStruct
+        Public SomeThing As Integer
+        Public ADate As DateHolder
+    End Class
+
+    Public Structure DateHolder
+        Public Year As Integer
+        Public Month As Integer
+        Public Day As Integer
+    End Structure
 
 End Class

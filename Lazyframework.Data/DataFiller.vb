@@ -11,8 +11,8 @@ Public Class DataFiller
         Private ReadOnly _col As Integer
         Private ReadOnly _name As String
         Private ReadOnly _fieldInfo As FieldInfo
-        Private ReadOnly _setter As Action(Of Object, Object)
-              
+        Private ReadOnly _setter As Func(Of Object, Object, Object)
+
 
         Public Sub New(ByVal reader As Object, ByVal col As Integer, ByVal fieldInfo As FieldInfo, ByVal name As String, ByVal mapByName As Boolean)
             _col = col

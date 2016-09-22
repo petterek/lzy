@@ -160,11 +160,13 @@ End Module
     <Test> Public Sub DateAttributesIsWrittenToText()
         Dim o As New ExcavationTripDate
 
-        o.StartDate = New Date(1999, 6, 1, 22, 05, 12, 25)
+        o.StartDate = New Date(1999, 6, 1, 22, 5, 12, 25)
         o.EndDate = New Date(2000, 6, 1,0,0,0)
 
-        stringAssert.Contains("""EndDate"":""2000-06-01T00:00:00""", Writer.ObjectToString(o))
-        stringAssert.Contains("""StartDate"":""1999-06-01T22:05:12.025""", Writer.ObjectToString(o))
+        Dim timeZone = TimeZoneInfo.Local.GetUtcOffset(o.StartDate)
+
+        StringAssert.Contains("""EndDate"":""2000-06-01T00:00:00+" + timeZone.Hours.ToString + "", Writer.ObjectToString(o))
+        StringAssert.Contains("""StartDate"":""1999-06-01T22:05:12.025+" + timeZone.Hours.ToString + "", Writer.ObjectToString(o))
         Dim des = Writer.ObjectToString(o)
         Dim o2 = Reader.StringToObject(Of ExcavationTripDate)(des)
 

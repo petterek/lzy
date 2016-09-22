@@ -113,7 +113,7 @@ Namespace Utils.Json
             Return ret
         End Function
 
-        Public Shared Sub Attributes(ByVal result As Object, ByVal nextChar As IReader)
+        Public Shared Sub Attributes(ByRef result As Object, ByVal nextChar As IReader)
             WhiteSpace(nextChar)
             'Cleaning out whitespace, check for " to ensure not empty object
             If nextChar.Current = Chr(34) Then
@@ -126,7 +126,7 @@ Namespace Utils.Json
 
         End Sub
 
-        Private Shared Sub CreateAttributeValue(ByVal nextChar As IReader, ByVal result As Object, ByVal name As String)
+        Private Shared Sub CreateAttributeValue(ByVal nextChar As IReader, ByRef result As Object, ByVal name As String)
             Dim fType As Type = Nothing
             Dim parserType As Type = Nothing
 
@@ -156,7 +156,7 @@ Namespace Utils.Json
             Dim value As Object = ParseValue(fType, nextChar, parserType)
             Dim parsedValue = value
             If fInfo IsNot Nothing Then
-                SetterCache.GetInfo(fInfo).Setter()(result, parsedValue)
+                result = SetterCache.GetInfo(fInfo).Setter()(result, parsedValue)
             End If
 
 
