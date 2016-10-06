@@ -3,16 +3,12 @@ Imports NUnit.Framework
 
 <TestFixture> Public Class PubSub
 
-    <Test> Public Sub AllHandlersIsFound()
-        Assert.Greater(Eventhub.AllHandlers.Count, 0)
-    End Sub
-
-
-
     <Test> Public Sub PublishedEventIsRecived()
-    
-        LazyFramework.Runtime.Context.Current = New Runtime.TestContext
-            
+
+        LazyFramework.EventHandling.EventHub.RegisterHandler(Of PersonGotNewName)(AddressOf ClassThatHandlesEventHandler.NewNameEventHandler)
+        LazyFramework.EventHandling.EventHub.RegisterHandler(Of PersonGotNewName)(AddressOf ClassThatHandlesEventHandler.HandlesTooEventHandler)
+
+
         EventPublisher.PublishEvent()
 
         Assert.IsNotNull(ClassThatHandlesEventHandler.Hmm)
@@ -21,21 +17,15 @@ Imports NUnit.Framework
 
     End Sub
 
-    <Test> Public Sub FindSourcesForEvent()
-        
-        Assert.Greater(EventHub.Publishers(Of PersonGotNewName).Count, 0)
-        Assert.AreEqual(EventHub.Publishers(Of PersonGotNewName)(0).Name, "PublishEvent")
-
-    End Sub
 
 End Class
 
 Public Class EventPublisher
     Implements IPublishEvent
 
-    <PublishesEventOfType(GetType(PersonGotNewName))> Public Shared Sub PublishEvent()
+    Public Shared Sub PublishEvent()
 
-        EventHub.Publish(New PersonGotNewName With {.Name = "Petter"})
+        EventHub.Publish(Nothing, New PersonGotNewName With {.Name = "Petter"})
 
     End Sub
 End Class
@@ -63,12 +53,12 @@ Public Class ClassThatHandlesEventHandler
     Public Shared Hmm As PersonGotNewName
     Public Shared Counter As Integer = 0
 
-    Public Shared Sub NewNameEventHandler(param As PersonGotNewName)
+    Public Shared Sub NewNameEventHandler(sender As Object, param As PersonGotNewName)
         Hmm = param
         Counter += 1
     End Sub
 
-    Public Shared Sub HandlesTooEventHandler(param As PersonGotNewName)
+    Public Shared Sub HandlesTooEventHandler(sender As Object, param As PersonGotNewName)
         Hmm = param
         Counter += 1
     End Sub

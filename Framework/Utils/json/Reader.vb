@@ -18,7 +18,7 @@ Namespace Utils.Json
             write.Write(input)
             write.Flush()
             write.BaseStream.Position = 0
-            Return StringToObject(new ReadStream(New StreamReader(mem, System.Text.Encoding.UTF8)), type)
+            Return StringToObject(New ReadStream(New StreamReader(mem, System.Text.Encoding.UTF8)), type)
         End Function
 
         'Here we can add another function that accepts stream as parameter
@@ -28,23 +28,45 @@ Namespace Utils.Json
 
         End Function
 
+        Public Shared Function StringToObject(input As StreamReader, type As Type) As Object
+
+            Return StringToObject(New ReadStream(input), type)
+
+        End Function
+        ''' <summary>
+        ''' This is the main function to parse the incomming stream of bytes. 
+        ''' It is important that the types is checked in the correct order. 
+        ''' 
+        ''' </summary>
+        ''' <param name="input"></param>
+        ''' <param name="type"></param>
+        ''' <returns></returns>
         Friend Shared Function StringToObject(input As IReader, type As Type) As Object
             Dim builder As Builder
 
-            If GetType(IList).IsAssignableFrom(type) Then
+
+
+            'we are trying to create something that is an interface. The we must guess what to create :) 
+            'This should boil down to IEnumerable of something.. :) 
+            If type.IsGenericType AndAlso type.GetGenericTypeDefinition() Is GetType(IEnumerable(Of)) Then
+                builder = New ArrayBuilder
+            ElseIf GetType(IList).IsAssignableFrom(type) Then
                 builder = New ArrayBuilder()
-            ElseIf GetType(IDictionary).IsAssignableFrom(type) then
+            ElseIf GetType(IDictionary).IsAssignableFrom(type) Then
                 builder = New DictionaryBuilder()
+            ElseIf GetType(ICollection).IsAssignableFrom(type) Then
+                builder = New ArrayBuilder()
             Else
                 builder = New ObjectBuilder()
             End If
+
 
             Return builder.Parse(input, type)
         End Function
 
 
 
-    End Class   
+    End Class
 
 
     <Serializable> Friend Class PropertyNotFoundException

@@ -1,46 +1,39 @@
-﻿
-Imports LazyFramework.CQRS.Dto
-Imports System.Linq
-Imports LazyFramework.CQRS.Security
+﻿Imports LazyFramework.CQRS.Dto
 
 Namespace Transform
     Public Class Handling
 
-        Public Shared Function TransformResult(profile As ExecutionProfile.IExecutionProfile, ByVal action As IAmAnAction, ByVal result As Object, Optional ByVal transformer As ITransformEntityToDto = Nothing) As Object
-            Dim transformerFactory As ITransformerFactory = EntityTransformerProvider.GetFactory(action)
+        Public Shared Function TransformResult(context As ExecutionProfile, ByVal result As Object) As Object
 
             'Hmmmm skal vi ha logikk her som sjekker om det er noe factory, og hvis det ikke er det bare returnere det den fikk inn. 
             'Egentlig er det jo bare commands som trenger dette. Queries bør jo gjøre dette selv.. Kanskje. 
 
-            If TypeOf result Is IEnumerable Then
+            If result Is Nothing Then
+                Return Nothing
+            End If
+
+            If TypeOf result Is IList Then
                 Dim ret As New Concurrent.ConcurrentQueue(Of Object)
                 Dim res As Object
 
+                If Not context.RunAsParallel OrElse Setup.ChickenMode Then
 
-                If Runtime.Context.Current.ChickenMode Then
                     For Each e In CType(result, IList)
-                        res = TransformAndAddAction(profile, action, If(transformer Is Nothing, transformerFactory.GetTransformer(action, e), transformer), e)
+                        res = Transform(context, e)
                         If res IsNot Nothing Then
                             ret.Enqueue(res)
                         End If
                     Next
-                    Return ret.ToList
                 Else
-                    Dim user = Runtime.Context.Current.CurrentUser  'Have to copy this from outside of the loop
-                    Dim s = Runtime.Context.Current.Storage
-                    Dim cm = Runtime.Context.Current.ChickenMode
                     Dim Errors As New Concurrent.ConcurrentBag(Of Exception)
-
-                    CType(result, IEnumerable).
+                    CType(result, IList).
                         Cast(Of Object).
                         AsParallel.ForAll(Sub(o As Object)
                                               Try
-                                                  Using New Runtime.SpawnThreadContext(user, s, cm)
-                                                      Dim temp = TransformAndAddAction(profile,action, If(transformer Is Nothing, transformerFactory.GetTransformer(action, o), transformer), o)
-                                                      If temp IsNot Nothing Then
-                                                          ret.Enqueue(temp)
-                                                      End If
-                                                  End Using
+                                                  Dim temp = Transform(context, o)
+                                                  If temp IsNot Nothing Then
+                                                      ret.Enqueue(temp)
+                                                  End If
                                               Catch ex As Exception
                                                   Errors.Add(ex)
                                               End Try
@@ -49,35 +42,34 @@ Namespace Transform
                     If Errors.Count > 0 Then
                         Throw Errors(0)
                     End If
-                    
-                    Return ret.ToList
                 End If
+
+                Dim retList = ret.ToList
+                If context.Sorter IsNot Nothing Then
+                    retList.Sort(context.Sorter)
+                End If
+                Return retList
             Else
-                Return TransformAndAddAction(profile, action, If(transformer Is Nothing, transformerFactory.GetTransformer(action, result), transformer), result)
+                Dim temp = Transform(context, result)
+                Return temp
             End If
         End Function
 
-        Public Shared Function TransformAndAddAction(profile As ExecutionProfile.IExecutionProfile, ByVal action As IAmAnAction, ByVal transformer As ITransformEntityToDto, e As Object) As Object
-            Dim securityContext As Object
-            If transformer Is Nothing Then Return Nothing
+        Public Shared Function Transform(ctx As ExecutionProfile, e As Object) As Object
 
-            If TypeOf (e) Is IProvideSecurityContext Then
-                securityContext = DirectCast(e, IProvideSecurityContext).Context
-            Else
-                securityContext = e
+            If ctx.ActionSecurity IsNot Nothing Then
+                If Not ctx.ActionSecurity.EntityIsAvailableForUser(e) Then Return Nothing
             End If
 
-            If Not ActionSecurity.Current.EntityIsAvailableForUser(profile, action, securityContext) Then Return Nothing
+            If ctx.Transformer Is Nothing Then Return e
 
-            Dim transformEntity As Object = transformer.TransformEntity(e)
+            Dim transformEntity As Object = ctx.Transformer(e)
             If transformEntity Is Nothing Then Return Nothing
 
-            If TypeOf (transformEntity) Is ISupportActionList Then
-                CType(transformEntity, ISupportActionList).Actions.AddRange(ActionSecurity.Current.GetActionList(profile, action, e))
+            If TypeOf (transformEntity) Is ISupportActionList AndAlso ctx.ActionSecurity IsNot Nothing Then
+                CType(transformEntity, ISupportActionList).Actions.AddRange(ctx.ActionSecurity.GetActionList(e))
             End If
-            If TypeOf transformEntity Is ActionContext.ActionContext Then
 
-            End If
             Return transformEntity
         End Function
     End Class

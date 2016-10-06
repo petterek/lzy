@@ -1,40 +1,26 @@
 ﻿
 
 Namespace Transform
-    Public Class EntityTransformerProvider
+       Public Class EntityTransformerProvider
         Private Shared ReadOnly PadLock As New Object
-        Private Shared _allTransformers As Dictionary(Of Type, ITransformerFactory)
+        Private Shared _allTransformers As New Dictionary(Of Type, ITransformerFactory)
 
         Private Shared ReadOnly Property AllTransformers As Dictionary(Of Type, ITransformerFactory)
             Get
-                If _allTransformers Is Nothing Then
-                    SyncLock PadLock
-                        If _allTransformers Is Nothing Then
-                            Dim temp As New Dictionary(Of Type, ITransformerFactory)
-                            For Each t In Reflection.FindAllClassesOfTypeInApplication(GetType(ITransformerFactory))
-                                If Not t.IsAbstract Then
-                                    If t.BaseType.IsGenericType Then
-                                        Dim key = t.BaseType.GetGenericArguments()(0)
-                                        Dim value = Activator.CreateInstance(t)
-                                        If temp.ContainsKey(key) Then
-                                            Throw New TransformerFactoryForActionAllreadyExists(key, t, temp(key))
-                                        End If
-                                        temp.Add(key, CType(value, ITransformerFactory))
-                                    End If
-                                End If
-                            Next
-                            _allTransformers = temp
-                        End If
-                    End SyncLock
-                End If
-
                 Return _allTransformers
             End Get
         End Property
 
+        Public Shared Sub AddFactory(Of TAction As IActionBase)(factory As ITransformerFactory)
+            If _allTransformers.ContainsKey(GetType(TAction)) Then
+                Throw New TransformerFactoryForActionAllreadyExists(GetType(TAction), _allTransformers(GetType(TAction)).GetType, factory)
+            End If
+            _allTransformers.Add(GetType(TAction), factory)
+        End Sub
+
         Private Shared ReadOnly DefaultFactory As New DefaultEntiyTransformerFactory
 
-        Public Shared Function GetFactory(ByVal action As IAmAnAction) As ITransformerFactory
+        Public Shared Function GetFactory(ByVal action As IActionBase) As ITransformerFactory
             Dim t = action.GetType
             While t IsNot Nothing
                 If AllTransformers.ContainsKey(t) Then
@@ -45,7 +31,6 @@ Namespace Transform
 
             Return DefaultFactory
 
-
         End Function
 
 
@@ -54,7 +39,18 @@ Namespace Transform
             
             ReadOnly _Trans As New DoNothingWithTheEntityTransformer
 
-            Public Function GetTransformer(action As IAmAnAction, ent As Object) As ITransformEntityToDto Implements ITransformerFactory.GetTransformer
+            Public Property RunAsParallel As Boolean = true Implements ITransformerFactory.RunAsParallel
+
+            Public Property ObjectComparer As Comparison(Of Object) Implements ITransformerFactory.ObjectComparer
+                Get
+                    Throw New NotImplementedException()
+                End Get
+                Set(value As Comparison(Of Object))
+                    Throw New NotImplementedException()
+                End Set
+            End Property
+
+            Public Function GetTransformer(ent As Object) As ITransformEntityToDto Implements ITransformerFactory.GetTransformer
                 Return _Trans
             End Function
 
@@ -65,9 +61,11 @@ Namespace Transform
                     Return ent
                 End Function
 
-                Public Property Action As IAmAnAction Implements ITransformEntityToDto.Action
+                Public Property Action As IActionBase Implements ITransformEntityToDto.Action
             End Class
-            
+
+
+
         End Class
 
     End Class

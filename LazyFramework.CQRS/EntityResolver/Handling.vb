@@ -3,37 +3,29 @@
 Namespace EntityResolver
     Public Class Handling
 
-        Private Shared _entityResolvers As Dictionary(Of Type, IResolveEntity)
-        Private Shared _padlock As new Object
+        Private Shared _entityResolvers As New Dictionary(Of Type, IResolveEntity)
+        Private Shared _padlock As New Object
 
         Private Shared ReadOnly Property EntityResolvers As Dictionary(Of Type, IResolveEntity)
             Get
-                If _entityResolvers Is Nothing Then
-                    SyncLock _padlock
-                        If _entityResolvers Is Nothing Then
-                            Dim temp As New Dictionary(Of Type, IResolveEntity)
-                            For Each handler In Reflection.FindAllClassesOfTypeInApplication(GetType(IResolveEntity))
-                                temp.Add(handler.BaseType.GetGenericArguments()(0), CType(Activator.CreateInstance(handler), IResolveEntity))
-                            Next
-                            _entityResolvers = temp
-                        End If
-                    End SyncLock
-                End If
                 Return _entityResolvers
             End Get
         End Property
 
-        Public Shared Sub ResolveEntity(profile As ExecutionProfile.IExecutionProfile, action As Command.IAmACommand)
+        Public Shared Sub AddResolver(Of TCommand As IAmACommand)(resolver As IResolveEntity)
+            _entityResolvers.Add(GetType(TCommand), resolver)
+        End Sub
+
+        Public Shared Sub ResolveEntity(action As IAmACommand)
             If EntityResolvers.ContainsKey(action.GetType) Then
                 EntityResolvers(action.GetType).Resolve(action)
             End If
         End Sub
     End Class
 
-    Friend Interface IResolveEntity
+    Public Interface IResolveEntity
 
-        Sub Resolve(action As Command.IAmACommand)
-
+        Sub Resolve(action As IAmACommand)
 
     End Interface
 
@@ -46,6 +38,4 @@ Namespace EntityResolver
 
         Public MustOverride Sub Resolve(action As T)
     End Class
-
-
 End Namespace

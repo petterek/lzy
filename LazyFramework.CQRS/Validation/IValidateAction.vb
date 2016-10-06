@@ -1,5 +1,6 @@
-﻿Namespace Validation
+﻿
+Namespace Validation
     Public Interface IValidateAction
-        Sub InternalValidate(profile As ExecutionProfile.IExecutionProfile, action As IAmAnAction)
+        Sub InternalValidate(ByVal action As IActionBase)
     End Interface
-End NameSpace
+End Namespace

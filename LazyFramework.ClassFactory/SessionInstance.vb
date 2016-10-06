@@ -77,7 +77,7 @@ Partial Class ClassFactory
         End Sub
 
         Public Function Remove(ByVal type As Type) As Boolean
-            _store.Remove(type)
+            Return _store.Remove(type)
         End Function
 
 #Region "IDisposable Support"

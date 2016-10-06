@@ -1,3 +1,4 @@
+Imports System.Diagnostics
 Imports System.IO
 Imports System.Linq.Expressions
 Imports System.Reflection
@@ -20,48 +21,51 @@ Public Class Reflection
         If AllTypes.Count > 0 Then
             _guidmap.TryGetValue(guid, ret)
         End If
-
-
-
         Return ret
     End Function
 
-    Public Shared Function CreateSetter(type As Type, name As String) As Action(Of Object, Object)
-        Dim mInfo As MemberInfo
-        mInfo = SearchForSetterInfo(type, name)
-        If mInfo Is Nothing Then
-            mInfo = SearchForFieldInfo(type, name)
-        End If
 
-        If mInfo IsNot Nothing Then
-            Return CreateSetter(mInfo)
-        Else
-            Return Nothing
-        End If
-    End Function
+    Public Shared Function CreateSetter(memberInfo As MemberInfo) As Func(Of Object, Object, Object)
 
-    Public Shared Function CreateSetter(memberInfo As MemberInfo) As Action(Of Object, Object)
         Dim targetType = memberInfo.DeclaringType
-        Dim exTarget = Expression.Parameter(GetType(Object), "t")
-        Dim exValue = Expression.Parameter(GetType(Object), "p")
-        Dim res As Action(Of Object, Object)
+        Dim memberType As System.Type
 
-        Dim exBody As Expression
         If TypeOf (memberInfo) Is FieldInfo Then
-            exBody = Expression.Assign(Expression.Field(Expression.Convert(exTarget, targetType), DirectCast(memberInfo, FieldInfo)), Expression.Convert(exValue, DirectCast(memberInfo, FieldInfo).FieldType))
+            memberType = DirectCast(memberInfo, FieldInfo).FieldType
         ElseIf TypeOf (memberInfo) Is PropertyInfo Then
-            exBody = Expression.Assign(Expression.Property(Expression.Convert(exTarget, targetType), CType(memberInfo, PropertyInfo)), Expression.Convert(exValue, CType(memberInfo, PropertyInfo).PropertyType))
+            memberType = DirectCast(memberInfo, PropertyInfo).PropertyType
         Else
             Throw New NotSupportedException
         End If
 
-        res = Expression.Lambda(Of Action(Of Object, Object))(exBody, exTarget, exValue).Compile()
 
-        Return res
+        'Inner expression
+        Dim exTarget = Expression.Parameter(targetType, "t")
+        Dim exValue As ParameterExpression = Expression.Parameter(GetType(Object))
+        Dim exBody = Expression.Lambda(Expression.Block(
+                Expression.Assign(Expression.PropertyOrField(exTarget, memberInfo.Name), Expression.Convert(exValue, memberType)),
+                exTarget), exTarget, exValue)
+
+        'Wrapper expression
+        Dim wrapperTarget = Expression.Parameter(GetType(Object))
+        Dim wrapperValue = Expression.Parameter(GetType(Object))
+        Dim wrapper = Expression.Lambda(Of Func(Of Object, Object, Object))(Expression.Convert(Expression.Invoke(
+            exBody, Expression.Convert(wrapperTarget, targetType), wrapperValue), GetType(Object)), wrapperTarget, wrapperValue).Compile
+
+
+        Return New Func(Of Object, Object, Object)(Function(target, value) wrapper(target, value))
     End Function
 
+    Public Shared Function GetMethodInfo(expression As Expression(Of Action)) As MethodInfo
+        Dim member As MethodCallExpression = CType(expression.Body, MethodCallExpression)
+        If member IsNot Nothing Then
+            Return member.Method
+        End If
 
-    Private Shared _allTypes As List(Of Type)
+        Throw New ArgumentException("Expression is not a method", NameOf(expression))
+    End Function
+
+    Private Shared _allTypes As List(Of Type) = Nothing
     Private Shared _guidmap As New Dictionary(Of Guid, Type)
 
     Private Shared ReadOnly _PadLock As New Object
@@ -125,7 +129,10 @@ Public Class Reflection
                                     Try
                                         If type.IsClass AndAlso Not type.IsAbstract Then
                                             allTypesTemp.Add(type)
-                                            _guidmap.Add(type.GUID, type)
+                                            If Not _guidmap.ContainsKey(type.GUID) Then
+                                                'Same guid could occure when different assenlies is loaded with same class.. strange...
+                                                _guidmap.Add(type.GUID, type)
+                                            End If
                                         End If
                                     Catch ex As Exception
                                         Throw New ApplicationException("Add type" & type.FullName, ex)
@@ -192,7 +199,7 @@ Public Class Reflection
         Return Nothing
     End Function
 
-    
+
     Public Delegate Function ClassFilter(type As List(Of Type)) As List(Of Type)
     Public Delegate Function MethodFilter(type As List(Of MethodInfo)) As List(Of MethodInfo)
 

@@ -1,50 +1,40 @@
-﻿Namespace Validation
-    Public MustInherit Class ValidateActionBase(Of TAction As IAmAnAction)
+﻿
+Namespace Validation
+    Public MustInherit Class ValidateActionBase(Of TAction As IActionBase)
         Implements IValidateAction
 
-        Friend Sub InternalValidate(profile As ExecutionProfile.IExecutionProfile, action As IAmAnAction) Implements IValidateAction.InternalValidate
+        Public Overridable ReadOnly Property DetailedExceptionInfo As Boolean = False
+
+        Friend Sub InternalValidate(ByVal action As IActionBase) Implements IValidateAction.InternalValidate
             '    ValidatAction(CType(action, TAction))
             Dim val As New ValidationException
+            Dim exList As New Dictionary(Of String, Exception)
+
 
             Dim [getType] As Type = Me.GetType
 
             For Each p In [getType].GetMethods(System.Reflection.BindingFlags.DeclaredOnly Or System.Reflection.BindingFlags.Public Or System.Reflection.BindingFlags.Instance)
                 Try
-                    Dim invokeParams = p.GetParameters()
-                    If invokeParams.Count = 1 Then
-                        If p.GetParameters(0).ParameterType.IsAssignableFrom(action.GetType) Then
-                            p.Invoke(Me, {profile, action})
-                        Else
-                            Throw New UnableToMapAsValidatorFunction(p.Name)
-                        End If
-                    ElseIf invokeParams.Count = 2 Then
-                        If p.GetParameters(0).ParameterType.IsAssignableFrom(GetType(ExecutionProfile.IExecutionProfile)) AndAlso p.GetParameters(1).ParameterType.IsAssignableFrom(action.GetType) Then
-                            p.Invoke(Me, {profile, action})
-                        Else
-                            Throw New UnableToMapAsValidatorFunction(p.Name)
-                        End If
+                    If p.GetParameters.Count = 1 AndAlso p.GetParameters(0).ParameterType.IsAssignableFrom(action.GetType) Then
+                        p.Invoke(Me, {action})
                     End If
-
                 Catch ex As Exception
-                    val.ExceptionList.Add(p.Name, ex.InnerException)
+                    exList.Add(p.Name, ex.InnerException)
                 End Try
-
             Next
 
-            If val.ExceptionList.Count > 0 Then
-                Throw val
+            If exList.Any Then
+                If Not DetailedExceptionInfo Then
+                    val.ExceptionList = exList
+                    Throw val
+                Else
+                    Dim ex As New DetailedValidationException(exList)
+                    Throw ex
+                End If
+
             End If
 
         End Sub
 
-        '        Public MustOverride Sub ValidatAction(action As TAction)
-
-    End Class
-
-    Friend Class UnableToMapAsValidatorFunction
-        Inherits Exception
-        Public Sub New(name As String)
-            MyBase.New(name)
-        End Sub
     End Class
 End Namespace

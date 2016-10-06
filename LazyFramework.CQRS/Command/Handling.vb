@@ -1,19 +1,17 @@
 ﻿Imports System.Reflection
 Imports LazyFramework.CQRS.Security
-Imports LazyFramework.EventHandling
-Imports LazyFramework.Logging
-Imports LazyFramework.Pipeline
-Imports LazyFramework.Utils
 
 Namespace Command
     Public Class Handling
-        Implements IPublishEvent
 
-        Private Shared ReadOnly PadLock As New Object
-        Private Shared _handlers As ActionHandlerMapper
-        Private Shared _commadList As Dictionary(Of String, Type)
+        Private Shared _handlers As New Dictionary(Of Type, Func(Of Object, IAmACommand, ExecutionProfile))
+        Private Shared _commadList As New Dictionary(Of String, Type)
 
-        
+        Public Shared Sub ClearMapping()
+            _handlers = New Dictionary(Of Type, Func(Of Object, IAmACommand, ExecutionProfile))
+            _commadList = New Dictionary(Of String, Type)
+        End Sub
+
         ''' <summary>
         ''' 
         ''' </summary>
@@ -22,21 +20,6 @@ Namespace Command
         ''' <remarks></remarks>
         Public Shared ReadOnly Property CommandList As Dictionary(Of String, Type)
             Get
-                If _commadList Is Nothing Then
-                    SyncLock PadLock
-                        If _commadList Is Nothing Then
-                            Dim temp As New Dictionary(Of String, Type)
-                            For Each t In Reflection.FindAllClassesOfTypeInApplication(GetType(IAmACommand))
-                                If t.IsAbstract Then Continue For 'Do not map abstract commands. 
-
-                                Dim c As IAmACommand = CType(Activator.CreateInstance(t), IAmACommand)
-                                temp.Add(c.ActionName, t)
-                            Next
-                            _commadList = temp
-                        End If
-                    End SyncLock
-                End If
-
                 Return _commadList
             End Get
         End Property
@@ -48,27 +31,22 @@ Namespace Command
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Private Shared ReadOnly Property AllHandlers() As ActionHandlerMapper
+        Private Shared ReadOnly Property AllHandlers() As Dictionary(Of Type, Func(Of Object, IAmACommand, ExecutionProfile))
             Get
-                If _handlers Is Nothing Then
-                    SyncLock PadLock
-                        If _handlers Is Nothing Then
-                           _handlers = New ActionHandlerMapper(
-                                Reflection.AllTypes.IsAssignableFrom(Of IHandleCommand).union(Reflection.AllTypes.NameEndsWith("CommandHandler")).ToList().
-                                AllMethods.
-                                NameEndsWith("Handler").
-                                IsSub.
-                                SignatureIs(GetType(Object)).ToList, False)
-                        End If
-                    End SyncLock
-                End If
                 Return _handlers
             End Get
         End Property
 
+        ''' <summary>
+        ''' Adds a mapping to a function for the given command. 
+        ''' </summary>
+        ''' <typeparam name="TCommand"></typeparam>
+        ''' <param name="run"></param>
+        Public Shared Sub AddCommandHandler(Of TCommand As IAmACommand)(run As Func(Of Object, IAmACommand, ExecutionProfile))
 
-        Private shared ReadOnly instanceLock As New Object
-        Private Shared ReadOnly TypeInstanceCache As new Dictionary(Of Type, Object)
+            _handlers.Add(GetType(TCommand), run)
+            _commadList.Add(GetType(TCommand).FullName, GetType(TCommand))
+        End Sub
 
 
         ''' <summary>
@@ -76,68 +54,44 @@ Namespace Command
         ''' </summary>
         ''' <param name="command"></param>
         ''' <remarks>Any command can have only 1 handler. An exception will be thrown if there is found more than one for any given command. </remarks>
-        Public Shared Sub ExecuteCommand(profile As ExecutionProfile.IExecutionProfile, command As IAmACommand)
+        Public Shared Function ExecuteCommand(profile As Object, command As IAmACommand) As Object
 
-            If AllHandlers.ContainsKey(command.GetType) Then
+            Dim commandExecProfile As ExecutionProfile = Nothing
+            Try
+                commandExecProfile = AllHandlers(command.GetType)(profile, command)
 
-                EntityResolver.Handling.ResolveEntity(profile, command)
+                commandExecProfile.Start()
+                commandExecProfile.Action = command
 
-                If Not Availability.Handler.CommandIsAvailable(profile,command) Then
-                    EventHub.Publish(New NoAccess(command))
-                    Throw New ActionIsNotAvailableException(command, profile.User)
+                If Not CanUserRunCommand(CType(commandExecProfile, CommandExecutionBase), CType(command, CommandBase)) Then
+                    Throw New ActionSecurityAuthorizationFaildException(command, profile)
                 End If
 
-                If Not CanUserRunCommand(profile, CType(command, CommandBase)) Then
-                    EventHub.Publish(New NoAccess(command))
-                    Throw New ActionSecurityAuthorizationFaildException(command, profile.User)
-                End If
+                If commandExecProfile.ValidateAction IsNot Nothing Then commandExecProfile.ValidateAction.InternalValidate(command)
+                Dim commandResult = Transform.Handling.TransformResult(commandExecProfile, commandExecProfile.ActionHandler(command))
 
-                Validation.Handling.ValidateAction(profile, command)
+                commandExecProfile.Stopp()
+                Logging.Log.Context(commandExecProfile)
+                Return commandResult
 
-                Try
-                    Dim methodInfo  = AllHandlers(command.GetType)(0)
-
-                    If not TypeInstanceCache.ContainsKey(methodInfo.DeclaringType) Then
-                        SyncLock instanceLock
-                            If not TypeInstanceCache.ContainsKey(methodInfo.DeclaringType) Then
-                                TypeInstanceCache(methodInfo.DeclaringType) = ClassFactory.Construct(methodInfo.DeclaringType)
-                            End If
-                        End SyncLock
-                    End If
-
-                    Dim temp = methodInfo.Invoke(TypeInstanceCache(methodInfo.DeclaringType), {command})
-                    If temp IsNot Nothing Then
-                        command.SetResult(Transform.Handling.TransformResult(profile, command, temp))
-                    End If
-
-                Catch ex As TargetInvocationException
-                    Logging.Log.Error(command, ex)
-                    Throw ex.InnerException
-                Catch ex As Exception
-                    Logging.Log.Error(command, ex)
-                    Throw
-                End Try
-            Else
-                Dim implementedException = New NotImplementedException(command.ActionName)
-                Logging.Log.Error(command, implementedException)
-                Throw implementedException
-            End If
-
-            command.ActionComplete()
-
-            Log.Write(command, LogLevelEnum.System)
-        End Sub
-
-        Public Shared Function IsCommandAvailable(profile As ExecutionProfile.IExecutionProfile, cmd As CommandBase) As Boolean
-            Return Availability.Handler.CommandIsAvailable(profile, cmd)
+            Catch ex As TargetInvocationException
+                Logging.Log.Error(commandExecProfile, ex)
+                Throw ex.InnerException
+            Catch ex As Exception
+                Logging.Log.Error(commandExecProfile, ex)
+                Throw
+            Finally
+                Logging.Log.Context(commandExecProfile)
+            End Try
         End Function
 
-        Public Shared Function CanUserRunCommand(profile As ExecutionProfile.IExecutionProfile, cmd As CommandBase) As Boolean
-            If cmd.GetInnerEntity Is Nothing Then
-                Return ActionSecurity.Current.UserCanRunThisAction(profile, cmd)
-            Else
-                Return ActionSecurity.Current.UserCanRunThisAction(profile, cmd, cmd.GetInnerEntity)
+        Public Shared Function CanUserRunCommand(profile As CommandExecutionBase, cmd As CommandBase) As Boolean
+            If profile.ActionSecurity Is Nothing Then
+                Return True
             End If
+
+            Return profile.ActionSecurity.UserCanRunThisAction(profile.Action, profile.Entity)
+
         End Function
 
 

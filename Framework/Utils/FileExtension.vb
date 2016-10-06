@@ -76,7 +76,7 @@ Namespace Utils
             Public Shared Function GetHandle(ByVal path As String, openType As AccessType) As SafeFileHandle
                 Dim handleValue As SafeFileHandle = Nothing
                 If path Is Nothing OrElse path.Length = 0 Then
-                    Throw New ArgumentNullException("path")
+                    Throw New ArgumentNullException(NameOf(path))
                 End If
 
                 ' Try to open the file.

@@ -5,6 +5,6 @@
         Public SourceGuid As Guid
         Public Message As String
         Public Type As String
-        Public Params As IAmAnAction
+        Public Params As IActionBase
     End Class
 End NameSpace

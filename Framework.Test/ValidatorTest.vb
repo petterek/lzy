@@ -1,15 +1,14 @@
 ﻿Imports NUnit.Framework
-Imports System.Security.Principal
-Imports LazyFramework.CQRS
-Imports LazyFramework.CQRS.ExecutionProfile
 
 <TestFixture> Public Class ValidatorTest
 
     <Test> Public Sub ValidatorsIsCalled()
-        Assert.Throws(Of LazyFramework.CQRS.Validation.ValidationException)(Sub() LazyFramework.CQRS.Validation.Handling.ValidateAction(nothing,New ToValidate))
+
+        LazyFramework.CQRS.Validation.Handling.AddValidator(Of ToValidate)(New ToValidateValidator)
+        Assert.Throws(Of LazyFramework.CQRS.Validation.ValidationException)(Sub() LazyFramework.CQRS.Validation.Handling.ValidateAction(New ToValidate))
 
         Try
-            LazyFramework.CQRS.Validation.Handling.ValidateAction(Nothing, New ToValidate)
+            LazyFramework.CQRS.Validation.Handling.ValidateAction(New ToValidate)
         Catch ex As LazyFramework.CQRS.Validation.ValidationException
             Assert.AreEqual(2, ex.ExceptionList.Count)
         End Try
@@ -21,7 +20,8 @@ End Class
 Public Class ToValidate
     Inherits LazyFramework.CQRS.ActionBase
     Property Id As Integer
-    
+
+
 End Class
 
 

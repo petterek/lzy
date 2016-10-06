@@ -62,14 +62,15 @@
     <Compile Include="ActionBase.vb" />
     <Compile Include="ActionContext\ActionContext.vb" />
     <Compile Include="ActionContext\Handling.vb" />
-    <Compile Include="ActionInfo.vb" />
     <Compile Include="ActionIsNotAvailableException.vb" />
-    <Compile Include="ActionLink\ActionLinkBase.vb" />
-    <Compile Include="ActionLink\Handling.vb" />
     <Compile Include="Availability\CommandAvailability.vb" />
-    <Compile Include="Availability\Handler.vb" />
-    <Compile Include="Availability\ICommandAvilability.vb" />
+    <Compile Include="Availability\CommandAvilabilityBase.vb" />
+    <Compile Include="Availability\ICommandAvailability.vb" />
+    <Compile Include="Command\CommandAllreadyMappedExcpetion.vb" />
+    <Compile Include="Dto\ActionDescriptor.vb" />
     <Compile Include="EntityResolver\Handling.vb" />
+    <Compile Include="ExecutionProfile.vb" />
+    <Compile Include="Query\AllreadeyConfiguredException.vb" />
     <Compile Include="Query\QueryMonitorData.vb" />
     <Compile Include="Security\ActionSecurity.vb" />
     <Compile Include="Security\ActionSecurityAuthorizationFaildException.vb" />
@@ -82,14 +83,8 @@
     <Compile Include="Dto\DtoBase.vb" />
     <Compile Include="Dto\IActionDescriptor.vb" />
     <Compile Include="Dto\ISupportActionList.vb" />
-    <Compile Include="ExecutionContext.vb" />
-    <Compile Include="HandlerNotFound.vb" />
     <Compile Include="IActionBase.vb" />
-    <Compile Include="ExecutionProfile\IExecutionProfile.vb" />
     <Compile Include="Security\IActionSecurity.vb" />
-    <Compile Include="IAmAnAction.vb" />
-    <Compile Include="ExecutionProfile\IApplicationInfo.vb" />
-    <Compile Include="ExecutionProfile\IExecutionProfileProvider.vb" />
     <Compile Include="Security\IProvideSecurityContext.vb" />
     <Compile Include="Logging\CommandInfo.vb" />
     <Compile Include="Logging\ErrorInfo.vb" />
@@ -111,14 +106,13 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Security\NoAccess.vb" />
     <Compile Include="Query\Handling.vb" />
     <Compile Include="Query\IAmAQuery.vb" />
     <Compile Include="Query\IHandleQuery.vb" />
     <Compile Include="Query\ParalellQueryBase.vb" />
     <Compile Include="Query\QueryBase.vb" />
-    <Compile Include="Query\QueryExecuted.vb" />
-    <Compile Include="Query\QueryLogEvent.vb" />
+    <Compile Include="Security\NoAccess.vb" />
+    <Compile Include="Setup.vb" />
     <Compile Include="Sorting\Handler.vb" />
     <Compile Include="Transform\EntityTransformerProvider.vb" />
     <Compile Include="Transform\Handling.vb" />
@@ -128,8 +122,10 @@
     <Compile Include="Transform\TransformerBase.vb" />
     <Compile Include="Transform\TransformerFactoryBase.vb" />
     <Compile Include="Transform\TransformerFactoryForActionAllreadyExists.vb" />
+    <Compile Include="Validation\DetailedValidationException.vb" />
     <Compile Include="Validation\Handling.vb" />
     <Compile Include="Validation\IValidateAction.vb" />
+    <Compile Include="Validation\UnableToMapAsValidatorFunction.vb" />
     <Compile Include="Validation\ValidateActionBase.vb" />
     <Compile Include="Validation\ValidationException.vb" />
   </ItemGroup>
@@ -152,24 +148,6 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Framework\LazyFramework.vbproj">
-      <Project>{d72ca321-6426-4493-bcc5-961284f1c51a}</Project>
-      <Name>LazyFramework</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\LazyFramework.ClassFactory\LazyFramework.ClassFactory.vbproj">
-      <Project>{919aa000-9d90-4c9d-b585-8afbf55a5304}</Project>
-      <Name>LazyFramework.ClassFactory</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\LazyFramework.EventHandling\LazyFramework.EventHandling.vbproj">
-      <Project>{ef6603ed-7f45-4bc4-bee0-ff7193cc8cfe}</Project>
-      <Name>LazyFramework.EventHandling</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\LazyFramework.Logging\LazyFramework.Logging.vbproj">
-      <Project>{80f1df77-210f-4e39-ae66-2fadcc420cdc}</Project>
-      <Name>LazyFramework.Logging</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>

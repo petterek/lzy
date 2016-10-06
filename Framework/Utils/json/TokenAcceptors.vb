@@ -113,7 +113,7 @@ Namespace Utils.Json
             Return ret
         End Function
 
-        Public Shared Sub Attributes(ByVal result As Object, ByVal nextChar As IReader)
+        Public Shared Sub Attributes(ByRef result As Object, ByVal nextChar As IReader)
             WhiteSpace(nextChar)
             'Cleaning out whitespace, check for " to ensure not empty object
             If nextChar.Current = Chr(34) Then
@@ -126,7 +126,7 @@ Namespace Utils.Json
 
         End Sub
 
-        Private Shared Sub CreateAttributeValue(ByVal nextChar As IReader, ByVal result As Object, ByVal name As String)
+        Private Shared Sub CreateAttributeValue(ByVal nextChar As IReader, ByRef result As Object, ByVal name As String)
             Dim fType As Type = Nothing
             Dim parserType As Type = Nothing
 
@@ -148,12 +148,15 @@ Namespace Utils.Json
                 parserType = GetType(EnumParser)
             End If
 
+            If fType.IsGenericType AndAlso fType.GetGenericTypeDefinition() Is GetType(Nullable(Of)) Then
+                parserType = GetType(NullableParser)
+            End If
 
-            
+
             Dim value As Object = ParseValue(fType, nextChar, parserType)
             Dim parsedValue = value
             If fInfo IsNot Nothing Then
-                SetterCache.GetInfo(fInfo).Setter()(result, parsedValue)
+                result = SetterCache.GetInfo(fInfo).Setter()(result, parsedValue)
             End If
 
 
@@ -191,10 +194,12 @@ Namespace Utils.Json
                                                                             {GetType(Int16), New IntegerParser},
                                                                             {GetType(Date), New DateParser},
                                                                             {GetType(Double), New DoubleParser},
+                                                                            {GetType(Decimal), New DecimalParser},
                                                                             {GetType(Guid), New GuidParser},
                                                                             {GetType(Boolean), New BoolanParser},
                                                                             {GetType(UnknownFieldParser), New UnknownFieldParser},
-                                                                            {GetType(EnumParser), New EnumParser}
+                                                                            {GetType(EnumParser), New EnumParser},
+                                                                            {GetType(NullableParser), New NullableParser}
                                                                         }
 
         Friend Shared Function CanFindValueSeparator(ByVal nextChar As IReader) As Boolean

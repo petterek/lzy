@@ -1,11 +1,9 @@
-﻿Imports System.Security.Principal
-Imports LazyFramework.CQRS.ExecutionProfile
-
-Namespace Query
+﻿Namespace Query
     Public MustInherit Class QueryBase
         Inherits ActionBase
         Implements IAmAQuery
-        
+
+
     End Class
 
 
@@ -17,12 +15,12 @@ Namespace Query
     ''' <remarks></remarks>
     Public MustInherit Class QueryBase(Of TResultEntity)
         Inherits QueryBase
-        
 
-        Public Overridable Function IsActionAvailable(profile As IExecutionProfile) As Boolean
+
+        Public Overridable Function IsActionAvailable(profile As Object) As Boolean
             Return True
         End Function
-        Public Overridable Function IsActionAvailable(profile As IExecutionProfile, entity As TResultEntity) As Boolean
+        Public Overridable Function IsActionAvailable(profile As Object, entity As TResultEntity) As Boolean
             Return True
         End Function
 

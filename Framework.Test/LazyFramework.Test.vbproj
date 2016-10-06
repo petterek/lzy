@@ -83,7 +83,6 @@
     <Compile Include="Cqrs\CommandHub.vb" />
     <Compile Include="CreateCustomer.vb" />
     <Compile Include="FileExtensionTest.vb" />
-    <Compile Include="LoggerTest.vb" />
     <Compile Include="MultiThread.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
@@ -103,12 +102,13 @@
     <Compile Include="NewLzyTest.vb" />
     <Compile Include="PipelineTest.vb" />
     <Compile Include="PubSub.vb" />
+    <Compile Include="PushMessageToRabbit.vb" />
     <Compile Include="Query.vb" />
     <Compile Include="Reflection.vb" />
     <Compile Include="ResponseThread.vb" />
+    <Compile Include="SmallType.vb" />
     <Compile Include="SpawnThread.vb" />
     <Compile Include="TestParser.vb" />
-    <Compile Include="UtilsConfig.vb" />
     <Compile Include="WriteJson.vb" />
     <Compile Include="ValidatorTest.vb" />
   </ItemGroup>
@@ -161,9 +161,9 @@
       <Project>{ef6603ed-7f45-4bc4-bee0-ff7193cc8cfe}</Project>
       <Name>LazyFramework.EventHandling</Name>
     </ProjectReference>
-    <ProjectReference Include="..\LazyFramework.Logging\LazyFramework.Logging.vbproj">
-      <Project>{80f1df77-210f-4e39-ae66-2fadcc420cdc}</Project>
-      <Name>LazyFramework.Logging</Name>
+    <ProjectReference Include="..\LazyFramework.Reflection\LazyFramework.Reflection.vbproj">
+      <Project>{ccc53780-1804-4826-b51b-a4950a606e5b}</Project>
+      <Name>LazyFramework.Reflection</Name>
     </ProjectReference>
     <ProjectReference Include="..\SqlServer\LazyFramework.MSSqlServer.vbproj">
       <Project>{50ab965d-b3d0-4da4-bfd4-49ea2907fc0d}</Project>

@@ -102,7 +102,7 @@ Imports NUnit.Framework
 
     <Test> Public Sub LongValueIsParsed()
 
-        Dim v As ClassWithLong
+        Dim v As ClassWithLong = Nothing
         Assert.DoesNotThrow(Sub() v = Reader.StringToObject(Of ClassWithLong)("{""Value"":1446212820320}"))
         Assert.AreEqual(1446212820320, v.Value)
 
@@ -111,21 +111,21 @@ Imports NUnit.Framework
 
     <Test> Public Sub LongValueIsParsedToProperty()
 
-        Dim v As ClassWithLongBooleanStringProperty
+        Dim v As ClassWithLongBooleanStringProperty = Nothing
         Assert.DoesNotThrow(Sub() v = Reader.StringToObject(Of ClassWithLongBooleanStringProperty)("{""Value"":1446212820320}"))
         Assert.AreEqual(1446212820320, v.Value)
 
     End Sub
 
     <Test> Public Sub ValueInStrinIsIgnoredWhenFieldDoesNotExist()
-        Dim v As ClassWithLongBooleanStringProperty
+        Dim v As ClassWithLongBooleanStringProperty = Nothing
         Assert.DoesNotThrow(Sub() v = Reader.StringToObject(Of ClassWithLongBooleanStringProperty)("{""Value"":1446212820320,""ValueTwo"":124}"))
         Assert.AreEqual(1446212820320, v.Value)
 
     End Sub
 
     <Test> Public Sub BooleanValueIsParsed()
-        Dim v As ClassWithLongBooleanStringProperty
+        Dim v As ClassWithLongBooleanStringProperty = Nothing
         Assert.DoesNotThrow(Sub() v = Reader.StringToObject(Of ClassWithLongBooleanStringProperty)("{""Value"":1446212820320,""ValueTrue"":True,""ValueFalse"":False}"))
         Assert.True( v.ValueTrue)
         Assert.False(v.ValueFalse)
@@ -133,8 +133,27 @@ Imports NUnit.Framework
     End Sub
 
 
+    <Test> Public Sub ParseStruct()
 
-    <Test> Public sub ClassWithArrayDoesNotThrow
+        Dim toParse = "{""SomeThing"":1,""ADate"":{""Year"":2016,""Month"":10,""Day"":9}}"
+
+        Dim retValue = Reader.StringToObject(Of ClassWithStruct)(toParse)
+
+        'Dim retValue = New ClassWithStruct
+
+        'SetTheValue(retValue.ADate)
+
+
+        Assert.AreEqual(2016, retValue.ADate.Year)
+
+    End Sub
+
+    Sub SetTheValue(ByRef s As DateHolder)
+        s.Year = 2016
+    End Sub
+
+
+    <Test> Public Sub ClassWithArrayDoesNotThrow()
 
         'empty array
         Dim v = Reader.StringToObject(Of ClassWithArray)("{""Data"":[]}")
@@ -148,13 +167,24 @@ Imports NUnit.Framework
         v = Reader.StringToObject(Of ClassWithArray)("{""DataInt"":[1,2,3]}")
 
         v = Reader.StringToObject(Of ClassWithArray)("{""StringValue"": null }")
-        
+
         v = Reader.StringToObject(Of ClassWithArray)("{""Attributes"": null }")
 
         v = Reader.StringToObject(Of ClassWithArray)("{""Attributes"": {""Test"":""Value"",""Test2"":""Value2""} }")
-        
-        
-    End sub
+
+
+    End Sub
+
+    <Test> Public Sub ParseObjectWithIEnumerableOfStringDoesNotThrow()
+        Dim v = Reader.StringToObject(Of ClassWithArray)("{""AList"": [""String1"",""String2""] }")
+        Assert.AreEqual(2, v.AList.Count)
+
+    End Sub
+    <Test> Public Sub ParseObjectWithIEnumerableOfSomeObjectTypeDoesNotThrow()
+        Dim v = Reader.StringToObject(Of ClassWithArray)("{""AnotherList"": [{""A"":""String1"",""B"":15},{""A"":""String1"",""B"":15}] }")
+        Assert.AreEqual(2, v.AnotherList.Count)
+
+    End Sub
 
 
     <Test>Public sub DeserializeEnums
@@ -204,8 +234,21 @@ Imports NUnit.Framework
     Public Class ClassWithArray
         Public Data As String()
         Public DataInt As Integer()
-        Public StringValue As string
-        Public Attributes As Dictionary(Of String,String)
+        Public StringValue As String
+        Public Attributes As Dictionary(Of String, String)
+        Public AList As IEnumerable(Of String)
+        Public AnotherList As IEnumerable(Of SmallType)
     End Class
+
+    Public Class ClassWithStruct
+        Public SomeThing As Integer
+        Public ADate As DateHolder
+    End Class
+
+    Public Structure DateHolder
+        Public Year As Integer
+        Public Month As Integer
+        Public Day As Integer
+    End Structure
 
 End Class

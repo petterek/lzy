@@ -2,7 +2,7 @@
 Imports System.Reflection
 Imports System.Security.Principal
 Imports System.Threading
-Imports LazyFramework.Utils
+
 
 ''' <summary>
 ''' 
@@ -10,10 +10,7 @@ Imports LazyFramework.Utils
 ''' <remarks></remarks>
 
 Public Class EventHub
-    Private Shared _handlers As Dictionary(Of Type, List(Of MethodInfo))
-    Private Shared _publishers As Dictionary(Of Type, List(Of MethodInfo))
-
-    Private Shared ReadOnly PadLock As New Object
+    Private Shared _handlers As New Dictionary(Of Type, List(Of Action(Of Object, Object)))
 
     ''' <summary>
     ''' 
@@ -21,70 +18,32 @@ Public Class EventHub
     ''' <value></value>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Public Shared ReadOnly Property AllHandlers() As Dictionary(Of Type, List(Of MethodInfo))
+    Public Shared ReadOnly Property AllHandlers() As Dictionary(Of Type, List(Of Action(Of Object, Object)))
         Get
-            If _handlers Is Nothing Then
-                SyncLock PadLock
-                    If _handlers Is Nothing Then
-                        _handlers = New ActionHandlerMapper(Reflection.AllTypes.IsAssignableFrom(Of IHandleEvent).
-                                                              Union(Reflection.AllTypes.NameEndsWith("EventHandler")).ToList().
-                                                              AllMethods.
-                                                              NameEndsWith("EventHandler").
-                                                              IsSub.SignatureIs(GetType(Object)).ToList, True)
-                    End If
-                End SyncLock
-            End If
             Return _handlers
         End Get
     End Property
 
+    Public Shared Sub RegisterHandler(Of T)(handler As Action(Of Object, T))
+        Dim handlerLIst As List(Of Action(Of Object, Object))
 
-
-    Public Shared Function Publishers(Of T)() As IEnumerable(Of MethodInfo)
-
-        If _publishers Is Nothing Then
-            SyncLock PadLock
-                If _publishers Is Nothing Then
-                    Dim temp As New Dictionary(Of Type, List(Of MethodInfo))
-                    For Each [class] In Reflection.FindAllClassesOfTypeInApplication(GetType(IPublishEvent))
-                        For Each method In [class].GetMethods
-                            Dim getCustomAttribute = method.GetCustomAttribute(Of PublishesEventOfTypeAttribute)()
-                            If getCustomAttribute IsNot Nothing Then
-                                For Each t In getCustomAttribute.Types
-                                    If Not temp.ContainsKey(t) Then
-                                        temp(t) = New List(Of MethodInfo)
-                                    End If
-                                    temp(t).Add(method)
-                                Next
-                            End If
-                        Next
-                    Next
-                    _publishers = temp
-                End If
-            End SyncLock
+        If Not _handlers.ContainsKey(GetType(T)) Then
+            _handlers.Add(GetType(T), New List(Of Action(Of Object, Object)))
         End If
 
-        If _publishers.ContainsKey(GetType(T)) Then
-            Return _publishers(GetType(T))
-        Else
-            Return New List(Of MethodInfo)
-        End If
-
-    End Function
+        handlerLIst = _handlers(GetType(T))
+        handlerLIst.Add(Sub(sender, e) handler(sender, DirectCast(e, T)))
+    End Sub
 
 
-    ''' <summary>
-    ''' Publish an event to the application. 
-    ''' </summary>
-    ''' <param name="event"></param>
-    ''' <remarks></remarks>
-    Public Shared Sub Publish([event] As IAmAnEvent, Optional runAsync As Boolean = False)
+
+    Public Shared Sub Publish(sender As Object, [event] As Object)
         Dim key As System.Type = [event].GetType
         While key IsNot Nothing
             If AllHandlers.ContainsKey(key) Then
                 For Each MethodInfo In AllHandlers(key)
                     Try
-                        WrapAndFire(MethodInfo, [event], runAsync)
+                        MethodInfo(sender, [event])
                     Catch ex As Exception
 
                     End Try
@@ -92,10 +51,6 @@ Public Class EventHub
             End If
             key = key.BaseType
         End While
-        [event].ActionComplete()
-
-        Logging.Logger.Write([event])
-
     End Sub
 
     Private Shared Sub WriteToEventLog(ByVal message As String)
@@ -110,57 +65,5 @@ Public Class EventHub
 
     End Sub
 
-    Private Shared Sub WrapAndFire(ByVal methodInfo As MethodInfo, ByVal [event] As IAmAnEvent, ByVal runAsync As Boolean)
-        'Wrapper den alltid.
-        'ikke nødvendig, men da blir det i hvertfall likt.. :) 
-        Dim doAsync As Boolean = False
-
-        If methodInfo.GetCustomAttribute(GetType(RunAsyncAttribute)) IsNot Nothing Then
-            doAsync = True
-        Else
-            If runAsync Then
-                doAsync = True
-            End If
-        End If
-
-        Dim w = New ThreadWrapper(methodInfo, [event], Runtime.Context.Current.CurrentUser)
-        If doAsync Then
-            Dim waitCallback As WaitCallback = New WaitCallback(AddressOf w.Start)
-            ThreadPool.QueueUserWorkItem(waitCallback)
-        Else
-            w.Start(Nothing)
-        End If
-    End Sub
-
-
-    Private Class ThreadWrapper
-        Private ReadOnly _M As MethodInfo
-        Private ReadOnly _E As IAmAnEvent
-        Private ReadOnly _Principal As IPrincipal
-
-        Public Sub New(m As MethodInfo, e As IAmAnEvent, principal As IPrincipal)
-            _M = m
-            _E = e
-            _Principal = principal
-        End Sub
-
-        Public Sub Start(stateInfo As Object)
-            If Not _Principal Is Nothing Then
-                Thread.CurrentPrincipal = _Principal
-            End If
-            Try
-                _M.Invoke(Nothing, {_E})
-            Catch ex As Exception
-                WriteToEventLog(ex.Message) 'Writes to the server log of the machine. Eventhandling failuers
-                'Logging.Log.Error(_E, ex)
-                Throw
-            End Try
-        End Sub
-    End Class
-
 End Class
 
-Public Class RunAsyncAttribute
-    Inherits Attribute
-
-End Class

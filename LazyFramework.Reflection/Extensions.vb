@@ -81,10 +81,10 @@ Public Module Extensions
 
     <Extension> Public Iterator Function IsSub(toSearch As IEnumerable(Of MethodInfo)) As IEnumerable(Of MethodInfo)
 
-        For Each m in toSearch.HasReturnTypeOf(GetType( System.void))
+        For Each m In toSearch.HasReturnTypeOf(GetType(System.Void))
             Yield m
         Next
-      
+
 
     End Function
 
@@ -94,6 +94,24 @@ Public Module Extensions
                 Yield m
             End If
         Next
+    End Function
+
+    <Extension> Public Iterator Function FromOpenGeneric(toSearch As IEnumerable(Of Type), searchFor As Type) As IEnumerable(Of Type)
+
+        For Each t In toSearch
+            Dim compare As Type
+            compare = t
+            While compare IsNot Nothing
+                If compare.IsGenericType Then
+                    If compare.GetGenericTypeDefinition = searchFor Then
+                        Yield t
+                    End If
+                End If
+
+                compare = compare.BaseType
+            End While
+        Next
+
     End Function
 
 End Module

@@ -1,9 +1,55 @@
 ﻿Imports System.IO
+Imports System.Linq.Expressions
 
 Namespace Utils.Json
     Public Class Writer
 
-        Public Delegate Function GetTypeInfo(t As Type) As String
+
+        Public Shared Function Serializer(objType As Type) As Action(Of StreamWriter, Object)
+
+            Dim exprns As New List(Of Expressions.Expression)
+
+            Dim writer = Expression.Parameter(GetType(StreamWriter), "writer")
+            Dim writeMethodInfo = GetType(StreamWriter).GetMethod("Write", {GetType(String)})
+            Dim valueObject = Expression.Parameter(GetType(Object), "theObject")
+
+            exprns.Add(Expression.Call(writer, writeMethodInfo, Expression.Constant("{")))
+            Dim first As Boolean = True
+
+            Dim writeToStream As System.Reflection.MethodInfo = Reflection.GetMethodInfo(Sub() WriteValue(Nothing, Nothing))
+
+            If AddTypeInfoForObjects Then
+                exprns.Add(Expression.Call(writer, writeMethodInfo, Expression.Constant("""$type$"":")))
+                Dim typeString = Expression.Call(Nothing, TypeInfoWriter.Method, valueObject)
+                exprns.Add(Expression.Call(Nothing, writeToStream, writer, typeString))
+                exprns.Add(Expression.Call(writer, writeMethodInfo, Expression.Constant(Chr(34).ToString)))
+                first = False
+            End If
+
+            For Each m In GetMembers(objType)
+                If Not first Then
+                    exprns.Add(Expression.Call(writer, writeMethodInfo, Expression.Constant(",")))
+                End If
+                first = False
+                exprns.Add(Expression.Call(writer, writeMethodInfo, Expression.Constant(Chr(&H22) & m.Name & Chr(&H22) & ":")))
+                Dim memberValue = Expression.PropertyOrField(Expression.Convert(valueObject, objType), m.Name)
+
+                exprns.Add(Expression.Call(Nothing, writeToStream, writer, Expression.Convert(memberValue, GetType(Object))))
+            Next
+
+            exprns.Add(Expression.Call(writer, writeMethodInfo, Expression.Constant("}")))
+
+            Dim block = Expression.Block(exprns.ToArray)
+
+
+
+            Dim expression1 As Expression(Of Action(Of StreamWriter, Object)) = Expression.Lambda(Of Action(Of StreamWriter, Object))(block, writer, valueObject)
+            expression1.Reduce()
+            Return expression1.Compile()
+        End Function
+
+
+        Public Delegate Function GetTypeInfo(t As Object) As String
 
         Public Shared Formatters As New Dictionary(Of Type, Writer) From {
             {GetType(Integer), Sub(w, val) w.Write(val.ToString)},
@@ -28,8 +74,8 @@ Namespace Utils.Json
         Public Shared AddTypeInfoForObjects As Boolean
         Public Shared TypeInfoWriter As GetTypeInfo = AddressOf DefaultTypeInfoWriter
 
-        Public Shared Function DefaultTypeInfoWriter(t As Type) As String
-            Return t.FullName
+        Public Shared Function DefaultTypeInfoWriter(t As Object) As String
+            Return t.GetType.FullName
         End Function
 
 
@@ -78,9 +124,7 @@ Namespace Utils.Json
                 If Not first Then
                     result.Write(",")
                 End If
-                result.Write(Chr(&H22))
-                result.Write(value.Key.ToString)
-                result.Write(Chr(&H22))
+                result.Write(Chr(&H22) & value.Key.ToString & Chr(&H22))
                 result.Write(":")
                 ObjectToString(result, value.Value)
                 first = False
@@ -89,42 +133,60 @@ Namespace Utils.Json
             result.Write("}")
         End Sub
 
+        Private Shared padLock As New Object
+        Private Shared typeinfoCache As New Dictionary(Of Type, List(Of System.Reflection.MemberInfo))
+        Private Shared Function GetMembers(t As Type) As IEnumerable(Of System.Reflection.MemberInfo)
+            If Not typeinfoCache.ContainsKey(t) Then
+                SyncLock padLock
+                    If Not typeinfoCache.ContainsKey(t) Then
+                        typeinfoCache.Add(t, t.GetMembers(System.Reflection.BindingFlags.Public Or System.Reflection.BindingFlags.Instance).Where(Function(v) v.MemberType = System.Reflection.MemberTypes.Field Or v.MemberType = System.Reflection.MemberTypes.Property).ToList)
+                    End If
+                End SyncLock
+            End If
+            Return typeinfoCache(t)
+        End Function
+
+
+        Private Shared funcCache As New Dictionary(Of Type, Action(Of StreamWriter, Object))
+        Private Shared funcCacheLock As New Object
+
         Private Shared Sub WriteObject(result As StreamWriter, o As Object)
-            Dim first As Boolean = True
-            result.Write("{"c)
 
-            Dim allProps As New System.Collections.Concurrent.ConcurrentStack(Of String)
-
-            If AddTypeInfoForObjects Then
-                allProps.Push("""$type$"":""" & TypeInfoWriter(o.GetType) & """")
+            If Not funcCache.ContainsKey(o.GetType) Then
+                SyncLock funcCacheLock
+                    If Not funcCache.ContainsKey(o.GetType) Then
+                        funcCache(o.GetType) = Serializer(o.GetType())
+                    End If
+                End SyncLock
             End If
 
-            o.GetType().GetMembers(System.Reflection.BindingFlags.Public Or System.Reflection.BindingFlags.Instance).Where(Function(v) v.MemberType = System.Reflection.MemberTypes.Field Or v.MemberType = System.Reflection.MemberTypes.Property).AsParallel.ForAll(
-                Sub(m As System.Reflection.MemberInfo)
-                    Dim memoryStream1 As MemoryStream = New System.IO.MemoryStream
-                    Dim res As New StreamWriter(memoryStream1)
-                    res.Write(Chr(&H22))
-                    res.Write(m.Name)
-                    res.Write(Chr(&H22))
-                    res.Write(":"c)
+            funcCache(o.GetType)(result, o)
+            Return
 
-                    Select Case m.MemberType
-                        Case System.Reflection.MemberTypes.Field
-                            Dim fld = o.GetType.GetField(m.Name)
-                            WriteValue(res, fld.FieldType, fld.GetValue(o))
-                        Case System.Reflection.MemberTypes.Property
-                            Dim prop = o.GetType.GetProperty(m.Name)
-                            WriteValue(res, prop.PropertyType, prop.GetValue(o))
-                    End Select
+            'result.Write("{"c)
+            'Dim first As Boolean = True
 
-                    res.Flush()
+            'If AddTypeInfoForObjects Then
+            '    result.Write("""$type$"":""" & TypeInfoWriter(o.GetType) & """,")
+            '    first = False
+            'End If
 
-                    memoryStream1.Seek(0, SeekOrigin.Begin)
-                    allProps.Push(New StreamReader(memoryStream1).ReadToEnd)
-
-                End Sub)
-            result.Write(Join(allProps.ToArray, ","))
-            result.Write("}"c)
+            'For Each m In GetMembers(o.GetType())
+            '    If Not first Then
+            '        result.Write(",")
+            '    End If
+            '    first = False
+            '    result.Write(Chr(&H22) & m.Name & Chr(&H22) & ":")
+            '    Select Case m.MemberType
+            '        Case System.Reflection.MemberTypes.Field
+            '            Dim fld = o.GetType.GetField(m.Name)
+            '            WriteValue(result, fld.GetValue(o))
+            '        Case System.Reflection.MemberTypes.Property
+            '            Dim prop = o.GetType.GetProperty(m.Name)
+            '            WriteValue(result, prop.GetValue(o))
+            '    End Select
+            'Next
+            'result.Write("}"c)
         End Sub
 
         Private Shared Sub WriteList(result As StreamWriter, o As Object)
@@ -140,14 +202,16 @@ Namespace Utils.Json
             result.Write("]")
         End Sub
 
-        Private Shared Sub WriteValue(writer As StreamWriter, t As System.Type, value As Object)
+        Private Shared Sub WriteValue(writer As StreamWriter, value As Object)
 
             If value Is Nothing Then
                 writer.Write("null")
                 Return
             End If
 
-            if value.GetType.IsEnum Then
+            Dim t As System.Type = value.GetType()
+
+            If value.GetType.IsEnum Then
                 t = value.GetType.GetEnumUnderlyingType
                 value = CTypeDynamic(value, t)
             End If
@@ -204,7 +268,7 @@ Namespace Utils.Json
         Private Shared Sub WriteDate(w As StreamWriter, value As Object)
             Dim d As Date = DirectCast(value, Date)
             w.Write(Chr(34))
-            w.Write(d.ToString("yyyy-MM-ddTHH\:mm\:ss.FFFK"))
+            w.Write(d.ToString("yyyy-MM-ddTHH\:mm\:ss.FFFKz"))
             w.Write(Chr(34))
         End Sub
 

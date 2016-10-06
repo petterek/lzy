@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "LazyFramework.CQRS", "LazyFramework.CQRS\LazyFramework.CQRS.vbproj", "{478C54CA-00C8-4F36-B3C5-AE7291270F70}"
 EndProject
@@ -13,11 +13,11 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "LazyFramework.ClassFactory"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Lazyframework.Data", "Lazyframework.Data\Lazyframework.Data.vbproj", "{05175B67-F72A-4618-B050-87D1057156A2}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "LazyFramework.Logging", "LazyFramework.Logging\LazyFramework.Logging.vbproj", "{80F1DF77-210F-4E39-AE66-2FADCC420CDC}"
-EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "LazyFramework.MSSqlServer", "SqlServer\LazyFramework.MSSqlServer.vbproj", "{50AB965D-B3D0-4DA4-BFD4-49EA2907FC0D}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "LazyFramework.EventHandling", "LazyFramework.EventHandling\LazyFramework.EventHandling.vbproj", "{EF6603ED-7F45-4BC4-BEE0-FF7193CC8CFE}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "LazyFramework.Reflection", "LazyFramework.Reflection\LazyFramework.Reflection.vbproj", "{CCC53780-1804-4826-B51B-A4950A606E5B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -56,12 +56,6 @@ Global
 		{05175B67-F72A-4618-B050-87D1057156A2}.DebugPersonalarkiv|Any CPU.Build.0 = Debug|Any CPU
 		{05175B67-F72A-4618-B050-87D1057156A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{05175B67-F72A-4618-B050-87D1057156A2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{80F1DF77-210F-4E39-AE66-2FADCC420CDC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{80F1DF77-210F-4E39-AE66-2FADCC420CDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{80F1DF77-210F-4E39-AE66-2FADCC420CDC}.DebugPersonalarkiv|Any CPU.ActiveCfg = Debug|Any CPU
-		{80F1DF77-210F-4E39-AE66-2FADCC420CDC}.DebugPersonalarkiv|Any CPU.Build.0 = Debug|Any CPU
-		{80F1DF77-210F-4E39-AE66-2FADCC420CDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{80F1DF77-210F-4E39-AE66-2FADCC420CDC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{50AB965D-B3D0-4DA4-BFD4-49EA2907FC0D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{50AB965D-B3D0-4DA4-BFD4-49EA2907FC0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{50AB965D-B3D0-4DA4-BFD4-49EA2907FC0D}.DebugPersonalarkiv|Any CPU.ActiveCfg = Debug|Any CPU
@@ -74,6 +68,12 @@ Global
 		{EF6603ED-7F45-4BC4-BEE0-FF7193CC8CFE}.DebugPersonalarkiv|Any CPU.Build.0 = Debug|Any CPU
 		{EF6603ED-7F45-4BC4-BEE0-FF7193CC8CFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EF6603ED-7F45-4BC4-BEE0-FF7193CC8CFE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CCC53780-1804-4826-B51B-A4950A606E5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CCC53780-1804-4826-B51B-A4950A606E5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CCC53780-1804-4826-B51B-A4950A606E5B}.DebugPersonalarkiv|Any CPU.ActiveCfg = Debug|Any CPU
+		{CCC53780-1804-4826-B51B-A4950A606E5B}.DebugPersonalarkiv|Any CPU.Build.0 = Debug|Any CPU
+		{CCC53780-1804-4826-B51B-A4950A606E5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CCC53780-1804-4826-B51B-A4950A606E5B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

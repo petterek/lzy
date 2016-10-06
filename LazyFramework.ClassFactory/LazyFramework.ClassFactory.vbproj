@@ -114,6 +114,10 @@
       <Project>{d72ca321-6426-4493-bcc5-961284f1c51a}</Project>
       <Name>LazyFramework</Name>
     </ProjectReference>
+    <ProjectReference Include="..\LazyFramework.Reflection\LazyFramework.Reflection.vbproj">
+      <Project>{ccc53780-1804-4826-b51b-a4950a606e5b}</Project>
+      <Name>LazyFramework.Reflection</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

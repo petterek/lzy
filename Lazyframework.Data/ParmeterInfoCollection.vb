@@ -1,5 +1,5 @@
 ﻿
-<Serializable> Public NotInheritable Class ParmeterInfoCollection
+ Public NotInheritable Class ParmeterInfoCollection
     Inherits Dictionary(Of String, ParameterInfo)
 
     Public Overloads Function Add(ByVal name As String, ByVal dbType As DbType) As ParameterInfo
@@ -43,16 +43,5 @@
 
     Private Class ValueNotSet
     End Class
-
-    Public Sub New()
-    End Sub
-
-    Protected Sub New(info As System.Runtime.Serialization.SerializationInfo, context As System.Runtime.Serialization.StreamingContext)
-        MyBase.New(info, context)
-    End Sub
     
-    Public Overrides Sub GetObjectData(info As System.Runtime.Serialization.SerializationInfo, context As System.Runtime.Serialization.StreamingContext)
-        MyBase.GetObjectData(info, context)
-    End Sub
-
 End Class

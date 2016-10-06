@@ -4,7 +4,7 @@ Imports LazyFramework.Data
 Public Class DataProvider
     Implements IDataAccessProvider
 
-    Public Function CreateCommand(cmd As data.CommandInfo) As IDbCommand Implements IDataAccessProvider.CreateCommand
+    Public Function CreateCommand(cmd As CommandInfo) As IDbCommand Implements IDataAccessProvider.CreateCommand
         Dim ret As New SqlCommand()
 
         ret.CommandText = cmd.CommandText
@@ -14,7 +14,14 @@ Public Class DataProvider
     End Function
 
     Public Function CreateConnection(connectionInfo As Data.ServerConnectionInfo) As IDbConnection Implements IDataAccessProvider.CreateConnection
-        Return New SqlConnection(String.Format(ConnectionStringTemplate, connectionInfo.Address, connectionInfo.Database, connectionInfo.UserName, connectionInfo.Password, connectionInfo.Pooling) )
+
+        If connectionInfo.ConnectionStrig Is Nothing Then
+            Return New SqlConnection(String.Format(ConnectionStringTemplate, connectionInfo.Address, connectionInfo.Database, connectionInfo.UserName, connectionInfo.Password, connectionInfo.Pooling))
+        Else
+            Return New SqlConnection(connectionInfo.ConnectionStrig)
+        End If
+
+
     End Function
     
     Public Shared ConnectionStringTemplate As String = "server={0};Database={1};User ID={2};Password={3};pooling={4};" ' ApplicationIntent=ReadOnly"
@@ -32,5 +39,8 @@ Public Class DataProvider
 
     End Sub
 
+    Public Function CreateConnection(connectionInfo As String) As IDbConnection Implements IDataAccessProvider.CreateConnection
+        Return New SqlConnection(connectionInfo)
+    End Function
 End Class
 

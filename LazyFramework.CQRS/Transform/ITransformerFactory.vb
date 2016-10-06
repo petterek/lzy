@@ -1,7 +1,11 @@
 ﻿
 
 Namespace Transform
+
     Public Interface ITransformerFactory
-        Function GetTransformer(ByVal action As IAmAnAction, ByVal ent As Object) As ITransformEntityToDto
+        Property RunAsParallel As Boolean
+        Function GetTransformer(ent As Object) As ITransformEntityToDto
+
+        Property ObjectComparer As Comparison(Of Object)
     End Interface
 End Namespace

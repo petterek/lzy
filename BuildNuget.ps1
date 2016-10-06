@@ -1,8 +1,9 @@
-param([bool]$force = $false,[string]$configuration = "Release", $output = "..\nuget\",[string] $symbolServer = "http://symbol.itaslan.infotjenester.no/nuget/Core" , [string]$repo = "lzy\")
+param([bool]$force = $false,[string]$configuration = "Release", $output = "..\nuget\",[string] $symbolServer = "http://nuget.infotjenester.no:8080/nuget/Default" , [string]$repo = "lzy\")
 
 $projects = @(
-    @{Path = '.\Framework\'; Project = 'LazyFramework'}
-    @{Path = '.\LazyFramework.ClassFactory\'; Project = 'LazyFramework.ClassFactory'}
+    @{Path = '.\LazyFramework.Reflection\'; Project = "LazyFramework.Reflection"}
+   ,@{Path = '.\Framework\'; Project = 'LazyFramework'}
+   ,@{Path = '.\LazyFramework.ClassFactory\'; Project = 'LazyFramework.ClassFactory'}
    ,@{Path = '.\LazyFramework.Logging\'; Project = 'LazyFramework.Logging'}
    ,@{Path = '.\Lazyframework.Data\'; Project = 'LazyFramework.Data'}
    ,@{Path = '.\SqlServer\'; Project = 'LazyFramework.MSSqlServer'}
@@ -10,7 +11,7 @@ $projects = @(
    ,@{Path = '.\LazyFramework.CQRS\'; Project = 'LazyFramework.CQRS'}
 )
 
-if($force){ C:\Windows\Microsoft.NET\Framework64\v4.0.30319\MSBuild.exe .\LazyFramework.sln /p:Configuration=$configuration /t:Clean,Rebuild /nologo /v:q}
+if($force){ "C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe .\LazyFramework.sln /p:Configuration=$configuration /t:Clean,Rebuild /nologo /v:q"}
 
 $output = $output + $repo
 
@@ -35,26 +36,26 @@ $projects | % {
 
     $outstanding = (git status $_.Path --porcelain) | Out-String
     $msg =  ((git log $lastRev`.`.$currRev --format=%B $_.Path) | Out-String )
-    $add = $true;	
+    $add = $true;
 
     $msg
 
     if(!($force)) {
-            if (!($outstanding -eq "")){ 
+            if (!($outstanding -eq "")){
                 Write-Host $outstanding
                 Write-Host "Commit all changes before building"
                 $add = $false
-            } 
+            }
 
             if (($currRev -eq $lastRev) -or ($msg -eq ""))   {
                 ": nothing to build "
                 $add = $false
             }
 
-            if($add){ 
+            if($add){
                 $toBuild.Add($_)
             }
-            
+
 
         }else {
             $toBuild = $projects
@@ -71,29 +72,29 @@ $projects | % {
 }
 
 $toBuild | % {
-    
+
     $_.Project
-    
+
     #$match = $_.Project + "\.\d+\.\d+\.\d+\.\d+\..*"
-    
-    #Get-ChildItem $output |  
+
+    #Get-ChildItem $output |
     #Where-Object {$_.Name -match "$match"} | % {
     #   del $_.FullName
     #}
-          
+
 	$p = $_.Path + $_.Project + ".*proj"
     $p = (Get-Item $p).FullName
-    
+
     if($force){
         .\nuget pack $p  -OutputDirectory $output -IncludeReferencedProjects -Symbols
         }
         else{
         .\nuget pack $p  -OutputDirectory $output -IncludeReferencedProjects -Symbols -Build
         }
-    
+
 	$packed.Add($_.Project)
 
-    
+
     "Release notes:"
     $msg
 }
@@ -102,7 +103,7 @@ $toBuild | % {
 git checkout *.nuspec
 
 "Writing revison info"
-$currRev | Set-Content $saveHash 
+$currRev | Set-Content $saveHash
 
 
 "Pushing symbols"
@@ -110,9 +111,9 @@ $output = "..\nuget\" + $repo
 
 $packed | % {
      $match = $_ + "\.\d+\.\d+\.\d+\.\d+\.symbols"
-     Get-ChildItem $output |  
+     Get-ChildItem $output |
      Where-Object {$_.Name -match "$match"} | % {
-        .\nuget push $_.FullName  p:p -source $symbolServer    
+        .\nuget push $_.FullName  Admin:Admin -source $symbolServer
     }
-	
+
 }

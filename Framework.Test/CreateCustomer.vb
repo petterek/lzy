@@ -1,11 +1,13 @@
 ﻿Imports LazyFramework.CQRS.Command
 Imports LazyFramework.EventHandling
-Imports LazyFramework.Logging
 
 
 Public Class CustomerCommandBase
-    Inherits CommandBase(Of Customer)
+    Inherits CommandBase
+
     Public Id As Guid
+
+   
 End Class
 
 Public Class CreateCustomerCommand
@@ -90,13 +92,13 @@ Public Class CommandHandler
 
         CommandHandler.CustomerRepository.Add(customer.Id, customer)
 
-        EventHandling.EventHub.Publish(New CustomerCreatedEvent(customer))
+        EventHandling.EventHub.Publish(Runtime.Context.Current.CurrentUser, New CustomerCreatedEvent(customer))
 
     End Sub
 
     Public Shared Sub AlterName(cmd As UpdateCustomerNameCommand)
         CustomerRepository(cmd.Id).Name = cmd.NewName
-        EventHandling.EventHub.Publish( New CustomerAlteredEvent(cmd.Id))
+        EventHandling.EventHub.Publish(Runtime.Context.Current.CurrentUser, New CustomerAlteredEvent(cmd.Id))
     End Sub
 
 End Class
@@ -112,18 +114,3 @@ Public Class EventHandler
 
 End Class
 
-
-Public Class Persistdata
-    Implements ILogWriter
-    
-    Public Sub Write(info As LogInfo) Implements ILogWriter.Write
-        Throw New NotImplementedException()
-    End Sub
-
-    Public Function Level() As LogLevelEnum Implements ILogWriter.Level
-        Return LogLevelEnum.Verbose
-    End Function
-
-    Public Property EventList As New List(Of LazyFramework.CQRS.Command.IAmACommand)
-
-End Class
