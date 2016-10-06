@@ -1,7 +1,7 @@
 ﻿Imports System.Data.SqlClient
 Imports System.Linq.Expressions
 Imports System.Reflection
-
+Imports System.Runtime.Serialization
 
 Public Class DataFiller
 
@@ -68,17 +68,20 @@ Public Class DataFiller
         Private Delegate Function GetValueDelegate(o As IDataReader) As Object
 
         Public Sub SetValueToObject(reader As IDataReader, o As Object)
-            Dim tempValue = _getValue(reader)
+            Try
+                Dim tempValue = _getValue(reader)
 
+                If TypeOf (tempValue) Is DBNull Then
+                    _setter(o, Nothing)
+                    '_fieldInfo.SetValue(o, Nothing)
+                Else
+                    _setter(o, tempValue)
+                    '_fieldInfo.SetValue(o, tempValue)
+                End If
+            Catch ex As Exception
+                Throw New UnableToSetValueException(_name, _memberInfo)
+            End Try
 
-
-            If TypeOf (tempValue) Is DBNull Then
-                _setter(o, Nothing)
-                '_fieldInfo.SetValue(o, Nothing)
-            Else
-                _setter(o, tempValue)
-                '_fieldInfo.SetValue(o, tempValue)
-            End If
         End Sub
 
     End Class
@@ -108,5 +111,33 @@ Public Class DataFiller
         For Each fieldInfo In _fields
             fieldInfo.SetValueToObject(reader, data)
         Next
+    End Sub
+End Class
+
+<Serializable>
+Friend Class UnableToSetValueException
+    Inherits Exception
+
+    Private _fieldInfo As MemberInfo
+    Private _name As String
+
+    Public Sub New()
+    End Sub
+
+    Public Sub New(message As String)
+        MyBase.New(message)
+    End Sub
+
+    Public Sub New(message As String, innerException As Exception)
+        MyBase.New(message, innerException)
+    End Sub
+
+    Public Sub New(_name As String, _fieldInfo As MemberInfo)
+        Me._name = _name
+        Me._fieldInfo = _fieldInfo
+    End Sub
+
+    Protected Sub New(info As SerializationInfo, context As StreamingContext)
+        MyBase.New(info, context)
     End Sub
 End Class
