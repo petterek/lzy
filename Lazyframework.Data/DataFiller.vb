@@ -10,17 +10,30 @@ Public Class DataFiller
     Private Class FieldInfoDecorator
         Private ReadOnly _col As Integer
         Private ReadOnly _name As String
-        Private ReadOnly _fieldInfo As FieldInfo
+        Private ReadOnly _memberInfo As MemberInfo
         Private ReadOnly _setter As Action(Of Object, Object)
 
         
 
-
-        Public Sub New(ByVal reader As Object, ByVal col As Integer, ByVal fieldInfo As FieldInfo, ByVal name As String, ByVal mapByName As Boolean)
+        Public Sub New(ByVal reader As Object, ByVal col As Integer, ByVal memberInfo As MemberInfo, ByVal name As String, ByVal mapByName As Boolean)
             _col = col
-            _fieldInfo = fieldInfo
+            _memberInfo = memberInfo
             _name = name
-            If GetType(System.IO.Stream).IsAssignableFrom(_fieldInfo.FieldType) Then
+
+            Dim memberType As Type = Nothing
+
+            Select Case memberInfo.MemberType
+                Case MemberTypes.Property
+                    memberType = CType(memberInfo, PropertyInfo).PropertyType
+                Case MemberTypes.Field
+                    memberType = CType(memberInfo, FieldInfo).FieldType
+            End Select
+
+            If memberType Is Nothing Then
+                Throw New NotSupportedException("Member type is not supported. Only properties and fields are supported")
+            End If
+
+            If GetType(System.IO.Stream).IsAssignableFrom(memberType) Then
                 If TypeOf (reader) Is SqlDataReader Then
                     _getValue = AddressOf GetStream
                 Else
@@ -34,7 +47,7 @@ Public Class DataFiller
                 End If
             End If
 
-            _setter = Reflection.CreateSetter(fieldInfo)
+            _setter = Reflection.CreateSetter(memberInfo)
         End Sub
 
         Private ReadOnly _getValue As GetValueDelegate
@@ -78,15 +91,15 @@ Public Class DataFiller
         For x = 0 To dataReader.FieldCount - 1
             n = dataReader.GetName(x)
 
-            Dim fieldInfo As FieldInfo = Nothing
+            Dim memberInfo As MemberInfo = Nothing
             Dim currType As Type
             currType = t
 
-            fieldInfo = LazyFramework.Reflection.SearchForFieldInfo(currType,  n)
-            
+            memberInfo = LazyFramework.Reflection.SearchForFieldInfo(currType, n)
 
-            If fieldInfo IsNot Nothing Then
-                _fields.Add(New FieldInfoDecorator(dataReader, x, fieldInfo, n, mapByName))
+
+            If memberInfo IsNot Nothing Then
+                _fields.Add(New FieldInfoDecorator(dataReader, x, memberInfo, n, mapByName))
             End If
         Next
     End Sub
