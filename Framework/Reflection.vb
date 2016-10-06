@@ -160,18 +160,21 @@ Public Class Reflection
     ''' <param name="currType"></param>
     ''' <param name="name"></param>
     ''' <returns></returns>
-    Public Shared Function SearchForFieldInfo(currType As Type, name As String) As FieldInfo
-        Dim fieldInfo As FieldInfo = Nothing
+    Public Shared Function SearchForFieldInfo(currType As Type, name As String) As MemberInfo
+        Dim memberInfo As MemberInfo = Nothing
 
-        While fieldInfo Is Nothing AndAlso currType IsNot Nothing
-            fieldInfo = currType.GetField("_" & name, BindingFlags.IgnoreCase Or BindingFlags.NonPublic Or BindingFlags.Instance)
-            If fieldInfo Is Nothing Then
-                fieldInfo = currType.GetField(name, BindingFlags.IgnoreCase Or BindingFlags.Instance Or BindingFlags.Public)
+        While memberInfo Is Nothing AndAlso currType IsNot Nothing
+            memberInfo = currType.GetField("_" & name, BindingFlags.IgnoreCase Or BindingFlags.NonPublic Or BindingFlags.Instance)
+            If memberInfo Is Nothing Then
+                memberInfo = currType.GetField(name, BindingFlags.IgnoreCase Or BindingFlags.Instance Or BindingFlags.Public)
+            End If
+            If memberInfo Is Nothing Then
+                memberInfo = currType.GetProperty(name, BindingFlags.IgnoreCase Or BindingFlags.Instance Or BindingFlags.Public)
             End If
             currType = currType.BaseType
         End While
 
-        Return fieldInfo
+        Return memberInfo
     End Function
 
     Public Shared Function SearchForSetterInfo(currType As Type, name As String) As PropertyInfo
