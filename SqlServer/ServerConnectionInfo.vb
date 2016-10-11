@@ -13,6 +13,9 @@ Public Class ServerConnectionInfo
         End If
 
     End Sub
+    Public Sub New(userName As String, password As String, server As String, initalCatalog As String)
+        MyBase.New(String.Format("server={0};Database={1};User ID={2};Password={3};pooling=true;", server, initalCatalog, userName, password))
+    End Sub
 
     Public Overrides Function GetProvider() As IDataAccessProvider
         Return New DataProvider
