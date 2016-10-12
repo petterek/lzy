@@ -2,6 +2,7 @@
 Imports System.Reflection
 Imports System.Runtime.InteropServices
 Imports System.Text.RegularExpressions
+Imports LazyFramework.Data
 
 Public Class Store
 
@@ -256,6 +257,7 @@ Public Interface IDataStore
     Sub Exec(command As CommandInfo, data As Object)
     Sub Exec(command As CommandInfo)
     Sub Exec(Of T As Structure)(command As CommandInfo, data As ICollection(Of T), colName As String)
+    Function ExecScalar(Of T)(command As CommandInfo) As T
     Sub GetStream(Of T As {New, WillDisposeThoseForU})(command As CommandInfo, data As T)
 End Interface
 
@@ -295,4 +297,11 @@ Public Class DataStoreInstance
     Public Sub GetStream(Of T As {WillDisposeThoseForU, New})(command As CommandInfo, data As T) Implements IDataStore.GetStream
         Store.GetStream(connectionInfo, command, data)
     End Sub
+
+    Public Function ExecScalar(Of T)(command As CommandInfo) As T Implements IDataStore.ExecScalar
+        Dim ret = Store.ExecScalar(connectionInfo, command)
+
+        Return CType(ret, T)
+
+    End Function
 End Class
