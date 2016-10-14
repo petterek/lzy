@@ -8,6 +8,12 @@ Public Class Store
 
     Private Shared Plugins As New List(Of Type)
     Public Shared Sub RegisterPlugin(Of T As DataModificationPluginBase)()
+        Dim type1 As Type = GetType(T)
+        For Each p In Plugins
+            If p.GetType = type1 Then
+                Return
+            End If
+        Next
         Plugins.Add(GetType(T))
     End Sub
 
