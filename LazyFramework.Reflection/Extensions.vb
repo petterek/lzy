@@ -1,6 +1,7 @@
 Imports System.Reflection
 Imports System.Runtime.CompilerServices
 Public Module Extensions
+
     <Extension> Public Iterator Function NameEndsWith(toSearch As IEnumerable(Of Type), search As String) As IEnumerable(Of Type)
         For Each e In toSearch
             If e.Name.EndsWith(search) Then Yield e
