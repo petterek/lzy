@@ -140,4 +140,8 @@ Friend Class UnableToSetValueException
     Protected Sub New(info As SerializationInfo, context As StreamingContext)
         MyBase.New(info, context)
     End Sub
+
+    Public Overrides Function ToString() As String
+        Return "Unable to map the " + _name + "to the type " + _fieldInfo.MemberType.ToString
+    End Function
 End Class
