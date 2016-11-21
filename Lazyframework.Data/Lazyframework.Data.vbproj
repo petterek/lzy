@@ -67,6 +67,7 @@
     <Compile Include="DbRequestOkLog.vb" />
     <Compile Include="EntityBase.vb" />
     <Compile Include="ExceptionInPluginEvent.vb" />
+    <Compile Include="ExtensionMethods.vb" />
     <Compile Include="FillResultEnum.vb" />
     <Compile Include="FillStatus.vb" />
     <Compile Include="IDataAccessProvider.vb" />

@@ -83,6 +83,7 @@
     <Compile Include="Cqrs\CommandHub.vb" />
     <Compile Include="CreateCustomer.vb" />
     <Compile Include="ErrorFromEspen.vb" />
+    <Compile Include="ExtensionMethodsTest.vb" />
     <Compile Include="FileExtensionTest.vb" />
     <Compile Include="MultiThread.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />

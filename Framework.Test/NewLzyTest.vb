@@ -104,6 +104,31 @@ Imports NUnit.Framework
     End Sub
 
 
+    <Test> Public Sub ReadonlyFieldsIsFilled()
+
+        Dim cmd As New Data.CommandInfo
+        cmd.CommandText = "select * from Hrunit"
+        cmd.TypeOfCommand = CommandTypeEnum.Read
+        Dim ret As New List(Of UnitWithReadOnly)
+
+
+        Store.Exec(Connection, cmd, ret)
+
+
+    End Sub
+
+
+    Public Class UnitWithReadOnly
+
+        Private _name As String
+
+        Public ReadOnly Property Name As String
+            Get
+                Return _name
+            End Get
+        End Property
+    End Class
+
 
     Public Class DataObjectList
         Inherits List(Of DataObject)
