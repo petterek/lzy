@@ -167,6 +167,10 @@ Namespace Cqrs
             Return New List(Of IActionDescriptor)
         End Function
 
+        Public Function GetActionNameList(entity As Object) As List(Of String) Implements IActionSecurity.GetActionNameList
+            Throw New NotImplementedException()
+        End Function
+
         Public Function UserCanRunThisAction(action As IActionBase) As Boolean Implements IActionSecurity.UserCanRunThisAction
             Throw New NotImplementedException()
         End Function
