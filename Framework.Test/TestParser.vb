@@ -7,6 +7,9 @@ Imports NUnit.Framework
         Assert.AreEqual("Petter", p.Navn)
         'Assert.AreEqual(43, p.Alder)
     End Sub
+    <Test> Public Sub ParseObjectWithPropertyThatsNotInClass()
+        Assert.DoesNotThrow(Sub() Utils.Json.Reader.StringToObject(Of Person)("{""Comment"":null}  "))
+    End Sub
 
     <Test> Public Sub ParseTextWithEscapeObject()
         Dim p = Utils.Json.Reader.StringToObject(Of Person)("{""Navn"":""Petter\nGjermund\\ \""Han er skikkelig tøff\"" ""}")
@@ -194,7 +197,7 @@ Imports NUnit.Framework
         toTest = Reader.StringToObject(Of ClassWithEnum)("{""Value"": 1}")
         toTest = Reader.StringToObject(Of ClassWithEnum)("{""Value"": ""Value1""}")
 
-        
+
 
     End sub
 
