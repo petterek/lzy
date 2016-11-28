@@ -10,6 +10,9 @@ Imports NUnit.Framework
     <Test> Public Sub ParseObjectWithPropertyThatsNotInClass()
         Assert.DoesNotThrow(Sub() Utils.Json.Reader.StringToObject(Of Person)("{""Comment"":null}  "))
     End Sub
+    <Test> Public Sub ParseObjectWithNullablePropertySetToNull()
+        Assert.DoesNotThrow(Sub() Utils.Json.Reader.StringToObject(Of Person)("{""ChildCount"":null}  "))
+    End Sub
 
     <Test> Public Sub ParseTextWithEscapeObject()
         Dim p = Utils.Json.Reader.StringToObject(Of Person)("{""Navn"":""Petter\nGjermund\\ \""Han er skikkelig tøff\"" ""}")

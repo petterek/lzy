@@ -334,6 +334,7 @@ Public Class Person
     Public Speed As Double
     Public Barn As List(Of Person)
     Public TestInfo As Test
+    Public ChildCount As Integer?
 End Class
 
 
