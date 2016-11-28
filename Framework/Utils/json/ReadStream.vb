@@ -36,11 +36,12 @@ Namespace Utils.Json
         End Function
 
         Public Function Read(count As Integer) As String Implements IReader.Read
-            Dim retVal(count) As Char
-            _StreamReader.ReadBlock(retVal,0,count)
-            
-            return New String(retVal)
+            Dim retVal As String = ""
+            For x = 0 To count - 1
+                retVal += Read()
+            Next
 
+            Return retVal
         End Function
 
         Public ReadOnly Property Buffer As String Implements IReader.Buffer

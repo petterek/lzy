@@ -16,7 +16,10 @@ Namespace Utils.Json
                     value = TokenAcceptors.TypeParserMapper(GetType(Long)).Parse(nextChar, GetType(Double))
                 Case = 70,84 ' T or F -> boolean
                     value = TokenAcceptors.TypeParserMapper(GetType(BoolanParser)).Parse(nextChar, GetType(BoolanParser))
-                Case = 78,44 'N null or , means no value.
+                Case 44
+                    value = Nothing
+                Case = 78, 110 '[N,n]ull or , means no value.
+                    TokenAcceptors.TypeParserMapper(GetType(NullableParser)).Parse(nextChar, GetType(NullableParser))
                     value = Nothing
                 Case = 123 ' {
                     Throw new NotSupportedException("Cannot parse unknown objct types")

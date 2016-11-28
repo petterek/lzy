@@ -8,7 +8,7 @@ Imports NUnit.Framework
         'Assert.AreEqual(43, p.Alder)
     End Sub
     <Test> Public Sub ParseObjectWithPropertyThatsNotInClass()
-        Assert.DoesNotThrow(Sub() Utils.Json.Reader.StringToObject(Of Person)("{""Comment"":null}  "))
+        Assert.DoesNotThrow(Sub() Utils.Json.Reader.StringToObject(Of Person)("{""Comment"":null}"))
     End Sub
     <Test> Public Sub ParseObjectWithNullablePropertySetToNull()
         Assert.DoesNotThrow(Sub() Utils.Json.Reader.StringToObject(Of Person)("{""ChildCount"":null}  "))
