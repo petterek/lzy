@@ -332,6 +332,7 @@ Public Class Person
     Public Navn As String
     Public Alder As Integer
     Public Speed As Double
+    Public SpeedyGonzales As Single
     Public Barn As List(Of Person)
     Public TestInfo As Test
     Public ChildCount As Integer?

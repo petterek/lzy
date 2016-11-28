@@ -13,6 +13,9 @@ Imports NUnit.Framework
     <Test> Public Sub ParseObjectWithNullablePropertySetToNull()
         Assert.DoesNotThrow(Sub() Utils.Json.Reader.StringToObject(Of Person)("{""ChildCount"":null}  "))
     End Sub
+    <Test> Public Sub ParseObjectWithSingleAsNonDecimal() 
+        Assert.DoesNotThrow(Sub() Utils.Json.Reader.StringToObject(Of Person)("{""SpeedyGonzales"":0}")) 
+    End Sub 
 
     <Test> Public Sub ParseTextWithEscapeObject()
         Dim p = Utils.Json.Reader.StringToObject(Of Person)("{""Navn"":""Petter\nGjermund\\ \""Han er skikkelig tøff\"" ""}")
