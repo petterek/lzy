@@ -13,9 +13,9 @@ Imports NUnit.Framework
     <Test> Public Sub ParseObjectWithNullablePropertySetToNull()
         Assert.DoesNotThrow(Sub() Utils.Json.Reader.StringToObject(Of Person)("{""ChildCount"":null}  "))
     End Sub
-    <Test> Public Sub ParseObjectWithSingleAsNonDecimal() 
-        Assert.DoesNotThrow(Sub() Utils.Json.Reader.StringToObject(Of Person)("{""SpeedyGonzales"":0}")) 
-    End Sub 
+    <Test> Public Sub ParseObjectWithSingleAsNonDecimal()
+        Assert.DoesNotThrow(Sub() Utils.Json.Reader.StringToObject(Of Person)("{""SpeedyGonzales"":0}"))
+    End Sub
 
     <Test> Public Sub ParseTextWithEscapeObject()
         Dim p = Utils.Json.Reader.StringToObject(Of Person)("{""Navn"":""Petter\nGjermund\\ \""Han er skikkelig tøff\"" ""}")
@@ -136,7 +136,7 @@ Imports NUnit.Framework
     <Test> Public Sub BooleanValueIsParsed()
         Dim v As ClassWithLongBooleanStringProperty = Nothing
         Assert.DoesNotThrow(Sub() v = Reader.StringToObject(Of ClassWithLongBooleanStringProperty)("{""Value"":1446212820320,""ValueTrue"":True,""ValueFalse"":False}"))
-        Assert.True( v.ValueTrue)
+        Assert.True(v.ValueTrue)
         Assert.False(v.ValueFalse)
 
     End Sub
@@ -196,7 +196,7 @@ Imports NUnit.Framework
     End Sub
 
 
-    <Test>Public sub DeserializeEnums
+    <Test> Public Sub DeserializeEnums()
 
         Dim toTest As ClassWithEnum
 
@@ -205,7 +205,7 @@ Imports NUnit.Framework
 
 
 
-    End sub
+    End Sub
 
     Public Class ClassWithEnum
         Public Value As MyEnum

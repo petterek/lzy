@@ -199,7 +199,8 @@ Namespace Utils.Json
                                                                             {GetType(Boolean), New BoolanParser},
                                                                             {GetType(UnknownFieldParser), New UnknownFieldParser},
                                                                             {GetType(EnumParser), New EnumParser},
-                                                                            {GetType(NullableParser), New NullableParser}
+                                                                            {GetType(NullableParser), New NullableParser},
+                                                                            {GetType(Single), New SingleParser}
                                                                         }
 
         Friend Shared Function CanFindValueSeparator(ByVal nextChar As IReader) As Boolean

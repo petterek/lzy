@@ -10,10 +10,18 @@ Namespace Utils.Json
             Return Double.Parse(nextChar.Buffer, CultureInfo.InvariantCulture.NumberFormat)
         End Function
 
+    End Class
+    Public Class SingleParser
+        Inherits Builder
 
-        
+        Public Overrides Function Parse(nextChar As IReader, t As Type) As Object
+            TokenAcceptors.WhiteSpace(nextChar)
+            TokenAcceptors.BufferLegalCharacters(nextChar, "0123456789.-")
+            Return Single.Parse(nextChar.Buffer, CultureInfo.InvariantCulture.NumberFormat)
+        End Function
 
     End Class
+
 
     Public Class DecimalParser
         Inherits Builder
