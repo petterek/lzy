@@ -66,10 +66,8 @@ Namespace Transform
             Dim transformEntity As Object = ctx.Transformer(e)
             If transformEntity Is Nothing Then Return Nothing
 
-            If TypeOf (transformEntity) Is ISupportActionList AndAlso ctx.ActionSecurity IsNot Nothing Then
-                CType(transformEntity, ISupportActionList).Actions.AddRange(ctx.ActionSecurity.GetActionList(e))
-            elseIf TypeOf (transformEntity) Is ISupportActionNameList AndAlso ctx.ActionSecurity IsNot Nothing Then
-                CType(transformEntity, ISupportActionNameList).Actions.AddRange(ctx.ActionSecurity.GetActionNameList(e))
+            If TypeOf (transformEntity) Is ISupportActionNameList AndAlso ctx.ActionSecurity IsNot Nothing Then
+                CType(transformEntity, ISupportActionNameList).Actions.AddRange(ctx.ActionSecurity.GetActionList(e))
             End If
 
             Return transformEntity

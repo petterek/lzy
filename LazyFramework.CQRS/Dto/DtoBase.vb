@@ -1,9 +1,9 @@
 ﻿Namespace Dto
     Public MustInherit Class DtoBase
-        Implements ISupportActionList
+        Implements ISupportActionNameList
 
-        Private ReadOnly _Actionlist As New List(Of IActionDescriptor)
-        Public ReadOnly Property Actions As List(Of IActionDescriptor) Implements ISupportActionList.Actions
+        Private ReadOnly _Actionlist As New List(Of String)
+        Public ReadOnly Property Actions As List(Of String) Implements ISupportActionNameList.Actions
             Get
                 Return _Actionlist
             End Get

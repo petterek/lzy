@@ -163,11 +163,7 @@ Namespace Cqrs
             Return True
         End Function
 
-        Public Function GetActionList(entity As Object) As List(Of IActionDescriptor) Implements IActionSecurity.GetActionList
-            Return New List(Of IActionDescriptor)
-        End Function
-
-        Public Function GetActionNameList(entity As Object) As List(Of String) Implements IActionSecurity.GetActionNameList
+        Public Function GetActionNameList(entity As Object) As List(Of String) Implements IActionSecurity.GetActionList
             Throw New NotImplementedException()
         End Function
 

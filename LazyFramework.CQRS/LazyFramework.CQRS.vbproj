@@ -67,7 +67,6 @@
     <Compile Include="Availability\CommandAvilabilityBase.vb" />
     <Compile Include="Availability\ICommandAvailability.vb" />
     <Compile Include="Command\CommandAllreadyMappedExcpetion.vb" />
-    <Compile Include="Dto\ActionDescriptor.vb" />
     <Compile Include="EntityResolver\Handling.vb" />
     <Compile Include="ExecutionProfile.vb" />
     <Compile Include="Query\AllreadeyConfiguredException.vb" />
@@ -81,7 +80,6 @@
     <Compile Include="Command\IAmACommand.vb" />
     <Compile Include="Command\IHandleCommand.vb" />
     <Compile Include="Dto\DtoBase.vb" />
-    <Compile Include="Dto\IActionDescriptor.vb" />
     <Compile Include="Dto\ISupportActionList.vb" />
     <Compile Include="IActionBase.vb" />
     <Compile Include="Security\IActionSecurity.vb" />
