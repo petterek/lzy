@@ -312,6 +312,19 @@ Imports NUnit.Framework
     End Sub
 
 
+    <Test> Public Sub DecomposeArrayToParams()
+        Dim cmd2 As New Data.CommandInfo
+        cmd2.CommandText = "select count(*) from Hrunit where Id in(@Id) "
+        cmd2.TypeOfCommand = CommandTypeEnum.Read
+        cmd2.Parameters.Add("Id", DbType.Int32, {1, 2, 3})
+        Dim ret As New List(Of DataObject)
+
+        Assert.DoesNotThrow(Sub() Store.Exec(Connection, cmd2, ret))
+        Assert.AreEqual(ret.Count, 1)
+
+    End Sub
+
+
 End Class
 
 Public Class StreamTo

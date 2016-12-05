@@ -186,7 +186,28 @@ Public Class Store
             End If
 
             If pi.Value IsNot Nothing Then
-                p.Value = pi.Value
+                If pi.Value.GetType().IsArray Then
+                    Dim x As Integer = 0
+                    Dim paramList As New List(Of String)
+                    For Each e In CType(pi.Value, IEnumerable)
+                        p = cmd.CreateParameter
+                        p.DbType = pi.DbType
+                        Dim v As String = pi.Name & "_" & x
+                        p.ParameterName = v
+                        paramList.Add("@" & v)
+                        If pi.Size <> 0 Then
+                            p.Size = pi.Size
+                        End If
+                        p.Value = e
+                        cmd.Parameters.Add(p)
+                        x += 1
+                    Next
+                    cmd.CommandText = cmd.CommandText.Replace("@" & pi.Name, Join(paramList.ToArray, ","))
+                Else
+                    p.Value = pi.Value
+                    cmd.Parameters.Add(p)
+                End If
+
             Else
                 'Read the value from the object... 
                 'Logger.Log(1000, New DataLog("Finding value for param:" & pi.Name))
@@ -204,9 +225,10 @@ Public Class Store
                         End If
                     End If
                 End If
+                cmd.Parameters.Add(p)
             End If
 
-            cmd.Parameters.Add(p)
+
         Next
     End Sub
 
