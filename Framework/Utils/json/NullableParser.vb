@@ -13,7 +13,11 @@
             End If
 
             Dim tParser = t.GetGenericArguments(0)
-            Return TokenAcceptors.TypeParserMapper(tParser).Parse(nextChar, tParser)
+            If TokenAcceptors.TypeParserMapper.ContainsKey(tParser) Then
+                Return TokenAcceptors.TypeParserMapper(tParser).Parse(nextChar, tParser)
+            Else
+                Return Reader.StringToObject(nextChar, tParser)
+            End If
 
         End Function
     End Class
