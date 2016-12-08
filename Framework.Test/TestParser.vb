@@ -13,6 +13,16 @@ Imports NUnit.Framework
     <Test> Public Sub ParseObjectWithNullablePropertySetToNull()
         Assert.DoesNotThrow(Sub() Utils.Json.Reader.StringToObject(Of Person)("{""ChildCount"":null}  "))
     End Sub
+    <Test> Public Sub ParseObjectWithNullableStructFilled()
+        Dim toParse = "{""SomeThing"":1,""ADate"":{""Year"":2016,""Month"":10,""Day"":9}}"
+        Assert.DoesNotThrow(Sub() Utils.Json.Reader.StringToObject(Of ClassWithNullableStruct)(toParse))
+        Assert.AreEqual(Reader.StringToObject(Of ClassWithNullableStruct)(toParse).ADate.Value.Day, 9)
+    End Sub
+    <Test> Public Sub ParseObjectWithNullableStructNulled()
+        Dim toParse = "{""SomeThing"":1,""ADate"":null}"
+        Assert.DoesNotThrow(Sub() Utils.Json.Reader.StringToObject(Of ClassWithNullableStruct)(toParse))
+        Assert.AreEqual(Reader.StringToObject(Of ClassWithNullableStruct)(toParse).ADate, Nothing)
+    End Sub
     <Test> Public Sub ParseObjectWithSingleAsNonDecimal()
         Assert.DoesNotThrow(Sub() Utils.Json.Reader.StringToObject(Of Person)("{""SpeedyGonzales"":0}"))
     End Sub
@@ -252,6 +262,10 @@ Imports NUnit.Framework
     Public Class ClassWithStruct
         Public SomeThing As Integer
         Public ADate As DateHolder
+    End Class
+    Public Class ClassWithNullableStruct
+        Public SomeThing As Integer
+        Public ADate As DateHolder?
     End Class
 
     Public Structure DateHolder
