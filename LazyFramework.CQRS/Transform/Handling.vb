@@ -28,16 +28,16 @@ Namespace Transform
                     Dim Errors As New Concurrent.ConcurrentBag(Of Exception)
                     CType(result, IList).
                         Cast(Of Object).
-                        AsParallel.ForAll(Sub(o As Object)
-                                              Try
-                                                  Dim temp = Transform(context, o)
-                                                  If temp IsNot Nothing Then
-                                                      ret.Enqueue(temp)
-                                                  End If
-                                              Catch ex As Exception
-                                                  Errors.Add(ex)
-                                              End Try
-                                          End Sub)
+                        AsParallel.AsOrdered.ForAll(Sub(o As Object)
+                                                        Try
+                                                            Dim temp = Transform(context, o)
+                                                            If temp IsNot Nothing Then
+                                                                ret.Enqueue(temp)
+                                                            End If
+                                                        Catch ex As Exception
+                                                            Errors.Add(ex)
+                                                        End Try
+                                                    End Sub)
 
                     If Errors.Count > 0 Then
                         Throw Errors(0)
