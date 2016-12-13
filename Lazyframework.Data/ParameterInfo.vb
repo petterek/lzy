@@ -6,6 +6,7 @@ Public Class ParameterInfo
     Private _Size As Integer
     Private _allowNull As Boolean
     Private _Value As Object
+    Private _Expand As Boolean = False
 
     Public Property Name() As String
         Get
@@ -51,5 +52,13 @@ Public Class ParameterInfo
             _Value = value
         End Set
     End Property
-    
+
+    Public Property Expand as Boolean
+        Get
+            return _Expand
+        End Get
+        Set
+            _Expand = value
+        End Set
+    End Property
 End Class
