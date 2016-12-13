@@ -86,10 +86,10 @@ $toBuild | % {
     $p = (Get-Item $p).FullName
 
     if($force){
-        .\nuget pack $p  -OutputDirectory $output -IncludeReferencedProjects -Symbols
+        .\nuget pack $p  -OutputDirectory $output -IncludeReferencedProjects -Symbols -Properties Configuration=$Configuration
         }
         else{
-        .\nuget pack $p  -OutputDirectory $output -IncludeReferencedProjects -Symbols -Build
+        .\nuget pack $p  -OutputDirectory $output -IncludeReferencedProjects -Symbols -Build -Properties Configuration=$Configuration
         }
 
 	$packed.Add($_.Project)
