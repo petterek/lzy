@@ -1,4 +1,4 @@
-param([bool]$force = $false,[string]$configuration = "Release", $output = "..\nuget\",[string] $symbolServer = "http://nuget.infotjenester.no:8080/nuget/Default" , [string]$repo = "lzy\")
+param([switch]$Force = $false,[string]$Configuration = "Release", $Output = "..\nuget\",[string] $SymbolServer = "http://nuget.infotjenester.no:8080/nuget/Default" , [string]$Repo = "lzy\")
 
 $projects = @(
     @{Path = '.\LazyFramework.Reflection\'; Project = "LazyFramework.Reflection"}
@@ -86,10 +86,10 @@ $toBuild | % {
     $p = (Get-Item $p).FullName
 
     if($force){
-        .\nuget pack $p  -OutputDirectory $output -IncludeReferencedProjects -Symbols
+        .\nuget pack $p  -OutputDirectory $output -IncludeReferencedProjects -Symbols -Properties Configuration=$Configuration
         }
         else{
-        .\nuget pack $p  -OutputDirectory $output -IncludeReferencedProjects -Symbols -Build
+        .\nuget pack $p  -OutputDirectory $output -IncludeReferencedProjects -Symbols -Build -Properties Configuration=$Configuration
         }
 
 	$packed.Add($_.Project)
