@@ -186,7 +186,7 @@ Public Class Store
             End If
 
             If pi.Value IsNot Nothing Then
-                If pi.Value.GetType().IsArray Then
+                If pi.Expand Then
                     Dim x As Integer = 0
                     Dim paramList As New List(Of String)
                     For Each e In CType(pi.Value, IEnumerable)
@@ -202,7 +202,11 @@ Public Class Store
                         cmd.Parameters.Add(p)
                         x += 1
                     Next
-                    cmd.CommandText = cmd.CommandText.Replace("@" & pi.Name, Join(paramList.ToArray, ","))
+                    If x = 0 Then
+                        cmd.CommandText = cmd.CommandText.Replace("@" & pi.Name, "NULL")
+                    Else 
+                        cmd.CommandText = cmd.CommandText.Replace("@" & pi.Name, Join(paramList.ToArray, ","))
+                    End If
                 Else
                     p.Value = pi.Value
                     cmd.Parameters.Add(p)

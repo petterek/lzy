@@ -313,17 +313,40 @@ Imports NUnit.Framework
 
 
     <Test> Public Sub DecomposeArrayToParams()
-        Dim cmd2 As New Data.CommandInfo
-        cmd2.CommandText = "select count(*) from Hrunit where Id in(@Id) "
-        cmd2.TypeOfCommand = CommandTypeEnum.Read
-        cmd2.Parameters.Add("Id", DbType.Int32, {1, 2, 3})
+        Dim cmd As New Data.CommandInfo
+        cmd.CommandText = "select count(*) from Hrunit where Id in(@Id) "
+        cmd.TypeOfCommand = CommandTypeEnum.Read
+        cmd.Parameters.AddExpandable("Id", DbType.Int32, {1, 2, 3})
         Dim ret As New List(Of DataObject)
 
-        Assert.DoesNotThrow(Sub() Store.Exec(Connection, cmd2, ret))
+        Assert.DoesNotThrow(Sub() Store.Exec(Connection, cmd, ret))
         Assert.AreEqual(ret.Count, 1)
 
     End Sub
 
+    <Test> Public Sub DecomposeListToParams()
+        Dim cmd As New Data.CommandInfo
+        cmd.CommandText = "select count(*) from Hrunit where Id in(@Id) "
+        cmd.TypeOfCommand = CommandTypeEnum.Read
+        cmd.Parameters.AddExpandable("Id", DbType.Int32, New List(Of Integer) From {1, 2, 3})
+        Dim ret As New List(Of DataObject)
+
+        Assert.DoesNotThrow(Sub() Store.Exec(Connection, cmd, ret))
+        Assert.AreEqual(ret.Count, 1)
+
+    End Sub
+
+    <Test> Public Sub DecomposeEmptyArrayToParams()
+        Dim cmd As New Data.CommandInfo
+        cmd.CommandText = "select count(*) from Hrunit where Id in(@Id) "
+        cmd.TypeOfCommand = CommandTypeEnum.Read
+        cmd.Parameters.AddExpandable("Id", DbType.Int32, New Integer(){} )
+        Dim ret As New List(Of DataObject)
+
+        Assert.DoesNotThrow(Sub() Store.Exec(Connection, cmd, ret))
+        Assert.AreEqual(ret.Count, 1)
+
+    End Sub
 
 End Class
 

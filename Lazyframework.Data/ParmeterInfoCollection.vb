@@ -40,6 +40,12 @@
         Return p
     End Function
 
+    Public Overloads Function AddExpandable(ByVal name As String, ByVal dbType As DbType, ByVal value As IEnumerable) As ParameterInfo
+        Dim ret = Add(name, dbType, 0, False, value)
+        ret.Expand = True
+        Return ret
+    End Function
+
 
     Private Class ValueNotSet
     End Class
