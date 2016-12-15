@@ -21,7 +21,42 @@ End Module
         Assert.AreEqual("{""ToTest"":1}", Writer.ObjectToString(New With {.ToTest = 1}))
 
     End Sub
-    
+
+    <Test> Public Sub ParseStringWithObjectToString()
+        Dim testString = <![CDATA[<h3>{0}</h3>
+                <p>Man skal ha en samtale med den syke allerede f&oslash;rste frav&aelig;rsdag. Dette gjelder b&aring;de n&aring;r den syke leverer egenmelding og ved sykmelding. Avklar forventet lengde p&aring; frav&aelig;ret og hvilke arbeidsoppgaver er den ansatte i stand til &aring; utf&oslash;re/ikke utf&oslash;re:</p>
+                <ul>
+                    <li>Om du som leder kan bidra med tiltak/tilpasning av arbeidssituasjonen, slik at den ansatte kan komme raskere tilbake p&aring; arbeidet.</li>
+                    <li>Om sykmelder er kontaktet og evt. om sykmelderen hadde innspill til tilpasning av arbeidet. Dette skal sykmelder gj&oslash;re umiddelbart.</li>
+                    <li>Om frav&aelig;ret har sammenheng med forholdene p&aring; arbeidsplassen.</li>
+                </ul>
+                <p>Noen ganger vil den ansatte f&oslash;le seg i stand til &aring; utf&oslash;re arbeid p&aring; tross&nbsp;av at det er utstedt en&nbsp;100% sykmelding. Vedkommende kan faktisk v&aelig;re i arbeid uten &aring; avklare dette med lege, men dere m&aring; sammen lage en oppf&oslash;lgingsplan som beskriver at arbeidet n&aring; er tilpasset. I tillegg m&aring; arbeidet som utf&oslash;res angis p&aring; D-blanketten av sykmeldingen&nbsp;punkt 13.5.</p>
+                <p>Gj&oslash;r notater som inneholder ovennevnte elementer n&aring;r du registrerer f&oslash;rste samtale.</p>
+                <p><strong>Ikke still sp&oslash;rsm&aring;l om diagnose, det har du ikke krav p&aring; &aring; f&aring; vite.</strong></p>]]>.Value
+
+        Dim result = Writer.ObjectToString(testString)
+        Dim expectedResult = """" & testString.Replace(vbLf, "\n") & """"
+        Assert.AreEqual(expectedResult, result)
+
+    End Sub
+
+    <Test> Public Sub ParseStringWithObjectToStringStream()
+        Dim testString = <![CDATA[<h3>{0}</h3>
+                <p>Man skal ha en samtale med den syke allerede f&oslash;rste frav&aelig;rsdag. Dette gjelder b&aring;de n&aring;r den syke leverer egenmelding og ved sykmelding. Avklar forventet lengde p&aring; frav&aelig;ret og hvilke arbeidsoppgaver er den ansatte i stand til &aring; utf&oslash;re/ikke utf&oslash;re:</p>
+                <ul>
+                    <li>Om du som leder kan bidra med tiltak/tilpasning av arbeidssituasjonen, slik at den ansatte kan komme raskere tilbake p&aring; arbeidet.</li>
+                    <li>Om sykmelder er kontaktet og evt. om sykmelderen hadde innspill til tilpasning av arbeidet. Dette skal sykmelder gj&oslash;re umiddelbart.</li>
+                    <li>Om frav&aelig;ret har sammenheng med forholdene p&aring; arbeidsplassen.</li>
+                </ul>
+                <p>Noen ganger vil den ansatte f&oslash;le seg i stand til &aring; utf&oslash;re arbeid p&aring; tross&nbsp;av at det er utstedt en&nbsp;100% sykmelding. Vedkommende kan faktisk v&aelig;re i arbeid uten &aring; avklare dette med lege, men dere m&aring; sammen lage en oppf&oslash;lgingsplan som beskriver at arbeidet n&aring; er tilpasset. I tillegg m&aring; arbeidet som utf&oslash;res angis p&aring; D-blanketten av sykmeldingen&nbsp;punkt 13.5.</p>
+                <p>Gj&oslash;r notater som inneholder ovennevnte elementer n&aring;r du registrerer f&oslash;rste samtale.</p>
+                <p><strong>Ikke still sp&oslash;rsm&aring;l om diagnose, det har du ikke krav p&aring; &aring; f&aring; vite.</strong></p>]]>.Value
+        Dim ms = New System.IO.MemoryStream()
+        Writer.ObjectToString(New System.IO.StreamWriter(ms), testString)
+        Dim result = System.Text.Encoding.UTF8.GetString(ms.ToArray())
+        Dim expectedResult = """" & testString.Replace(vbLf, "\n") & """"
+        Assert.AreEqual(expectedResult, result)
+    End Sub
 
     <Test(Description:="Testing encoding of strings"),
         TestCase("StandardText"),
@@ -161,7 +196,7 @@ End Module
         Dim o As New ExcavationTripDate
 
         o.StartDate = New Date(1999, 6, 1, 22, 5, 12, 25)
-        o.EndDate = New Date(2000, 6, 1,0,0,0)
+        o.EndDate = New Date(2000, 6, 1, 0, 0, 0)
 
         Dim timeZone = TimeZoneInfo.Local.GetUtcOffset(o.StartDate)
 
@@ -199,7 +234,7 @@ End Module
     End Sub
 
 
-    <Test> Public Sub TypeinfoIsIncludede
+    <Test> Public Sub TypeinfoIsIncludede()
 
         Dim toWrite = New ClassWithLong
         toWrite.Value = 12
@@ -211,7 +246,7 @@ End Module
     End Sub
 
 
-    <Test> Public sub WriteIEumerableAsArray
+    <Test> Public Sub WriteIEumerableAsArray()
         Dim list As New Stack(Of String)
         list.Push("A")
         list.Push("B")
@@ -220,19 +255,19 @@ End Module
 
         Assert.AreEqual("[""C"",""B"",""A""]", Utils.Json.Writer.ObjectToString(list))
 
-    End sub
+    End Sub
 
 
-    <test> public sub DictionaryIsWrittenAsObjectHash
-        Dim dic As New Dictionary(Of String,String)
-        dic.Add("Test","Value")
-        dic.Add("Test2","Value2")
+    <Test> Public Sub DictionaryIsWrittenAsObjectHash()
+        Dim dic As New Dictionary(Of String, String)
+        dic.Add("Test", "Value")
+        dic.Add("Test2", "Value2")
 
         Assert.AreEqual("{""Test"":""Value"",""Test2"":""Value2""}", Utils.Json.Writer.ObjectToString(dic))
 
     End Sub
 
-    <test> Public Sub WriteEnumValues()
+    <Test> Public Sub WriteEnumValues()
         Dim v As New TestParser.ClassWithEnum
 
         v.Value = TestParser.MyEnum.Value1
@@ -245,7 +280,7 @@ End Module
 
 
     <Test> Public Sub ExpressionIsCreated()
-        Dim ex = LazyFramework.Utils.Json.Writer.Serializer(GetType(ClassWithLong))
+        Dim ex = Writer.Serializer(GetType(ClassWithLong))
         Dim toSerialize = New ClassWithLong
         Dim sw As New System.IO.StreamWriter(New System.IO.MemoryStream)
 
