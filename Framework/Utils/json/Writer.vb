@@ -102,18 +102,19 @@ Namespace Utils.Json
                 result.Write("null")
                 Return
             End If
+
             If Formatters.ContainsKey(o.GetType) Then
                 Formatters(o.GetType)(result, o)
-                Return
+            Else
+                If TypeOf (o) Is IDictionary Then
+                    WriteDictionary(result, o)
+                ElseIf TypeOf (o) Is IEnumerable Then
+                    WriteList(result, o)
+                Else
+                    WriteObject(result, o)
+                End If
             End If
 
-            If TypeOf (o) Is IDictionary Then
-                WriteDictionary(result, o)
-            ElseIf TypeOf (o) Is IEnumerable Then
-                WriteList(result, o)
-            Else
-                WriteObject(result, o)
-            End If
             result.Flush()
         End Sub
 

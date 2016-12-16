@@ -340,11 +340,38 @@ Imports NUnit.Framework
         Dim cmd As New Data.CommandInfo
         cmd.CommandText = "select count(*) from Hrunit where Id in(@Id) "
         cmd.TypeOfCommand = CommandTypeEnum.Read
-        cmd.Parameters.AddExpandable("Id", DbType.Int32, New Integer(){} )
+        cmd.Parameters.AddExpandable("Id", DbType.Int32, New Integer() {})
         Dim ret As New List(Of DataObject)
 
         Assert.DoesNotThrow(Sub() Store.Exec(Connection, cmd, ret))
         Assert.AreEqual(ret.Count, 1)
+
+    End Sub
+
+
+    <Test> Public Sub FillListOfValueType()
+        Dim cmd As New Data.CommandInfo
+        cmd.CommandText = "SELECT * FROM (VALUES ('4DD0D8B2-802D-4C1A-8D2B-135B014F362C'), ('4DD0D8B2-802D-4C1A-8D2B-135B014F362C')) AS X(a) "
+        cmd.TypeOfCommand = CommandTypeEnum.Read
+
+        Dim ret As New List(Of Guid)
+
+        Store.Exec(Connection, cmd, ret)
+        Assert.AreEqual(ret.Count, 2)
+        Assert.AreEqual(ret(0), Guid.Parse("4DD0D8B2-802D-4C1A-8D2B-135B014F362C"))
+
+    End Sub
+
+    <Test> Public Sub FillListOfValueTypeNotInConverter()
+        Dim cmd As New Data.CommandInfo
+        cmd.CommandText = "SELECT * FROM (VALUES (1), (2)) AS X(a) "
+        cmd.TypeOfCommand = CommandTypeEnum.Read
+
+        Dim ret As New List(Of Integer)
+
+        Store.Exec(Connection, cmd, ret)
+        Assert.AreEqual(ret.Count, 2)
+        Assert.AreEqual(ret(0), 1)
 
     End Sub
 
