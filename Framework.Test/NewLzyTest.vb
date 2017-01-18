@@ -375,6 +375,18 @@ Imports NUnit.Framework
 
     End Sub
 
+    <Test> Public Sub FillLilstOfGUIDS()
+
+        Dim list As New List(Of Guid)
+
+        Dim cmd As New Data.CommandInfo
+        cmd.CommandText = "SELECT GUID FROM HRUnit"
+        cmd.TypeOfCommand = CommandTypeEnum.Read
+
+        Assert.DoesNotThrow(Sub() Store.Exec(Connection, cmd, list))
+
+
+    End Sub
 End Class
 
 Public Class StreamTo

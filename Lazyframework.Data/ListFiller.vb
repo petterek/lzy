@@ -34,10 +34,12 @@ Friend Class ListFiller
         If listObjectType.IsValueType And reader.FieldCount = 1 Then
             While reader.Read
                 Dim val As Object
-                If ValueTypeTransformers.ContainsKey(listObjectType) Then
-                    val = ValueTypeTransformers(listObjectType)(reader(0))
+                Dim value As Object = reader(0)
+
+                If listObjectType <> value.GetType AndAlso ValueTypeTransformers.ContainsKey(listObjectType) Then
+                    val = ValueTypeTransformers(listObjectType)(value)
                 Else
-                    val = reader(0)
+                    val = value
                 End If
 
                 data.Value.Add(val)
