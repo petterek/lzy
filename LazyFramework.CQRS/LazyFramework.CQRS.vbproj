@@ -112,14 +112,8 @@
     <Compile Include="Security\NoAccess.vb" />
     <Compile Include="Setup.vb" />
     <Compile Include="Sorting\Handler.vb" />
-    <Compile Include="Transform\EntityTransformerProvider.vb" />
     <Compile Include="Transform\Handling.vb" />
     <Compile Include="Sorting\ISortResult.vb" />
-    <Compile Include="Transform\ITransformEntityToDto.vb" />
-    <Compile Include="Transform\ITransformerFactory.vb" />
-    <Compile Include="Transform\TransformerBase.vb" />
-    <Compile Include="Transform\TransformerFactoryBase.vb" />
-    <Compile Include="Transform\TransformerFactoryForActionAllreadyExists.vb" />
     <Compile Include="Validation\DetailedValidationException.vb" />
     <Compile Include="Validation\Handling.vb" />
     <Compile Include="Validation\IValidateAction.vb" />

@@ -171,27 +171,8 @@ Public Class QueryResultDto
 End Class
 
 
-Public Class TransformFactory
-    Inherits TransformerFactoryBase(Of QueryResult, QueryResultDto)
 
-    Dim trans As New Transformers()
 
-    Public Overrides Function GetTransformer(ent As QueryResult) As ITransformEntityToDto
-        Return trans
-    End Function
-End Class
-
-Friend Class Transformers
-    Inherits TransformerBase(Of QueryResult, QueryResultDto)
-
-    Public Overrides Function TransformToDto(ent As QueryResult) As QueryResultDto
-
-        Dim ret As New QueryResultDto
-        ret.Id = ent.Id
-        ret.NameAndDate = String.Format("{0} har bursdag på {1}", ent.Name, ent.SomeDate.ToShortDateString)
-        Return ret
-    End Function
-End Class
 
 
 
