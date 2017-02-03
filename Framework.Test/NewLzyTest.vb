@@ -376,15 +376,28 @@ Imports NUnit.Framework
     End Sub
 
     <Test> Public Sub FillLilstOfGUIDS()
-
         Dim list As New List(Of Guid)
-
         Dim cmd As New Data.CommandInfo
         cmd.CommandText = "SELECT GUID FROM HRUnit"
         cmd.TypeOfCommand = CommandTypeEnum.Read
-
         Assert.DoesNotThrow(Sub() Store.Exec(Connection, cmd, list))
 
+    End Sub
+
+    <Test> Public Sub PluginsIsFired()
+        Dim instance = New DataStoreInstance(Connection)
+        Dim cmd2 As New Data.CommandInfo
+        cmd2.CommandText = "select * from Hrunit where id = @Id"
+        cmd2.TypeOfCommand = CommandTypeEnum.Create
+        cmd2.Parameters.Add("Id", DbType.Int32, False, 1)
+
+        Dim testPlugin1 As TestPlugin = New TestPlugin
+        instance.AddPlugin(testPlugin1)
+
+        Dim data As New DataObject
+        instance.Exec(cmd2, data)
+
+        Assert.IsTrue(testPlugin1.InstaceIsCalled)
 
     End Sub
 End Class
@@ -429,8 +442,11 @@ Public Class TestPlugin
 
     Public Shared IsCalled As Boolean = False
 
+    Public InstaceIsCalled As Boolean = False
+
     Public Overrides Sub Pre(context As DataModificationPluginContext)
         IsCalled = True
+        InstaceIsCalled = True
     End Sub
 
     Public Overrides Sub Post(context As DataModificationPluginContext)

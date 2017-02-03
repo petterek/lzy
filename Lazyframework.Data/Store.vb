@@ -17,24 +17,24 @@ Public Class Store
         Plugins.Add(GetType(T))
     End Sub
 
-    Public Shared Sub Exec(Of T As New)(connectionInfo As ServerConnectionInfo, command As CommandInfo, data As List(Of T))
-        ExecReader(connectionInfo, command, New FillStatus(Of List(Of T))(data), CommandBehavior.SingleResult, AddressOf New ListFiller().FillList, GetType(T))
+    Public Shared Sub Exec(Of T As New)(connectionInfo As ServerConnectionInfo, command As CommandInfo, data As List(Of T), Optional plugins As List(Of DataModificationPluginBase) = Nothing)
+        ExecReader(connectionInfo, command, New FillStatus(Of List(Of T))(data), CommandBehavior.SingleResult, AddressOf New ListFiller().FillList, GetType(T), plugins)
     End Sub
 
-    Public Shared Sub Exec(Of T As New)(connectionInfo As ServerConnectionInfo, command As CommandInfo, data As FillStatus(Of T))
-        ExecReader(connectionInfo, command, data, CommandBehavior.SingleResult Or CommandBehavior.SingleRow, AddressOf ReadOne, GetType(T))
+    Public Shared Sub Exec(Of T As New)(connectionInfo As ServerConnectionInfo, command As CommandInfo, data As FillStatus(Of T), Optional plugins As List(Of DataModificationPluginBase) = Nothing)
+        ExecReader(connectionInfo, command, data, CommandBehavior.SingleResult Or CommandBehavior.SingleRow, AddressOf ReadOne, GetType(T), plugins)
     End Sub
 
-    Public Shared Sub Exec(connectionInfo As ServerConnectionInfo, command As CommandInfo, data As Object)
-        ExecReader(connectionInfo, command, New FillStatus(Of Object)(data), CommandBehavior.SingleResult Or CommandBehavior.SingleRow, AddressOf ReadOne, data.GetType)
+    Public Shared Sub Exec(connectionInfo As ServerConnectionInfo, command As CommandInfo, data As Object, Optional plugins As List(Of DataModificationPluginBase) = Nothing)
+        ExecReader(connectionInfo, command, New FillStatus(Of Object)(data), CommandBehavior.SingleResult Or CommandBehavior.SingleRow, AddressOf ReadOne, data.GetType, plugins)
     End Sub
 
-    Public Shared Sub Exec(connectionInfo As ServerConnectionInfo, command As CommandInfo)
-        ExecReader(Of Object)(connectionInfo, command, New FillStatus(Of Object)(Nothing), CommandBehavior.SingleResult, Nothing, Nothing)
+    Public Shared Sub Exec(connectionInfo As ServerConnectionInfo, command As CommandInfo, Optional plugins As List(Of DataModificationPluginBase) = Nothing)
+        ExecReader(Of Object)(connectionInfo, command, New FillStatus(Of Object)(Nothing), CommandBehavior.SingleResult, Nothing, Nothing, plugins)
     End Sub
 
-    Public Shared Sub Exec(Of T As Structure)(connectionInfo As ServerConnectionInfo, command As CommandInfo, data As ICollection(Of T), colName As String)
-        ExecReader(Of T)(connectionInfo, command, data, CommandBehavior.SingleResult, AddressOf New ListFiller(colName).FillListForValueType)
+    Public Shared Sub Exec(Of T As Structure)(connectionInfo As ServerConnectionInfo, command As CommandInfo, data As ICollection(Of T), colName As String, Optional plugins As List(Of DataModificationPluginBase) = Nothing)
+        ExecReader(Of T)(connectionInfo, command, data, CommandBehavior.SingleResult, AddressOf New ListFiller(colName).FillListForValueType, plugins)
     End Sub
 
 
@@ -42,6 +42,29 @@ Public Class Store
         ExecReaderWithStream(Of T)(connectionInfo, command, New FillStatus(Of T)(data), CommandBehavior.SingleResult Or CommandBehavior.SingleRow, AddressOf ReadOne(Of T), data.GetType)
     End Sub
 
+
+    Public Shared Function ExecScalar(connectionInfo As ServerConnectionInfo, command As CommandInfo, Optional plugins As List(Of DataModificationPluginBase) = Nothing) As Object
+        Dim executeScalar As Object
+        Dim pluginCollection As List(Of DataModificationPluginBase) = plugins
+        Dim data = New FillStatus(Of Object)(Nothing)
+        Dim provider = connectionInfo.GetProvider
+
+        Using cmd = provider.CreateCommand(command)
+            FillParameters(provider, command, Nothing, data.Value, cmd)
+
+            FirePlugin(pluginCollection, PluginExecutionPointEnum.Pre, connectionInfo, command, data.Value)
+
+            Using conn = provider.CreateConnection(connectionInfo)
+                cmd.Connection = conn
+                conn.Open()
+                executeScalar = cmd.ExecuteScalar()
+            End Using
+
+            FirePlugin(pluginCollection, PluginExecutionPointEnum.Post, connectionInfo, command, data.Value)
+        End Using
+
+        Return executeScalar
+    End Function
 
 
 #Region "Privates"
@@ -76,8 +99,8 @@ Public Class Store
 
     End Sub
 
-    Private Shared Sub ExecReader(Of T As Structure)(ByVal connectionInfo As ServerConnectionInfo, ByVal command As CommandInfo, data As ICollection(Of T), readerOptions As CommandBehavior, handler As HandleReaderForValueType(Of T))
-        Dim pluginCollection As List(Of DataModificationPluginBase) = Nothing
+    Private Shared Sub ExecReader(Of T As Structure)(ByVal connectionInfo As ServerConnectionInfo, ByVal command As CommandInfo, data As ICollection(Of T), readerOptions As CommandBehavior, handler As HandleReaderForValueType(Of T), plugins As List(Of DataModificationPluginBase))
+        Dim pluginCollection As List(Of DataModificationPluginBase) = plugins
         Dim provider = connectionInfo.GetProvider
 
         Using cmd = provider.CreateCommand(command)
@@ -96,32 +119,10 @@ Public Class Store
         End Using
     End Sub
 
-    Public Shared Function ExecScalar(connectionInfo As ServerConnectionInfo, command As CommandInfo) As Object
-        Dim executeScalar As Object
-        Dim pluginCollection As List(Of DataModificationPluginBase) = Nothing
-        Dim data = New FillStatus(Of Object)(Nothing)
-        Dim provider = connectionInfo.GetProvider
+    Private Shared Sub ExecReader(Of T As New)(ByVal connectionInfo As ServerConnectionInfo, ByVal command As CommandInfo, data As FillStatus(Of T), readerOptions As CommandBehavior, handler As HandleReader(Of T), dataObjectType As Type, plugins As List(Of DataModificationPluginBase))
 
-        Using cmd = provider.CreateCommand(command)
-            FillParameters(provider, command, Nothing, data.Value, cmd)
+        Dim pluginCollection As List(Of DataModificationPluginBase) = plugins
 
-            FirePlugin(pluginCollection, PluginExecutionPointEnum.Pre, connectionInfo, command, data.Value)
-
-            Using conn = provider.CreateConnection(connectionInfo)
-                cmd.Connection = conn
-                conn.Open()
-                executeScalar = cmd.ExecuteScalar()
-            End Using
-
-            FirePlugin(pluginCollection, PluginExecutionPointEnum.Post, connectionInfo, command, data.Value)
-        End Using
-
-        Return executeScalar
-    End Function
-
-
-    Private Shared Sub ExecReader(Of T As New)(ByVal connectionInfo As ServerConnectionInfo, ByVal command As CommandInfo, data As FillStatus(Of T), readerOptions As CommandBehavior, handler As HandleReader(Of T), dataObjectType As Type)
-        Dim pluginCollection As List(Of DataModificationPluginBase) = Nothing
         Dim provider = connectionInfo.GetProvider
 
         Using cmd = provider.CreateCommand(command)
@@ -306,24 +307,31 @@ Public Class DataStoreInstance
 
     End Sub
 
+
+    Private plugins As List(Of DataModificationPluginBase)
+    Public Sub AddPlugin(plugin As DataModificationPluginBase)
+        If plugins Is Nothing Then plugins = New List(Of DataModificationPluginBase)
+        plugins.Add(plugin)
+    End Sub
+
     Public Sub Exec(command As CommandInfo) Implements IDataStore.Exec
-        Store.Exec(connectionInfo, command)
+        Store.Exec(connectionInfo, command, plugins)
     End Sub
 
     Public Sub Exec(command As CommandInfo, data As Object) Implements IDataStore.Exec
-        Store.Exec(connectionInfo, command, data)
+        Store.Exec(connectionInfo, command, data, plugins)
     End Sub
 
     Public Sub Exec(Of T As New)(command As CommandInfo, data As FillStatus(Of T)) Implements IDataStore.Exec
-        Store.Exec(connectionInfo, command, data)
+        Store.Exec(connectionInfo, command, data, plugins)
     End Sub
 
     Public Sub Exec(Of T As New)(command As CommandInfo, data As List(Of T)) Implements IDataStore.Exec
-        Store.Exec(connectionInfo, command, data)
+        Store.Exec(connectionInfo, command, data, plugins)
     End Sub
 
     Public Sub Exec(Of T As Structure)(command As CommandInfo, data As ICollection(Of T), colName As String) Implements IDataStore.Exec
-        Store.Exec(connectionInfo, command, data, colName)
+        Store.Exec(connectionInfo, command, data, colName, plugins)
     End Sub
 
     Public Sub GetStream(Of T As {WillDisposeThoseForU, New})(command As CommandInfo, data As T) Implements IDataStore.GetStream
@@ -331,7 +339,7 @@ Public Class DataStoreInstance
     End Sub
 
     Public Function ExecScalar(Of T)(command As CommandInfo) As T Implements IDataStore.ExecScalar
-        Dim ret = Store.ExecScalar(connectionInfo, command)
+        Dim ret = Store.ExecScalar(connectionInfo, command, plugins)
 
         Return CType(ret, T)
 
