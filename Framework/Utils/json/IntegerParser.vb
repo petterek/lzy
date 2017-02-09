@@ -4,9 +4,7 @@ Namespace Utils.Json
 
         Public Overrides Function Parse(nextChar As IReader, t As Type) As Object
             TokenAcceptors.WhiteSpace(nextChar)
-            While IsNumeric(nextChar.Peek)
-                nextChar.PeekToBuffer()
-            End While
+            TokenAcceptors.BufferLegalCharacters(nextChar, "0123456789-")
             Return Integer.Parse(nextChar.Buffer)
         End Function
 

@@ -151,6 +151,16 @@ Imports NUnit.Framework
 
     End Sub
 
+    <Test> Public Sub NegativIntIsParsed()
+
+        Dim toParse = "{""SomeThing"":-1,""ADate"":{""Year"":2016,""Month"":10,""Day"":9}}"
+
+        Dim retValue = Reader.StringToObject(Of ClassWithStruct)(toParse)
+
+        Assert.AreEqual(-1, retValue.SomeThing)
+
+
+    End Sub
 
     <Test> Public Sub ParseStruct()
 
