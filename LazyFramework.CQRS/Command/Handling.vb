@@ -68,7 +68,7 @@ Namespace Command
                 End If
 
                 If commandExecProfile.ValidateAction IsNot Nothing Then commandExecProfile.ValidateAction.InternalValidate(command)
-                Dim commandResult = Transform.Handling.TransformResult(commandExecProfile, commandExecProfile.ActionHandler(command))
+                Dim commandResult = commandExecProfile.ActionHandler(command)
 
                 commandExecProfile.Stopp()
                 Logging.Log.Context(commandExecProfile)

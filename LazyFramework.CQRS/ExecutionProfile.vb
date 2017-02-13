@@ -78,6 +78,11 @@ Public Class CommandExecutionProfile(Of TCommand As Command.IAmACommand, TBo)
                                                         Return Nothing
                                                     End Function)
     End Sub
+    Public Sub New(handler As Func(Of TCommand, TBo))
+        ActionHandler = New Func(Of Object, Object)(Function()
+                                                        Return handler(CType(Action, TCommand))
+                                                    End Function)
+    End Sub
 End Class
 
 Public Class CommandExecutionProfile(Of TCommand As Command.IAmACommand, TBo, TDto)
