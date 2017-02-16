@@ -64,7 +64,7 @@ End Class
 
 Public Class CommandExecutionBase
     Inherits ExecutionProfile
-    Public Property Entity As Object
+    Friend Property Entity As Object
 
 End Class
 
@@ -78,15 +78,14 @@ Public Class CommandExecutionProfile(Of TCommand As Command.IAmACommand, TBo)
                                                         Return Nothing
                                                     End Function)
     End Sub
+
+
     Public Sub New(handler As Func(Of TCommand, TBo))
         ActionHandler = New Func(Of Object, Object)(Function()
                                                         Return handler(CType(Action, TCommand))
                                                     End Function)
     End Sub
-End Class
 
-Public Class CommandExecutionProfile(Of TCommand As Command.IAmACommand, TBo, TDto)
-    Inherits CommandExecutionBase
 
     Public Property BusinessObject As TBo
         Get
@@ -96,6 +95,11 @@ Public Class CommandExecutionProfile(Of TCommand As Command.IAmACommand, TBo, TD
             Me.Entity = value
         End Set
     End Property
+End Class
+
+Public Class CommandExecutionProfile(Of TCommand As Command.IAmACommand, TBo, TDto)
+    Inherits CommandExecutionBase
+
 
     Public Sub New(handler As Func(Of TCommand, Object))
         ActionHandler = New Func(Of Object, Object)(Function(action) handler(CType(action, TCommand)))

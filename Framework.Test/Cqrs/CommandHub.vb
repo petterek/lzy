@@ -45,7 +45,46 @@ Namespace Cqrs
 
         End Sub
 
+        Public Class SomeAction
+            Implements IAmACommand
+            Public ReadOnly Property Guid As Guid Implements IActionBase.Guid
+                Get
+                    Throw New NotImplementedException()
+                End Get
+            End Property
+        End Class
+        Public Class SomeOtherAction
+            Implements IAmACommand
+            Public ReadOnly Property Guid As Guid Implements IActionBase.Guid
+                Get
+                    Throw New NotImplementedException()
+                End Get
+            End Property
+        End Class
 
+        Public Class SomeBO
+
+        End Class
+
+        Public Class SomeHandlerClass
+            Public Sub Handle(p As SomeAction)
+
+            End Sub
+
+            Public Function Handle2(p As SomeOtherAction) As SomeBO
+                Return New SomeBO()
+            End Function
+        End Class
+
+        <Test> Public Sub RegisterSubAndFuncInCommandExecProfile()
+
+            Dim handler As New SomeHandlerClass
+
+            Dim cep = New CommandExecutionProfile(Of SomeAction, SomeBO)(AddressOf handler.Handle)
+
+            Dim cep2 = New CommandExecutionProfile(Of SomeOtherAction, SomeBO)(AddressOf handler.Handle2)
+
+        End Sub
 
 
 
