@@ -106,6 +106,15 @@ Public Class CommandExecutionProfile(Of TCommand As Command.IAmACommand, TBo, TD
     End Sub
 
 
+    Public Property BusinessObject As TBo
+        Get
+            Return CType(Me.Entity, TBo)
+        End Get
+        Set(value As TBo)
+            Me.Entity = value
+        End Set
+    End Property
+
     Private _localTransformer As Func(Of TBo, TDto)
     Public Property ResultTransformer As Func(Of TBo, TDto)
         Get

@@ -1,6 +1,7 @@
 ﻿Imports LazyFramework.CQRS
 Imports NUnit.Framework
 Imports LazyFramework.Test.Cqrs
+Imports System.Runtime.CompilerServices
 
 <TestFixture> Public Class ActioninfoTest
 
@@ -25,9 +26,14 @@ Imports LazyFramework.Test.Cqrs
 
     <Test> Public Sub WiredActionIsFoundForEntity()
         'Assert.IsInstanceOf(Of MenuAction)(ActionInfo.GetAvailableActionsForEntity(New Object, New ActionEntity)(0))
+
+
     End Sub
 
+
+
 End Class
+
 
 Public Class SomeOtherActionBase(Of T)
     Inherits ActionBase
