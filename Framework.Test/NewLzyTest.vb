@@ -384,20 +384,30 @@ Imports NUnit.Framework
 
     End Sub
 
-    <Test> Public Sub PluginsIsFired()
-        Dim instance = New DataStoreInstance(Connection)
+    <Test> Public Sub ReaderInstanceIsWorking()
+        Dim instance = New ReaderInstance(Connection)
         Dim cmd2 As New Data.CommandInfo
         cmd2.CommandText = "select * from Hrunit where id = @Id"
         cmd2.TypeOfCommand = CommandTypeEnum.Create
-        cmd2.Parameters.Add("Id", DbType.Int32, False, 1)
-
-        Dim testPlugin1 As TestPlugin = New TestPlugin
-        instance.AddPlugin(testPlugin1)
+        cmd2.Parameters.Add("Id", DbType.Int32, False, 3)
 
         Dim data As New DataObject
-        instance.Exec(cmd2, data)
+        instance.Read(cmd2, data)
 
-        Assert.IsTrue(testPlugin1.InstaceIsCalled)
+        Assert.AreEqual(3, data.Id)
+
+    End Sub
+
+    <Test> Public Sub ReaderInstanceIsWorkingOnList()
+        Dim instance = New ReaderInstance(Connection)
+        Dim cmd2 As New Data.CommandInfo
+        cmd2.CommandText = "select * from Hrunit "
+        cmd2.TypeOfCommand = CommandTypeEnum.Create
+
+        Dim data As New List(Of DataObject)
+        instance.Read(cmd2, data)
+
+        Assert.AreNotEqual(0, data.Count)
 
     End Sub
 End Class
