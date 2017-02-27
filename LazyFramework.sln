@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "LazyFramework.CQRS", "LazyFramework.CQRS\LazyFramework.CQRS.vbproj", "{478C54CA-00C8-4F36-B3C5-AE7291270F70}"
 EndProject
@@ -18,6 +18,8 @@ EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "LazyFramework.EventHandling", "LazyFramework.EventHandling\LazyFramework.EventHandling.vbproj", "{EF6603ED-7F45-4BC4-BEE0-FF7193CC8CFE}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "LazyFramework.Reflection", "LazyFramework.Reflection\LazyFramework.Reflection.vbproj", "{CCC53780-1804-4826-B51B-A4950A606E5B}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "LazyFramework.Logging", "LazyFramework.Logging\LazyFramework.Logging.vbproj", "{80F1DF77-210F-4E39-AE66-2FADCC420CDC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -74,6 +76,12 @@ Global
 		{CCC53780-1804-4826-B51B-A4950A606E5B}.DebugPersonalarkiv|Any CPU.Build.0 = Debug|Any CPU
 		{CCC53780-1804-4826-B51B-A4950A606E5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CCC53780-1804-4826-B51B-A4950A606E5B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80F1DF77-210F-4E39-AE66-2FADCC420CDC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80F1DF77-210F-4E39-AE66-2FADCC420CDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80F1DF77-210F-4E39-AE66-2FADCC420CDC}.DebugPersonalarkiv|Any CPU.ActiveCfg = Debug|Any CPU
+		{80F1DF77-210F-4E39-AE66-2FADCC420CDC}.DebugPersonalarkiv|Any CPU.Build.0 = Debug|Any CPU
+		{80F1DF77-210F-4E39-AE66-2FADCC420CDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80F1DF77-210F-4E39-AE66-2FADCC420CDC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
