@@ -296,6 +296,7 @@ End Interface
 Public Interface IDataReaderStore
     Sub Read(Of T)(command As CommandInfo, data As T)
     Sub Read(Of T As New)(command As CommandInfo, data As List(Of T))
+    Function Read(Of T)(command As CommandInfo) As T
 End Interface
 Public Interface IWriterInstance
     Sub Create(command As CommandInfo)
@@ -326,6 +327,9 @@ Public Class ReaderInstance
     Public Sub Read(Of T)(command As CommandInfo, data As T) Implements IDataReaderStore.Read
         Store.Exec(connectionInfo, command, data)
     End Sub
+    Public Function Read(Of T)(command As CommandInfo) As T Implements IDataReaderStore.Read
+        Return CType(Store.ExecScalar(connectionInfo, command), T)
+    End Function
 End Class
 
 Public Class WriterInstance
