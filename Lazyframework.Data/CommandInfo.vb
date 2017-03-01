@@ -34,17 +34,17 @@ Public Class CommandInfo
         End Set
     End Property
 
-    Private _parameters As ParmeterInfoCollection
+    Private _parameters As ParameterInfoCollection
 
-    Public ReadOnly Property Parameters() As ParmeterInfoCollection
+    Public ReadOnly Property Parameters() As ParameterInfoCollection
         Get
             If _parameters Is Nothing Then
-                _parameters = New ParmeterInfoCollection
+                _parameters = New ParameterInfoCollection
             End If
             Return _parameters
         End Get
     End Property
-    
+
 
     'Private _commandDuration As Long
     'Public Property CommandDuration() As Long
@@ -66,7 +66,7 @@ Public Class CommandInfo
     '    End Set
     'End Property
 
-'    Public Property CommandQuery() As Linq.Expressions.Expression
+    '    Public Property CommandQuery() As Linq.Expressions.Expression
 
 
     ''' <summary>
