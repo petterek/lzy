@@ -34,12 +34,12 @@ Public Class CommandInfo
         End Set
     End Property
 
-    Private _parameters As ParameterInfoCollection
+    Private _parameters As ParmeterInfoCollection
 
-    Public ReadOnly Property Parameters() As ParameterInfoCollection
+    Public ReadOnly Property Parameters() As ParmeterInfoCollection
         Get
             If _parameters Is Nothing Then
-                _parameters = New ParameterInfoCollection
+                _parameters = New ParmeterInfoCollection
             End If
             Return _parameters
         End Get

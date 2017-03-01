@@ -1,5 +1,5 @@
 ﻿
-Public NotInheritable Class ParameterInfoCollection
+Public NotInheritable Class ParmeterInfoCollection
     Inherits Dictionary(Of String, ParameterInfo)
 
     Public Overloads Function Add(ByVal name As String, ByVal dbType As DbType) As ParameterInfo

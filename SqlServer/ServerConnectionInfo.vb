@@ -35,8 +35,8 @@ Public Class ServerConnectionInfo
         }
 
 
-        Public Shared Function Create(dto As Object) As LazyFramework.Data.ParameterInfoCollection
-            Dim ret As New ParameterInfoCollection
+        Public Shared Function Create(dto As Object) As LazyFramework.Data.ParmeterInfoCollection
+            Dim ret As New ParmeterInfoCollection
 
             For Each p In dto.GetType().GetFields()
                 If TypeMap.ContainsKey(p.FieldType) Then
