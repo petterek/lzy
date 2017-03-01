@@ -60,4 +60,11 @@ Namespace Logging
         Sub Warn(data As Object)
 
     End Interface
+
+
+    Public Interface ICommandLogger
+        Sub Log(execProfile As ExecutionProfile, profile As Object, command As Object)
+        Sub [Error](execProfile As ExecutionProfile, profile As Object, command As Object, ex As Exception)
+    End Interface
+
 End Namespace

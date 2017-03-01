@@ -54,7 +54,7 @@ Namespace Command
         ''' </summary>
         ''' <param name="command"></param>
         ''' <remarks>Any command can have only 1 handler. An exception will be thrown if there is found more than one for any given command. </remarks>
-        Public Shared Function ExecuteCommand(profile As Object, command As IAmACommand) As Object
+        Public Shared Function ExecuteCommand(profile As Object, command As IAmACommand, Optional ByVal logger As Logging.ICommandLogger = Nothing) As Object
 
             Dim commandExecProfile As ExecutionProfile = Nothing
             Try
@@ -72,13 +72,22 @@ Namespace Command
 
                 commandExecProfile.Stopp()
                 Logging.Log.Context(commandExecProfile)
+                If logger IsNot Nothing Then
+                    logger.Log(commandExecProfile, profile, command)
+                End If
                 Return commandResult
 
             Catch ex As TargetInvocationException
                 Logging.Log.Error(commandExecProfile, ex)
+                If logger IsNot Nothing Then
+                    logger.Error(commandExecProfile, profile, command, ex)
+                End If
                 Throw ex.InnerException
             Catch ex As Exception
                 Logging.Log.Error(commandExecProfile, ex)
+                If logger IsNot Nothing Then
+                    logger.Error(commandExecProfile, profile, command, ex)
+                End If
                 Throw
             Finally
                 Logging.Log.Context(commandExecProfile)
