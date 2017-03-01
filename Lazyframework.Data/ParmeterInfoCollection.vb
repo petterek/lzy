@@ -1,5 +1,5 @@
 ﻿
- Public NotInheritable Class ParmeterInfoCollection
+Public NotInheritable Class ParameterInfoCollection
     Inherits Dictionary(Of String, ParameterInfo)
 
     Public Overloads Function Add(ByVal name As String, ByVal dbType As DbType) As ParameterInfo
@@ -17,7 +17,7 @@
     Public Overloads Function Add(ByVal name As String, ByVal dbType As DbType, ByVal size As Integer, ByVal allowNulls As Boolean) As ParameterInfo
         Return Add(name, dbType, size, allowNulls, New ValueNotSet)
     End Function
-    
+
     Public Overloads Function Add(ByVal name As String, ByVal dbType As DbType, ByVal size As Integer, ByVal allowNulls As Boolean, ByVal value As Object) As ParameterInfo
         Dim p As New ParameterInfo
         p.Name = name
@@ -49,5 +49,5 @@
 
     Private Class ValueNotSet
     End Class
-    
+
 End Class

@@ -1,5 +1,6 @@
 ﻿
 Public MustInherit Class ExecutionProfile
+    Public ReadOnly InstanceGuid As Guid = Guid.NewGuid()
     Public Property Action As IActionBase
     Public Property ClientContext As Object
     Friend Property ActionHandler As Func(Of Object, Object)
