@@ -68,8 +68,9 @@ Public Class DataFiller
         Private Delegate Function GetValueDelegate(o As IDataReader) As Object
 
         Public Sub SetValueToObject(reader As IDataReader, o As Object)
+            Dim tempValue As Object
             Try
-                Dim tempValue = _getValue(reader)
+                tempValue = _getValue(reader)
 
                 If TypeOf (tempValue) Is DBNull Then
                     _setter(o, Nothing)
@@ -79,7 +80,7 @@ Public Class DataFiller
                     '_fieldInfo.SetValue(o, tempValue)
                 End If
             Catch ex As Exception
-                Throw New UnableToSetValueException(_name, _memberInfo)
+                Throw New UnableToSetValueException(_name, _memberInfo, tempvalue)
             End Try
 
         End Sub
@@ -115,11 +116,8 @@ Public Class DataFiller
 End Class
 
 <Serializable>
-Friend Class UnableToSetValueException
+Public Class UnableToSetValueException
     Inherits Exception
-
-    Private _fieldInfo As MemberInfo
-    Private _name As String
 
     Public Sub New()
     End Sub
@@ -132,18 +130,33 @@ Friend Class UnableToSetValueException
         MyBase.New(message, innerException)
     End Sub
 
-    Public Sub New(_name As String, _fieldInfo As MemberInfo)
-        MyBase.New("Unable to map the " + _name + "to the type " + _fieldInfo.MemberType.ToString)
-        Me._name = _name
-        Me._fieldInfo = _fieldInfo
+    Public Sub New(_name As String, _fieldInfo As MemberInfo, value As Object)
+        MyBase.New(CreateMessage(_name, _fieldInfo, value))
+        Me.Name = _name
+        Me.FieldInfo = _fieldInfo
 
     End Sub
+
+    Private Shared Function CreateMessage(_name As String, _fieldInfo As MemberInfo, value As Object) As String
+        Dim retType As String = "UNKNOWN"
+        Select Case _fieldInfo.MemberType
+            Case MemberTypes.Property
+                retType = CType(_fieldInfo, PropertyInfo).PropertyType.FullName()
+            Case MemberTypes.Field
+                retType = CType(_fieldInfo, FieldInfo).FieldType.FullName()
+        End Select
+
+        Return "Unable to map " + _name + " to " + retType + " with value '" + value.ToString() + "'"
+    End Function
+
+    Public ReadOnly Property Name As String
+    Public ReadOnly Property FieldInfo As MemberInfo
 
     Protected Sub New(info As SerializationInfo, context As StreamingContext)
         MyBase.New(info, context)
     End Sub
 
     Public Overrides Function ToString() As String
-        Return "Unable to map the " + _name + "to the type " + _fieldInfo.MemberType.ToString
+        Return "Unable to map the " + Name + " to the type " + FieldInfo.MemberType.ToString
     End Function
 End Class

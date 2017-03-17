@@ -410,6 +410,29 @@ Imports NUnit.Framework
         Assert.AreNotEqual(0, data.Count)
 
     End Sub
+
+    <Test> Public Sub UnabeleToSetValueExceptionContainsBetterInfo()
+        Dim instance = New MSSqlServer.ReaderInstance(Connection)
+        Dim cmd2 As New Data.CommandInfo
+
+        cmd2.CommandText = "select cast(Id as Char(5)) Id from Hrunit "
+        cmd2.TypeOfCommand = CommandTypeEnum.Create
+
+        Dim data As New List(Of DataObject)
+        Try
+            instance.Read(cmd2, data)
+        Catch unable As Data.UnableToSetValueException
+            Assert.AreEqual("Id", unable.Name)
+            Assert.AreEqual("Unable to map Id to System.Int32 with value '3    '", unable.Message)
+        Catch ex As Exception
+            Throw
+        End Try
+
+
+
+
+    End Sub
+
 End Class
 
 Public Class StreamTo
