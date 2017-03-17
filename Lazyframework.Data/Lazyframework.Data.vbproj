@@ -95,9 +95,11 @@
     <Compile Include="ParameterInfo.vb" />
     <Compile Include="ParmeterInfoCollection.vb" />
     <Compile Include="PluginExecutionPointEnum.vb" />
+    <Compile Include="ReaderInstance.vb" />
     <Compile Include="ServerConnectionInfo.vb" />
     <Compile Include="Store.vb" />
     <Compile Include="WillDisposeThoseForU.vb" />
+    <Compile Include="WriterInstance.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">
