@@ -133,8 +133,10 @@ Friend Class UnableToSetValueException
     End Sub
 
     Public Sub New(_name As String, _fieldInfo As MemberInfo)
+        MyBase.New("Unable to map the " + _name + "to the type " + _fieldInfo.MemberType.ToString)
         Me._name = _name
         Me._fieldInfo = _fieldInfo
+
     End Sub
 
     Protected Sub New(info As SerializationInfo, context As StreamingContext)

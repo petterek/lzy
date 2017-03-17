@@ -3,7 +3,7 @@ Imports NUnit.Framework
 
 <TestFixture> Public Class NewLzyTest
 
-    Public Shared Connection As Data.ServerConnectionInfo = New MSSqlServer.ServerConnectionInfo With {.Address = "10.151.46.52", .Database = "hr", .UserName = "loginFor_HR", .Password = "AsDfGhJkL12345"}
+    Public Shared Connection As MSSqlServer.ServerConnectionInfo = New MSSqlServer.ServerConnectionInfo With {.Address = "10.151.46.52", .Database = "hr", .UserName = "loginFor_HR", .Password = "AsDfGhJkL12345"}
 
 
     <SetUp> Public Sub SetUp()
@@ -385,7 +385,7 @@ Imports NUnit.Framework
     End Sub
 
     <Test> Public Sub ReaderInstanceIsWorking()
-        Dim instance = New ReaderInstance(Connection)
+        Dim instance = New MSSqlServer.ReaderInstance(Connection)
         Dim cmd2 As New Data.CommandInfo
         cmd2.CommandText = "select * from Hrunit where id = @Id"
         cmd2.TypeOfCommand = CommandTypeEnum.Create
@@ -399,7 +399,7 @@ Imports NUnit.Framework
     End Sub
 
     <Test> Public Sub ReaderInstanceIsWorkingOnList()
-        Dim instance = New ReaderInstance(Connection)
+        Dim instance = New MSSqlServer.ReaderInstance(Connection)
         Dim cmd2 As New Data.CommandInfo
         cmd2.CommandText = "select * from Hrunit "
         cmd2.TypeOfCommand = CommandTypeEnum.Create

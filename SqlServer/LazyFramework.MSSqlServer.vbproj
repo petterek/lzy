@@ -76,8 +76,10 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="ReaderInstance.vb" />
     <Compile Include="ServerConnectionInfo.vb" />
     <Compile Include="DataProvider.vb" />
+    <Compile Include="WriterInstance.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">
