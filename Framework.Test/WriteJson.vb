@@ -198,10 +198,12 @@ End Module
         o.StartDate = New Date(1999, 6, 1, 22, 5, 12, 25)
         o.EndDate = New Date(2000, 6, 1, 0, 0, 0)
 
+
         Dim timeZone = TimeZoneInfo.Local.GetUtcOffset(o.StartDate)
 
-        StringAssert.Contains("""EndDate"":""2000-06-01T00:00:00+" + timeZone.Hours.ToString + "", Writer.ObjectToString(o))
-        StringAssert.Contains("""StartDate"":""1999-06-01T22:05:12.025+" + timeZone.Hours.ToString + "", Writer.ObjectToString(o))
+        StringAssert.Contains("""EndDate"":""2000-06-01T00:00:00", Writer.ObjectToString(o))
+        StringAssert.Contains("""StartDate"":""1999-06-01T22:05:12.025", Writer.ObjectToString(o))
+
         Dim des = Writer.ObjectToString(o)
         Dim o2 = Reader.StringToObject(Of ExcavationTripDate)(des)
 
@@ -325,6 +327,37 @@ End Module
 
     End Sub
 
+
+    <Test> Public Sub StrangeBehaviorOnDate()
+
+        Dim test = New MyObj
+        test.TransactionDate = DateTime.Now()
+
+        Dim res = Writer.ObjectToString(test)
+
+        'res = Now().ToString("yyyy-MM-ddTHH\:mm\:ss.FFFK")
+
+        StringAssert.EndsWith("+01:00""}", res)
+
+        Dim resultString = Reader.StringToObject(Of MyObj)(res)
+
+
+        Newtonsoft.Json.JsonConvert.DeserializeObject(Of MyObj)("{""SourceTicketId"":""d877c090-1fad-4f95-b2a9-22648787f2b4"",""AccountId"":""c983068f-04e9-402a-acee-0ec9c6995178"",""Owner"":""80a62ae1-ee06-45b7-a8e4-69780db59113"",""Approver"":""9366378f-a200-4cc7-ad1c-340f8a3217a1"",""MinutesAffected"":0,""NewBalance"":360,""TransactionDate"":""2017-03-21T17:46:34.444+01:00""}")
+        LazyFramework.Utils.Json.Reader.StringToObject(Of MyObj)("{""SourceTicketId"":""d877c090-1fad-4f95-b2a9-22648787f2b4"",""AccountId"":""c983068f-04e9-402a-acee-0ec9c6995178"",""Owner"":""80a62ae1-ee06-45b7-a8e4-69780db59113"",""Approver"":""9366378f-a200-4cc7-ad1c-340f8a3217a1"",""MinutesAffected"":0,""NewBalance"":360,""TransactionDate"":""2017-03-21T17:46:34.444+01:00""}")
+
+    End Sub
+
+
+
+    Public Class MyObj
+        Public Property SourceTicketId As Guid = New Guid("d877c090-1fad-4f95-b2a9-22648787f2b4")
+        Public Property AccountId As Guid = New Guid("c983068f-04e9-402a-acee-0ec9c6995178")
+        Public Property Owner As Guid = New Guid("80a62ae1-ee06-45b7-a8e4-69780db59113")
+        Public Property Approver As Guid = New Guid("9366378f-a200-4cc7-ad1c-340f8a3217a1")
+        Public Property MinutesAffected As Integer = 10
+        Public Property NewBalance As Integer = 100
+        Public Property TransactionDate As Date
+    End Class
 
 End Class
 

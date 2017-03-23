@@ -269,7 +269,7 @@ Namespace Utils.Json
         Private Shared Sub WriteDate(w As StreamWriter, value As Object)
             Dim d As Date = DirectCast(value, Date)
             w.Write(Chr(34))
-            w.Write(d.ToString("yyyy-MM-ddTHH\:mm\:ss.FFFKz"))
+            w.Write(d.ToString("yyyy-MM-ddTHH\:mm\:ss.FFFK"))
             w.Write(Chr(34))
         End Sub
 
