@@ -51,7 +51,7 @@ Public Class Store
         connection.Open()
 
         Dim reader = command.ExecuteReader(CommandBehavior.CloseConnection Or CommandBehavior.SingleResult Or CommandBehavior.SingleRow)
-        ReadOne(Of T)(GetFiller(command, reader, GetType(T)), reader, New FillStatus(Of T)(data))
+        ReadOne(Of T)(GetFiller(command, reader, data.GetType()), reader, New FillStatus(Of T)(data))
 
         reader.Close()
         reader.Dispose()
@@ -70,7 +70,7 @@ Public Class Store
         Dim reader = command.ExecuteReader(CommandBehavior.CloseConnection Or CommandBehavior.SingleResult)
         Dim filler = New ListFiller()
 
-        filler.FillList(GetFiller(command, reader, GetType(T)), reader, New FillStatus(Of List(Of T))(data))
+        filler.FillList(GetFiller(command, reader, data.GetType()), reader, New FillStatus(Of List(Of T))(data))
 
         reader.Close()
         reader.Dispose()

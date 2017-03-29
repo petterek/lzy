@@ -263,7 +263,6 @@ Imports NUnit.Framework
         Dim con As New SqlClient.SqlConnection(String.Format("server={0};Database={1};User ID={2};Password={3};pooling=true;", "10.151.46.52", "hr", "loginFor_HR", "AsDfGhJkL12345"))
         Dim cmd As New SqlClient.SqlCommand("select * from Hrunit")
 
-        cmd.Parameters.Add(New SqlClient.SqlParameter("id", 3))
         Dim d = New List(Of DataObject)
         Assert.DoesNotThrow(Sub() Store.Exec(con, cmd, d))
         Assert.Greater(d.Count, 0)

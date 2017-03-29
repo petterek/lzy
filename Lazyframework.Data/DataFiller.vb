@@ -90,18 +90,13 @@ Public Class DataFiller
 
     Public Sub New(ByVal dataReader As IDataReader, ByVal t As Type, mapByName As Boolean)
         'Her kunne vi laget noe lureri for å gjøre dette med emitting av il, men det lar vi være enn så lenge. 
-
+        Dim memberInfo As MemberInfo = Nothing
+        Dim currType = t
         Dim n As String
+
         For x = 0 To dataReader.FieldCount - 1
             n = dataReader.GetName(x)
-
-            Dim memberInfo As MemberInfo = Nothing
-            Dim currType As Type
-            currType = t
-
             memberInfo = LazyFramework.Reflection.SearchForFieldInfo(currType, n)
-
-
             If memberInfo IsNot Nothing Then
                 _fields.Add(New FieldInfoDecorator(dataReader, x, memberInfo, n, mapByName))
             End If
