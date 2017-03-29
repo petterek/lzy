@@ -43,6 +43,58 @@ Public Class Store
     End Sub
 
 
+    Public Shared Sub Exec(Of T)(connection As IDbConnection, command As IDbCommand, data As T)
+        If connection.State <> ConnectionState.Closed Then
+            Throw New NotSupportedException("Open connections is not not supported yet...")
+        End If
+        command.Connection = connection
+        connection.Open()
+
+        Dim reader = command.ExecuteReader(CommandBehavior.CloseConnection Or CommandBehavior.SingleResult Or CommandBehavior.SingleRow)
+        ReadOne(Of T)(GetFiller(command, reader, GetType(T)), reader, New FillStatus(Of T)(data))
+
+        reader.Close()
+        reader.Dispose()
+        connection.Close()
+        connection.Dispose()
+        command.Dispose()
+    End Sub
+
+    Public Shared Sub Exec(Of T As New)(connection As IDbConnection, command As IDbCommand, data As List(Of T))
+        If connection.State <> ConnectionState.Closed Then
+            Throw New NotSupportedException("Open connections is not not supported yet...")
+        End If
+        command.Connection = connection
+        connection.Open()
+
+        Dim reader = command.ExecuteReader(CommandBehavior.CloseConnection Or CommandBehavior.SingleResult)
+        Dim filler = New ListFiller()
+
+        filler.FillList(GetFiller(command, reader, GetType(T)), reader, New FillStatus(Of List(Of T))(data))
+
+        reader.Close()
+        reader.Dispose()
+        connection.Close()
+        connection.Dispose()
+        command.Dispose()
+    End Sub
+
+    Public Shared Function ExecScalar(Of T)(connection As IDbConnection, command As IDbCommand) As T
+        If connection.State <> ConnectionState.Closed Then
+            Throw New NotSupportedException("Open connections is not not supported yet...")
+        End If
+
+        command.Connection = connection
+        connection.Open()
+        Dim ret = command.ExecuteScalar()
+
+        command.Dispose()
+        connection.Close()
+        connection.Dispose()
+
+        Return CType(ret, T)
+    End Function
+
 
 #Region "Privates"
 
@@ -68,7 +120,7 @@ Public Class Store
         reader = cmd.ExecuteReader(readerOptions Or CommandBehavior.CloseConnection Or CommandBehavior.SequentialAccess)
 
         If dataObjectType IsNot Nothing Then
-            filler = GetFiller(command, reader, dataObjectType)
+            filler = GetFiller(cmd, reader, dataObjectType)
             handler(filler, reader, data)
         End If
 
@@ -85,7 +137,7 @@ Public Class Store
             Using conn = provider.CreateConnection(connectionInfo)
                 cmd.Connection = conn
                 conn.Open()
-                Dim filler As FillObject = Nothing
+                'Dim filler As FillObject = Nothing
                 Dim reader As IDataReader = Nothing
                 reader = cmd.ExecuteReader(readerOptions Or CommandBehavior.CloseConnection Or CommandBehavior.SequentialAccess)
                 handler(reader, data)
@@ -138,7 +190,7 @@ Public Class Store
 
                 reader = cmd.ExecuteReader(readerOptions Or CommandBehavior.CloseConnection Or CommandBehavior.SequentialAccess)
                 If dataObjectType IsNot Nothing Then
-                    filler = GetFiller(command, reader, dataObjectType)
+                    filler = GetFiller(cmd, reader, dataObjectType)
                     handler(filler, reader, data)
                 End If
 
@@ -238,7 +290,7 @@ Public Class Store
 
 
 
-    Private Shared Sub ReadOne(Of T As New)(filler As FillObject, reader As IDataReader, data As FillStatus(Of T))
+    Private Shared Sub ReadOne(Of T)(filler As FillObject, reader As IDataReader, data As FillStatus(Of T))
         If reader.Read Then
             FillData(reader, filler, data.Value)
             data.FillResult = FillResultEnum.DataFound
@@ -258,7 +310,7 @@ Public Class Store
     Public Shared ReadOnly Fillers As New Dictionary(Of Integer, DataFiller)
     Private Shared ReadOnly Match As New System.Text.RegularExpressions.Regex("^.*?(?:(?= from(?!.*?(?=from)))|$)", Text.RegularExpressions.RegexOptions.IgnoreCase Or Text.RegularExpressions.RegexOptions.Singleline Or RegexOptions.Compiled) 'Match anything all the way to the last FROM. 
 
-    Private Shared Function GetFiller(ByVal commandInfo As CommandInfo, ByVal dataReader As IDataReader, ByVal t As Type) As FillObject
+    Private Shared Function GetFiller(ByVal commandInfo As IDbCommand, ByVal dataReader As IDataReader, ByVal t As Type) As FillObject
 
         Dim key = GetHashCodeForCommand(commandInfo, t, dataReader)
         If Not Fillers.ContainsKey(key) Then
@@ -271,7 +323,7 @@ Public Class Store
         Return AddressOf Fillers(key).FillObject
     End Function
 
-    Private Shared Function GetHashCodeForCommand(ByVal commandInfo As CommandInfo, ByVal t As Type, ByVal dataReader As IDataReader) As Integer
+    Private Shared Function GetHashCodeForCommand(ByVal commandInfo As IDbCommand, ByVal t As Type, ByVal dataReader As IDataReader) As Integer
         Dim cmd = Match.Match(commandInfo.CommandText.ToLower).Value.Replace(" ", "")
         Return (cmd & t.ToString & "-" & dataReader.FieldCount).GetHashCode
     End Function

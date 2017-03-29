@@ -202,7 +202,7 @@ Imports NUnit.Framework
         cmd2.TypeOfCommand = CommandTypeEnum.Read
         cmd2.Parameters.Add("Id", DbType.Int32, False, 27)
 
-        Dim data As New FillStatus(Of DataObject)
+        Dim data As New FillStatus(Of DataObject)(New DataObject)
 
         Store.Exec(Connection, cmd2, data)
 
@@ -240,10 +240,40 @@ Imports NUnit.Framework
 
     End Sub
 
+    <Test> Public Sub ExecNewScalar()
+
+        Dim con As New SqlClient.SqlConnection(String.Format("server={0};Database={1};User ID={2};Password={3};pooling=true;", "10.151.46.52", "hr", "loginFor_HR", "AsDfGhJkL12345"))
+        Dim cmd As New SqlClient.SqlCommand("select count(*) from Hrunit")
+        Assert.AreNotEqual(0, Store.ExecScalar(Of Integer)(con, cmd))
+
+
+    End Sub
+
+    <Test> Public Sub ExecFillObjectNew()
+        Dim con As New SqlClient.SqlConnection(String.Format("server={0};Database={1};User ID={2};Password={3};pooling=true;", "10.151.46.52", "hr", "loginFor_HR", "AsDfGhJkL12345"))
+        Dim cmd As New SqlClient.SqlCommand("select * from Hrunit where id = @id")
+
+        cmd.Parameters.Add(New SqlClient.SqlParameter("id", 3))
+        Dim d = New DataObject
+        Assert.DoesNotThrow(Sub() Store.Exec(con, cmd, d))
+        Assert.AreEqual(3, d.Id)
+    End Sub
+
+    <Test> Public Sub ExecFillListObjectNew()
+        Dim con As New SqlClient.SqlConnection(String.Format("server={0};Database={1};User ID={2};Password={3};pooling=true;", "10.151.46.52", "hr", "loginFor_HR", "AsDfGhJkL12345"))
+        Dim cmd As New SqlClient.SqlCommand("select * from Hrunit")
+
+        cmd.Parameters.Add(New SqlClient.SqlParameter("id", 3))
+        Dim d = New List(Of DataObject)
+        Assert.DoesNotThrow(Sub() Store.Exec(con, cmd, d))
+        Assert.Greater(d.Count, 0)
+    End Sub
+
+
     <Test> Public Sub ExecCommandWithoutResult()
 
         Dim cmd2 As New Data.CommandInfo
-        cmd2.CommandText = "select * from Hrunit where id = @Id"
+        cmd2.CommandText = "Select * from Hrunit where id = @Id"
         cmd2.TypeOfCommand = CommandTypeEnum.Update
         cmd2.Parameters.Add("Id", DbType.Int32, False, 1)
 
@@ -258,7 +288,7 @@ Imports NUnit.Framework
 
      <test> public Sub AddDataToHashSet
         Dim cmd2 As New CommandInfo
-        cmd2.CommandText = "select id from Hrunit"
+        cmd2.CommandText = "Select id from Hrunit"
         cmd2.TypeOfCommand = CommandTypeEnum.Read
         
         Dim data As New HashSet(Of Integer)
@@ -271,7 +301,7 @@ Imports NUnit.Framework
     <Test> Public Sub ProprtiesOfBaseClassIsFilledIfNotFOundOnInstanceClass()
 
         Dim cmd2 As New Data.CommandInfo
-        cmd2.CommandText = "select * from Hrunit where id = @Id"
+        cmd2.CommandText = "Select * from Hrunit where id = @Id"
         cmd2.TypeOfCommand = CommandTypeEnum.Read
         cmd2.Parameters.Add("Id", DbType.Int32, False)
 
@@ -286,7 +316,7 @@ Imports NUnit.Framework
     <Test, Ignore> Public Sub ReadStreamFromTable()
 
         Dim cmd2 As New Data.CommandInfo
-        cmd2.CommandText = "select * from HrFile where id = @Id"
+        cmd2.CommandText = "Select * from HrFile where id = @Id"
         cmd2.TypeOfCommand = CommandTypeEnum.Read
         cmd2.Parameters.Add("Id", DbType.Int32, False, 19)
 
@@ -303,7 +333,7 @@ Imports NUnit.Framework
 
     <Test> Public Sub ExecScalar()
         Dim cmd2 As New Data.CommandInfo
-        cmd2.CommandText = "select count(*) from Hrunit "
+        cmd2.CommandText = "Select count(*) from Hrunit "
         cmd2.TypeOfCommand = CommandTypeEnum.Read
         Dim ret As Integer
 
@@ -314,7 +344,7 @@ Imports NUnit.Framework
 
     <Test> Public Sub DecomposeArrayToParams()
         Dim cmd As New Data.CommandInfo
-        cmd.CommandText = "select count(*) from Hrunit where Id in(@Id) "
+        cmd.CommandText = "Select count(*) from Hrunit where Id In(@Id) "
         cmd.TypeOfCommand = CommandTypeEnum.Read
         cmd.Parameters.AddExpandable("Id", DbType.Int32, {1, 2, 3})
         Dim ret As New List(Of DataObject)
@@ -326,7 +356,7 @@ Imports NUnit.Framework
 
     <Test> Public Sub DecomposeListToParams()
         Dim cmd As New Data.CommandInfo
-        cmd.CommandText = "select count(*) from Hrunit where Id in(@Id) "
+        cmd.CommandText = "Select count(*) from Hrunit where Id In(@Id) "
         cmd.TypeOfCommand = CommandTypeEnum.Read
         cmd.Parameters.AddExpandable("Id", DbType.Int32, New List(Of Integer) From {1, 2, 3})
         Dim ret As New List(Of DataObject)
@@ -338,7 +368,7 @@ Imports NUnit.Framework
 
     <Test> Public Sub DecomposeEmptyArrayToParams()
         Dim cmd As New Data.CommandInfo
-        cmd.CommandText = "select count(*) from Hrunit where Id in(@Id) "
+        cmd.CommandText = "Select count(*) from Hrunit where Id In(@Id) "
         cmd.TypeOfCommand = CommandTypeEnum.Read
         cmd.Parameters.AddExpandable("Id", DbType.Int32, New Integer() {})
         Dim ret As New List(Of DataObject)
@@ -351,7 +381,7 @@ Imports NUnit.Framework
 
     <Test> Public Sub FillListOfValueType()
         Dim cmd As New Data.CommandInfo
-        cmd.CommandText = "SELECT * FROM (VALUES ('4DD0D8B2-802D-4C1A-8D2B-135B014F362C'), ('4DD0D8B2-802D-4C1A-8D2B-135B014F362C')) AS X(a) "
+        cmd.CommandText = "Select * FROM (VALUES ('4DD0D8B2-802D-4C1A-8D2B-135B014F362C'), ('4DD0D8B2-802D-4C1A-8D2B-135B014F362C')) AS X(a) "
         cmd.TypeOfCommand = CommandTypeEnum.Read
 
         Dim ret As New List(Of Guid)

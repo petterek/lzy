@@ -163,31 +163,6 @@ Namespace Utils.Json
 
             funcCache(o.GetType)(result, o)
             Return
-
-            'result.Write("{"c)
-            'Dim first As Boolean = True
-
-            'If AddTypeInfoForObjects Then
-            '    result.Write("""$type$"":""" & TypeInfoWriter(o.GetType) & """,")
-            '    first = False
-            'End If
-
-            'For Each m In GetMembers(o.GetType())
-            '    If Not first Then
-            '        result.Write(",")
-            '    End If
-            '    first = False
-            '    result.Write(Chr(&H22) & m.Name & Chr(&H22) & ":")
-            '    Select Case m.MemberType
-            '        Case System.Reflection.MemberTypes.Field
-            '            Dim fld = o.GetType.GetField(m.Name)
-            '            WriteValue(result, fld.GetValue(o))
-            '        Case System.Reflection.MemberTypes.Property
-            '            Dim prop = o.GetType.GetProperty(m.Name)
-            '            WriteValue(result, prop.GetValue(o))
-            '    End Select
-            'Next
-            'result.Write("}"c)
         End Sub
 
         Private Shared Sub WriteList(result As StreamWriter, o As Object)
