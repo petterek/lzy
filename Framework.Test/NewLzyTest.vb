@@ -266,6 +266,7 @@ Imports NUnit.Framework
         Dim d = New List(Of DataObject)
         Assert.DoesNotThrow(Sub() Store.Exec(con, cmd, d))
         Assert.Greater(d.Count, 0)
+        Assert.IsNotEmpty(d(0).Name)
     End Sub
 
 
