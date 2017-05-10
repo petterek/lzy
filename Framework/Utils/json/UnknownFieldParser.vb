@@ -14,8 +14,8 @@ Namespace Utils.Json
                     value = TokenAcceptors.TypeParserMapper(GetType(String)).Parse(nextChar, GetType(string))
                 Case =  45,46,48,49,50,51,52,53,54,55,56,57 'This is a number of some kind..
                     value = TokenAcceptors.TypeParserMapper(GetType(Long)).Parse(nextChar, GetType(Double))
-                Case = 70,84 ' T or F -> boolean
-                    value = TokenAcceptors.TypeParserMapper(GetType(BoolanParser)).Parse(nextChar, GetType(BoolanParser))
+                Case = 70, 84, 116, 102 ' T, F, t, f -> boolean
+                    value = TokenAcceptors.TypeParserMapper(GetType(Boolean)).Parse(nextChar, GetType(BoolanParser))
                 Case 44
                     value = Nothing
                 Case = 78, 110 '[N,n]ull or , means no value.

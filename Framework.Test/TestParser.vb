@@ -104,6 +104,9 @@ Imports NUnit.Framework
         Dim p = Reader.StringToObject(Of TestWithDArray)("{""Name"":""Petter"",""Scores"" : [1.2,2.34,3.12]}")
         Assert.AreEqual(1.2, p.Scores(0))
     End Sub
+    <Test> Public Sub ParseWithBoolValueNotInObject()
+        Assert.DoesNotThrow(Sub() Reader.StringToObject(Of TestWithDArray)("{""Name"":""Petter"",""NotInObject"":false}"))
+    End Sub
 
     <Test> Public Sub Readguid()
         Dim p = Reader.StringToObject(Of Holder(Of Guid))("{""Value"":""FE41254C-FFFC-4121-8345-7353C5D128DC""}")
