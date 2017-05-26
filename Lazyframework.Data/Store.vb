@@ -139,7 +139,7 @@ Public Class Store
                 conn.Open()
                 'Dim filler As FillObject = Nothing
                 Dim reader As IDataReader = Nothing
-                reader = cmd.ExecuteReader(readerOptions Or CommandBehavior.CloseConnection Or CommandBehavior.SequentialAccess)
+                reader = cmd.ExecuteReader(readerOptions Or CommandBehavior.CloseConnection) 'Or CommandBehavior.SequentialAccess
                 handler(reader, data)
             End Using
 
