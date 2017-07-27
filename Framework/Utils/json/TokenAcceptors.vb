@@ -97,20 +97,8 @@ Namespace Utils.Json
         End Function
 
         Public Shared Function Attribute(nextChar As IReader) As String
-            'Dim buffer As New StringBuilder
-            WhiteSpace(nextChar)
-            Quote(nextChar)
-            Dim w = AscW(nextChar.PeekToBuffer)
-
-            'TokenAcceptors.BufferLegalCharacters(nextChar, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-")
-
-            While (w > 64 AndAlso w < 91) OrElse (w > 96 AndAlso w < 123) OrElse (w > 47 AndAlso w < 58) OrElse w = 45 'This is A-Z a-z  The only characters allowed in attribute names.
-                w = AscW(nextChar.PeekToBuffer)
-            End While
-
-            Dim ret = nextChar.Buffer
-            Quote(nextChar)
-            Return ret
+            Dim stringP = New StringParser()
+            Return CStr(stringP.Parse(nextChar, Nothing))
         End Function
 
         Public Shared Sub Attributes(ByRef result As Object, ByVal nextChar As IReader)

@@ -230,6 +230,38 @@ Imports NUnit.Framework
 
     End Sub
 
+    <Test> Public Sub SomethingStrangeFromGoogle()
+        Dim toTest = "{""azp"": ""529794868022-pholasipv70npdhlaj41lrft2en7m8cg.apps.googleusercontent.com"",
+                         ""aud"": ""529794868022-nuif63n2dit7510tvn1h1t5mrsl6k0dn.apps.googleusercontent.com"",
+                         ""Sub"": ""106692936747611074481"",
+                         ""email"": ""fredrikaxk@gmail.com"", 
+                         ""email_verified"": ""True"",
+                         ""iss"": ""https//accounts.google.com"",
+                         ""iat"": ""1501151900"",
+                         ""exp"": ""1501155500"",
+                         ""name"": ""Fredrik Aleksander Kristiansen"",
+                         ""picture"": ""https://lh4.googleusercontent.com/-1vRNQCdRoZw/AAAAAAAAAAI/AAAAAAAAAc8/SVeiP0j7rsg/s96-c/photo.jpg"",
+                         ""given_name"": ""Fredrik Aleksander"",
+                         ""family_name"": ""Kristiansen"",
+                         ""locale"": ""no"",
+                         ""alg"": ""RS256"",
+                         ""kid"": ""6cd8597a1f685ce06cca42de0c25f6f4b048d689""
+                        }"
+
+        Dim res = Reader.StringToObject(Of GoogleUserInfo)(toTest)
+
+        Assert.AreEqual("fredrikaxk@gmail.com", res.email)
+
+    End Sub
+
+
+    Public Class GoogleUserInfo
+        Public email As String
+        Public email_verified As String
+    End Class
+
+
+
     Public Class ClassWithEnum
         Public Value As MyEnum
     End Class
