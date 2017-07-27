@@ -26,17 +26,6 @@ Namespace Query
             _handlers.Add(GetType(TQuery), New Func(Of Object, IAmAQuery, ExecutionProfile)(Function(o, a) handler(o, CType(a, TQuery))))
         End Sub
 
-        Public Shared Sub AddQueryProfileCreator(Of TQuery As IAmAQuery)(profileCreator As Func(Of Object, TQuery, ExecutionProfile))
-            If _queryList.ContainsKey(GetType(TQuery).FullName) Then
-                Throw New AllreadeyConfiguredException(GetType(TQuery))
-            Else
-                _queryList(GetType(TQuery).FullName) = GetType(TQuery)
-            End If
-
-            _handlers.Add(GetType(TQuery), New Func(Of Object, IAmAQuery, ExecutionProfile)(Function(o, a) profileCreator(o, CType(a, TQuery))))
-        End Sub
-
-
 
         Public Shared Sub ClearHandlers()
             _queryList = New Dictionary(Of String, Type)
