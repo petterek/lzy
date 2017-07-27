@@ -337,7 +337,7 @@ End Module
 
         'res = Now().ToString("yyyy-MM-ddTHH\:mm\:ss.FFFK")
 
-        StringAssert.EndsWith("+01:00""}", res)
+        'StringAssert.EndsWith("+01:00""}", res)
 
         Dim resultString = Reader.StringToObject(Of MyObj)(res)
 

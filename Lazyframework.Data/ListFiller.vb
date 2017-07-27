@@ -1,10 +1,15 @@
 ﻿
+
+Imports System.Linq.Expressions
+
 Friend Class ListFiller
     Private ReadOnly _colName As String
 
     Private Shared ValueTypeTransformers As Dictionary(Of Type, Func(Of Object, Object)) = New Dictionary(Of Type, Func(Of Object, Object)) From {
         {GetType(System.Guid), Function(val) Guid.Parse(CStr(val))}
     }
+
+
 
     Public Sub New()
     End Sub
@@ -47,7 +52,8 @@ Friend Class ListFiller
         Else
             While reader.Read
                 counter += 1
-                Dim toFill = Activator.CreateInstance(listObjectType)
+
+                Dim toFill = Reflection.CreateInstance(listObjectType)  'Activator.CreateInstance(listObjectType)
                 Store.FillData(reader, filler, toFill)
                 If TypeOf (toFill) Is EntityBase Then
                     DirectCast(toFill, EntityBase).FillResult = FillResultEnum.DataFound

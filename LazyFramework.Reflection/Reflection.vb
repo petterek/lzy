@@ -25,6 +25,25 @@ Public Class Reflection
     End Function
 
 
+    Private Shared creators As New Dictionary(Of Type, Func(Of Object))
+    Private Shared padLock As New Object
+
+    Public Shared Function CreateInstance(toCreate As Type) As Object
+
+        If Not creators.ContainsKey(toCreate) Then
+            SyncLock padLock
+                If Not creators.ContainsKey(toCreate) Then
+                    Dim ctor = Expression.[New](toCreate)
+                    Dim func = Expression.Lambda(Of Func(Of Object))(ctor).Compile()
+                    creators.Add(toCreate, func)
+                End If
+            End SyncLock
+        End If
+
+        Return creators(toCreate)()
+
+    End Function
+
     Public Shared Function CreateSetter(memberInfo As MemberInfo) As Func(Of Object, Object, Object)
 
         Dim targetType = memberInfo.DeclaringType
