@@ -17,66 +17,79 @@ Public Class Store
         Plugins.Add(GetType(T))
     End Sub
 
-    Public Shared Sub Exec(Of T As New)(connectionInfo As ServerConnectionInfo, command As CommandInfo, data As List(Of T))
+    <Obsolete> Public Shared Sub Exec(Of T As New)(connectionInfo As ServerConnectionInfo, command As CommandInfo, data As List(Of T))
         ExecReader(connectionInfo, command, New FillStatus(Of List(Of T))(data), CommandBehavior.SingleResult, AddressOf New ListFiller().FillList, GetType(T))
     End Sub
 
-    Public Shared Sub Exec(Of T As New)(connectionInfo As ServerConnectionInfo, command As CommandInfo, data As FillStatus(Of T))
+    <Obsolete> Public Shared Sub Exec(Of T As New)(connectionInfo As ServerConnectionInfo, command As CommandInfo, data As FillStatus(Of T))
         ExecReader(connectionInfo, command, data, CommandBehavior.SingleResult Or CommandBehavior.SingleRow, AddressOf ReadOne, GetType(T))
     End Sub
 
-    Public Shared Sub Exec(connectionInfo As ServerConnectionInfo, command As CommandInfo, data As Object)
+    <Obsolete> Public Shared Sub Exec(connectionInfo As ServerConnectionInfo, command As CommandInfo, data As Object)
         ExecReader(connectionInfo, command, New FillStatus(Of Object)(data), CommandBehavior.SingleResult Or CommandBehavior.SingleRow, AddressOf ReadOne, data.GetType)
     End Sub
 
-    Public Shared Sub Exec(connectionInfo As ServerConnectionInfo, command As CommandInfo)
+    <Obsolete> Public Shared Sub Exec(connectionInfo As ServerConnectionInfo, command As CommandInfo)
         ExecReader(Of Object)(connectionInfo, command, New FillStatus(Of Object)(Nothing), CommandBehavior.SingleResult, Nothing, Nothing)
     End Sub
 
-    Public Shared Sub Exec(Of T As Structure)(connectionInfo As ServerConnectionInfo, command As CommandInfo, data As ICollection(Of T), colName As String)
+    <Obsolete> Public Shared Sub Exec(Of T As Structure)(connectionInfo As ServerConnectionInfo, command As CommandInfo, data As ICollection(Of T), colName As String)
         ExecReader(Of T)(connectionInfo, command, data, CommandBehavior.SingleResult, AddressOf New ListFiller(colName).FillListForValueType)
     End Sub
 
 
-    Public Shared Sub GetStream(Of T As {New, WillDisposeThoseForU})(connectionInfo As ServerConnectionInfo, command As CommandInfo, data As T)
+    <Obsolete> Public Shared Sub GetStream(Of T As {New, WillDisposeThoseForU})(connectionInfo As ServerConnectionInfo, command As CommandInfo, data As T)
         ExecReaderWithStream(Of T)(connectionInfo, command, New FillStatus(Of T)(data), CommandBehavior.SingleResult Or CommandBehavior.SingleRow, AddressOf ReadOne(Of T), data.GetType)
     End Sub
 
 
-    Public Shared Sub Exec(Of T)(connection As IDbConnection, command As IDbCommand, data As T)
-        If connection.State <> ConnectionState.Closed Then
-            Throw New NotSupportedException("Open connections is not not supported yet...")
-        End If
+    Public Shared Sub Exec(connection As IDbConnection, command As IDbCommand)
+
         command.Connection = connection
-        connection.Open()
 
-        Dim reader = command.ExecuteReader(CommandBehavior.CloseConnection Or CommandBehavior.SingleResult Or CommandBehavior.SingleRow)
-        ReadOne(Of T)(GetFiller(command, reader, data.GetType()), reader, New FillStatus(Of T)(data))
+        If connection.State = ConnectionState.Closed Then
+            connection.Open()
+            command.ExecuteNonQuery()
+            connection.Close()
+        Else
+            command.ExecuteNonQuery()
+        End If
 
-        reader.Close()
-        reader.Dispose()
-        connection.Close()
-        connection.Dispose()
-        command.Dispose()
+
+    End Sub
+
+    Public Shared Sub Exec(Of T)(connection As IDbConnection, command As IDbCommand, data As T)
+        Dim wasClosed = connection.State = ConnectionState.Closed
+        command.Connection = connection
+
+        If connection.State = ConnectionState.Closed Then
+            connection.Open()
+        End If
+
+        Using reader = command.ExecuteReader(CommandBehavior.CloseConnection Or CommandBehavior.SingleResult Or CommandBehavior.SingleRow)
+            ReadOne(Of T)(GetFiller(command, reader, data.GetType()), reader, New FillStatus(Of T)(data))
+        End Using
+
+        If wasClosed Then
+            connection.Close()
+        End If
     End Sub
 
     Public Shared Sub Exec(Of T As New)(connection As IDbConnection, command As IDbCommand, data As List(Of T))
-        If connection.State <> ConnectionState.Closed Then
-            Throw New NotSupportedException("Open connections is not not supported yet...")
-        End If
+        Dim wasClosed = connection.State = ConnectionState.Closed
         command.Connection = connection
-        connection.Open()
 
-        Dim reader = command.ExecuteReader(CommandBehavior.CloseConnection Or CommandBehavior.SingleResult)
-        Dim filler = New ListFiller()
+        If connection.State = ConnectionState.Closed Then
+            connection.Open()
+        End If
+        Using reader = command.ExecuteReader(CommandBehavior.CloseConnection Or CommandBehavior.SingleResult)
+            Dim filler = New ListFiller()
+            filler.FillList(GetFiller(command, reader, GetType(T)), reader, New FillStatus(Of List(Of T))(data))
+        End Using
 
-        filler.FillList(GetFiller(command, reader, GetType(T)), reader, New FillStatus(Of List(Of T))(data))
-
-        reader.Close()
-        reader.Dispose()
-        connection.Close()
-        connection.Dispose()
-        command.Dispose()
+        If wasClosed Then
+            connection.Close()
+        End If
     End Sub
 
     Public Shared Function ExecScalar(Of T)(connection As IDbConnection, command As IDbCommand) As T

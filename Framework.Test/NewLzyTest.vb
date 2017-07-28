@@ -259,6 +259,50 @@ Imports NUnit.Framework
         Assert.AreEqual(3, d.Id)
     End Sub
 
+    <Test> Public Sub TestNonQueryWithOpenConnection()
+
+        Dim cmd As New SqlClient.SqlCommand("select * from Hrunit where id = @id")
+        cmd.Parameters.AddWithValue("id", 3)
+        Dim d = New DataObject
+        Using con As New SqlClient.SqlConnection(String.Format("server={0};Database={1};User ID={2};Password={3};pooling=true;", "10.151.46.52", "hr", "loginFor_HR", "AsDfGhJkL12345"))
+            con.Open()
+            Store.Exec(con, cmd, d)
+            Store.Exec(con, cmd, d)
+        End Using
+
+    End Sub
+    <Test> Public Sub TestNonQuery()
+        Dim con As New SqlClient.SqlConnection(String.Format("server={0};Database={1};User ID={2};Password={3};pooling=true;", "10.151.46.52", "hr", "loginFor_HR", "AsDfGhJkL12345"))
+        Dim cmd As New SqlClient.SqlCommand("insert into HRunit (UnitTypeId,Name,Guid) values(1,'Test',@guid)")
+        Dim d = New DataObject
+
+
+        Dim guid = System.Guid.NewGuid()
+
+        cmd.Parameters.Add(New SqlClient.SqlParameter("guid", guid))
+        Assert.DoesNotThrow(Sub() Store.Exec(con, cmd))
+
+
+        Dim cmd2 As New SqlClient.SqlCommand("select * from Hrunit where guid = @guid")
+        cmd2.Parameters.Add(New SqlClient.SqlParameter("guid", guid))
+
+        con = New SqlClient.SqlConnection(String.Format("server={0};Database={1};User ID={2};Password={3};pooling=true;", "10.151.46.52", "hr", "loginFor_HR", "AsDfGhJkL12345"))
+        Assert.DoesNotThrow(Sub() Store.Exec(con, cmd2, d))
+        Assert.AreEqual(guid, d.Guid)
+
+
+        Dim cmd3 As New SqlClient.SqlCommand("delete from Hrunit where guid = @guid")
+        cmd3.Parameters.Add(New SqlClient.SqlParameter("guid", guid))
+
+        con = New SqlClient.SqlConnection(String.Format("server={0};Database={1};User ID={2};Password={3};pooling=true;", "10.151.46.52", "hr", "loginFor_HR", "AsDfGhJkL12345"))
+        Assert.DoesNotThrow(Sub() Store.Exec(con, cmd3, d))
+        Assert.AreEqual(guid, d.Guid)
+
+
+    End Sub
+
+
+
     <Test> Public Sub ExecFillListObjectNew()
         Dim con As New SqlClient.SqlConnection(String.Format("server={0};Database={1};User ID={2};Password={3};pooling=true;", "10.151.46.52", "hr", "loginFor_HR", "AsDfGhJkL12345"))
         Dim cmd As New SqlClient.SqlCommand("select * from Hrunit")
@@ -475,6 +519,7 @@ End Class
 Public Class DataObject
     Inherits Data.EntityBase
 
+    Public Guid As Guid
     Private _id As Integer
     Property Id As Integer
         Get
