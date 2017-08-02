@@ -30,10 +30,10 @@ Namespace Transform
                         Cast(Of Object).
                         AsParallel.AsOrdered.ForAll(Sub(o As Object)
                                                         Try
-                                                            Dim temp = Transform(context, o)
-                                                            If temp IsNot Nothing Then
-                                                                ret.Enqueue(temp)
+                                                            If Not CheckSecurity(context, o) Then
+                                                                Return
                                                             End If
+                                                            ret.Enqueue(Transform(context, o))
                                                         Catch ex As Exception
                                                             Errors.Add(ex)
                                                         End Try
@@ -55,11 +55,14 @@ Namespace Transform
             End If
         End Function
 
-        Public Shared Function Transform(ctx As ExecutionProfile, e As Object) As Object
 
+        Public Shared Function CheckSecurity(ctx As ExecutionProfile, e As Object) As Boolean
             If ctx.ActionSecurity IsNot Nothing Then
-                If Not ctx.ActionSecurity.EntityIsAvailableForUser(e) Then Return Nothing
+                Return ctx.ActionSecurity.EntityIsAvailableForUser(e)
             End If
+            Return True
+        End Function
+        Public Shared Function Transform(ctx As ExecutionProfile, e As Object) As Object
 
             If ctx.Transformer Is Nothing Then Return e
 

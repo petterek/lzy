@@ -43,10 +43,52 @@ Namespace Command
         ''' <typeparam name="TCommand"></typeparam>
         ''' <param name="run"></param>
         Public Shared Sub AddCommandHandler(Of TCommand As IAmACommand)(run As Func(Of Object, IAmACommand, ExecutionProfile))
-
             _handlers.Add(GetType(TCommand), run)
             _commadList.Add(GetType(TCommand).FullName, GetType(TCommand))
         End Sub
+
+        Public Shared Function GetCommandProfile(profile As Object, command As IAmACommand) As ExecutionProfile
+            Dim commandExecProfile = AllHandlers(command.GetType)(profile, command)
+            commandExecProfile.Action = command
+            Return commandExecProfile
+        End Function
+
+        Public Shared Function ExecuteCommand(commandExecProfile As ExecutionProfile, Optional ByVal logger As Logging.ICommandLogger = Nothing) As Object
+
+            Try
+
+                commandExecProfile.Start()
+
+                If Not CanUserRunCommand(CType(commandExecProfile, CommandExecutionBase), CType(commandExecProfile.Action, CommandBase)) Then
+                    Throw New ActionSecurityAuthorizationFaildException(commandExecProfile.Action, Nothing)
+                End If
+
+                If commandExecProfile.ValidateAction IsNot Nothing Then commandExecProfile.ValidateAction.InternalValidate(commandExecProfile.Action)
+                Dim commandResult = commandExecProfile.ActionHandler(commandExecProfile.Action)
+
+                commandExecProfile.Stopp()
+                Logging.Log.Context(commandExecProfile)
+                If logger IsNot Nothing Then
+                    logger.Log(commandExecProfile, Nothing, commandExecProfile.Action)
+                End If
+                Return commandResult
+
+            Catch ex As TargetInvocationException
+                Logging.Log.Error(commandExecProfile, ex)
+                If logger IsNot Nothing Then
+                    logger.Error(commandExecProfile, Nothing, commandExecProfile.Action, ex)
+                End If
+                Throw ex.InnerException
+            Catch ex As Exception
+                Logging.Log.Error(commandExecProfile, ex)
+                If logger IsNot Nothing Then
+                    logger.Error(commandExecProfile, Nothing, commandExecProfile.Action, ex)
+                End If
+                Throw
+            Finally
+                Logging.Log.Context(commandExecProfile)
+            End Try
+        End Function
 
 
         ''' <summary>
@@ -55,43 +97,7 @@ Namespace Command
         ''' <param name="command"></param>
         ''' <remarks>Any command can have only 1 handler. An exception will be thrown if there is found more than one for any given command. </remarks>
         Public Shared Function ExecuteCommand(profile As Object, command As IAmACommand, Optional ByVal logger As Logging.ICommandLogger = Nothing) As Object
-
-            Dim commandExecProfile As ExecutionProfile = Nothing
-            Try
-                commandExecProfile = AllHandlers(command.GetType)(profile, command)
-
-                commandExecProfile.Start()
-                commandExecProfile.Action = command
-
-                If Not CanUserRunCommand(CType(commandExecProfile, CommandExecutionBase), CType(command, CommandBase)) Then
-                    Throw New ActionSecurityAuthorizationFaildException(command, profile)
-                End If
-
-                If commandExecProfile.ValidateAction IsNot Nothing Then commandExecProfile.ValidateAction.InternalValidate(command)
-                Dim commandResult = commandExecProfile.ActionHandler(command)
-
-                commandExecProfile.Stopp()
-                Logging.Log.Context(commandExecProfile)
-                If logger IsNot Nothing Then
-                    logger.Log(commandExecProfile, profile, command)
-                End If
-                Return commandResult
-
-            Catch ex As TargetInvocationException
-                Logging.Log.Error(commandExecProfile, ex)
-                If logger IsNot Nothing Then
-                    logger.Error(commandExecProfile, profile, command, ex)
-                End If
-                Throw ex.InnerException
-            Catch ex As Exception
-                Logging.Log.Error(commandExecProfile, ex)
-                If logger IsNot Nothing Then
-                    logger.Error(commandExecProfile, profile, command, ex)
-                End If
-                Throw
-            Finally
-                Logging.Log.Context(commandExecProfile)
-            End Try
+            Return ExecuteCommand(GetCommandProfile(profile, command), logger)
         End Function
 
         Public Shared Function CanUserRunCommand(profile As CommandExecutionBase, cmd As CommandBase) As Boolean

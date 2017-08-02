@@ -50,46 +50,50 @@ Namespace Query
 
 
 
-        Public Shared Function ExecuteQuery(profile As Object, q As IAmAQuery) As Object
-
+        Public Shared Function GetProfile(profile As Object, q As IAmAQuery) As ExecutionProfile
             Dim handler As Func(Of Object, IAmAQuery, ExecutionProfile) = Nothing
-            'Standard queryhandling. 1->1 mapping 
             If _handlers.TryGetValue(q.GetType, handler) Then
+                Dim ret = handler(profile, q)
+                ret.Action = q
+                Return ret
+            End If
+            Throw New NotSupportedException("Query handler not found")
+        End Function
 
-                Dim context = handler(profile, q)
 
-                context.Start()
-                context.Action = q
+        Public Shared Function ExecuteQuery(context As ExecutionProfile) As Object
+            context.Start()
 
-                If context.ActionSecurity IsNot Nothing AndAlso Not context.ActionSecurity.UserCanRunThisAction(q) Then
-                    Dim actionSecurityAuthorizationFaildException As ActionSecurityAuthorizationFaildException = New ActionSecurityAuthorizationFaildException(q, profile)
-                    Logging.Log.Error(context, actionSecurityAuthorizationFaildException)
-                    Throw actionSecurityAuthorizationFaildException
-                End If
-
-                If context.ValidateAction IsNot Nothing Then context.ValidateAction.InternalValidate(q)
-                Try
-                    Dim result As Object = context.ActionHandler(q)
-                    result = Transform.Handling.TransformResult(context, result)
-                    context.Stopp()
-                    Logging.Log.Context(context)
-
-                    Return result
-
-                Catch ex As TargetInvocationException
-                    Logging.Log.Error(context, ex)
-                    Throw ex.InnerException
-                Catch ex As AggregateException
-                    Logging.Log.Error(context, ex)
-                    Throw
-                Catch ex As Exception
-                    Logging.Log.Error(context, ex)
-                    Throw
-                End Try
+            If context.ActionSecurity IsNot Nothing AndAlso Not context.ActionSecurity.UserCanRunThisAction(context.Action) Then
+                Dim actionSecurityAuthorizationFaildException As ActionSecurityAuthorizationFaildException = New ActionSecurityAuthorizationFaildException(context.Action, Nothing)
+                Logging.Log.Error(context, actionSecurityAuthorizationFaildException)
+                Throw actionSecurityAuthorizationFaildException
             End If
 
-            Throw New NotSupportedException("Query handler not found")
+            If context.ValidateAction IsNot Nothing Then context.ValidateAction.InternalValidate(context.Action)
+            Try
+                Dim result As Object = context.ActionHandler(context.Action)
+                result = Transform.Handling.TransformResult(context, result)
+                context.Stopp()
+                Logging.Log.Context(context)
 
+                Return result
+
+            Catch ex As TargetInvocationException
+                Logging.Log.Error(context, ex)
+                Throw ex.InnerException
+            Catch ex As AggregateException
+                Logging.Log.Error(context, ex)
+                Throw
+            Catch ex As Exception
+                Logging.Log.Error(context, ex)
+                Throw
+            End Try
+
+        End Function
+
+        Public Shared Function ExecuteQuery(profile As Object, q As IAmAQuery) As Object
+            Return ExecuteQuery(GetProfile(profile, q))
         End Function
 
 
