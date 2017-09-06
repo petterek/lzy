@@ -56,7 +56,6 @@ Namespace Command
         Public Shared Function ExecuteCommand(commandExecProfile As ExecutionProfile, Optional ByVal logger As Logging.ICommandLogger = Nothing) As Object
 
             Try
-
                 commandExecProfile.Start()
 
                 If Not CanUserRunCommand(CType(commandExecProfile, CommandExecutionBase), CType(commandExecProfile.Action, CommandBase)) Then

@@ -27,6 +27,10 @@ Namespace Utils.Json
             End If
 
             For Each m In GetMembers(objType)
+                If m.GetCustomAttributes(GetType(System.Runtime.Serialization.IgnoreDataMemberAttribute), False).Count <> 0 Then
+                    Continue For
+                End If
+
                 If Not first Then
                     exprns.Add(Expression.Call(writer, writeMethodInfo, Expression.Constant(",")))
                 End If

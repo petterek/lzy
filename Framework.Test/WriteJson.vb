@@ -1,5 +1,6 @@
 ﻿
 Imports System.Runtime.CompilerServices
+Imports System.Runtime.Serialization
 Imports LazyFramework.Utils.Json
 Imports NUnit.Framework
 
@@ -155,6 +156,19 @@ End Module
 
     End Sub
 
+
+    <Test> Public Sub IgnoredAttributesIsNotSerialized()
+
+        Dim res = Writer.ObjectToString(New ClassWithIgnoredField())
+
+        Assert.AreEqual("{""IsHere"":""HERE""}", res)
+
+    End Sub
+
+    Public Class ClassWithIgnoredField
+        Public IsHere As String = "HERE"
+        <IgnoreDataMember> Public NotSerialized As String = "NOT HERE"
+    End Class
 
     <Test> Public Sub InheritedAttributesIsWrittenToText()
         Dim o As New Person2
