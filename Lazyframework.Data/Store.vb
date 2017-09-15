@@ -105,7 +105,10 @@ Public Class Store
         connection.Close()
         connection.Dispose()
 
-        Return CType(ret, T)
+        If ret IsNot DBNull.Value Then Return CType(ret, T)
+
+        Return CType(Nothing, T)
+
     End Function
 
 

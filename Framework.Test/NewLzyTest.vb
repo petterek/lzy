@@ -246,6 +246,14 @@ Imports NUnit.Framework
         Dim cmd As New SqlClient.SqlCommand("select count(*) from Hrunit")
         Assert.AreNotEqual(0, Store.ExecScalar(Of Integer)(con, cmd))
 
+    End Sub
+
+    <Test> Public Sub ExecNewScalarThatReturnNullValue()
+
+        Dim con As New SqlClient.SqlConnection(String.Format("server={0};Database={1};User ID={2};Password={3};pooling=true;", "10.151.46.52", "hr", "loginFor_HR", "AsDfGhJkL12345"))
+        Dim cmd As New SqlClient.SqlCommand("select top 1  null from Hrunit")
+        Assert.AreEqual(Nothing, Store.ExecScalar(Of String)(con, cmd))
+
 
     End Sub
 
@@ -328,9 +336,38 @@ Imports NUnit.Framework
 
 
     End Sub
-    
+    <Test> Public Sub ExecCommandWithoutResultAndEqSignInParam()
 
-     <test> public Sub AddDataToHashSet
+        Dim cmd2 As New Data.CommandInfo
+        cmd2.CommandText = "Select * from Hrunit where name = @name"
+        cmd2.TypeOfCommand = CommandTypeEnum.Read
+        cmd2.Parameters.Add("name", DbType.String, False, "strange=stuff")
+
+        Dim data As New DataObject
+
+        Assert.DoesNotThrow(Sub() Store.Exec(Connection, cmd2))
+
+
+
+    End Sub
+
+    <Test> Public Sub ExecCommandWithoutEqInUpdateSignInParam()
+
+        Dim cmd2 As New Data.CommandInfo
+        cmd2.CommandText = "Update Hrunit set Name='iijj=ijijij'  where name = @name"
+        cmd2.TypeOfCommand = CommandTypeEnum.Update
+        cmd2.Parameters.Add("name", DbType.String, False, "strange = stuff")
+
+        Dim data As New DataObject
+
+        Assert.DoesNotThrow(Sub() Store.Exec(Connection, cmd2))
+
+
+
+    End Sub
+
+
+    <test> public Sub AddDataToHashSet
         Dim cmd2 As New CommandInfo
         cmd2.CommandText = "Select id from Hrunit"
         cmd2.TypeOfCommand = CommandTypeEnum.Read

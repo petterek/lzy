@@ -254,6 +254,17 @@ Imports NUnit.Framework
 
     End Sub
 
+    <Test> Public Sub StringWithEQSignDoesNotBreakTheParser()
+
+        Const Input1 As String = "{""Name"":""Petter = the bug killer""}"
+
+        Dim toTest = Reader.StringToObject(Of DataObject)(Input1)
+
+
+        Assert.AreEqual("Petter = the bug killer", toTest.Name)
+
+    End Sub
+
 
     Public Class GoogleUserInfo
         Public email As String
