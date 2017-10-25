@@ -266,6 +266,21 @@ Imports NUnit.Framework
     End Sub
 
 
+    <Test> Public Sub EatListOfUnknownProperty()
+        Const inp = "{""UnknownField"":[""String1"",{""Strange"":1}],""KnownField"":1}"
+
+        Dim toTest As MissingFieldClass = Nothing
+        Assert.DoesNotThrow(Sub() toTest = Reader.StringToObject(Of MissingFieldClass)(inp))
+
+        Assert.AreEqual(1, toTest.KnownField)
+
+
+    End Sub
+    Public Class MissingFieldClass
+        Public KnownField As Integer
+    End Class
+
+
     Public Class GoogleUserInfo
         Public email As String
         Public email_verified As String
