@@ -122,6 +122,13 @@ Namespace Utils.Json
             result.Flush()
         End Sub
 
+
+        Public Shared Sub ObjectToString(result As Stream, o As Object)
+
+            ObjectToString(New System.IO.StreamWriter(result), o)
+
+        End Sub
+
         Private Shared Sub WriteDictionary(result As StreamWriter, o As Object)
             result.Write("{")
             Dim first As Boolean = True
