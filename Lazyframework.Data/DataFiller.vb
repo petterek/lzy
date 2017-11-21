@@ -80,7 +80,7 @@ Public Class DataFiller
                     '_fieldInfo.SetValue(o, tempValue)
                 End If
             Catch ex As Exception
-                Throw New UnableToSetValueException(_name, _memberInfo, tempvalue)
+                Throw New UnableToSetValueException(ex, _name, _memberInfo, tempValue)
             End Try
 
         End Sub
@@ -125,8 +125,8 @@ Public Class UnableToSetValueException
         MyBase.New(message, innerException)
     End Sub
 
-    Public Sub New(_name As String, _fieldInfo As MemberInfo, value As Object)
-        MyBase.New(CreateMessage(_name, _fieldInfo, value))
+    Public Sub New(innerException As Exception, _name As String, _fieldInfo As MemberInfo, value As Object)
+        MyBase.New(CreateMessage(_name, _fieldInfo, value), innerException)
         Me.Name = _name
         Me.FieldInfo = _fieldInfo
 
