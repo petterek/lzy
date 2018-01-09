@@ -50,6 +50,10 @@ Namespace Transform
                 End If
                 Return retList
             Else
+                If Not CheckSecurity(context, result) Then
+                    Return Nothing
+                End If
+
                 Dim temp = Transform(context, result)
                 Return temp
             End If
