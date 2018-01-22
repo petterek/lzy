@@ -361,6 +361,10 @@ End Module
 
     End Sub
 
+    <Test> Public Sub GenericOverrideThrowsAmbiguousMatchException()
+        Dim obj = New NotificationObject(Of String) With {.ViewData = "Test"}
+        Assert.DoesNotThrow(Sub() Writer.ObjectToString(obj))
+    End Sub
 
 
     Public Class MyObj
@@ -373,6 +377,17 @@ End Module
         Public Property TransactionDate As Date
     End Class
 
+End Class
+
+
+Public Class NotificationObject(Of TViewData)
+    Inherits NotificationObject
+
+    Public Shadows Property ViewData As TViewData
+End Class
+
+Public Class NotificationObject
+    Public Property ViewData As Object
 End Class
 
 
