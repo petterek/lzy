@@ -63,7 +63,7 @@ Namespace Data
 
             Dim timer = New InlineTimer(connectionInfo.Database & "-" & cmd.CommandText, ResponseThread.Current.Timer.Timings)
             data.Value.DisposeThis(timer)
-            reader = cmd.ExecuteReader(readerOptions Or CommandBehavior.CloseConnection Or CommandBehavior.SequentialAccess)
+            reader = cmd.ExecuteReader(readerOptions Or CommandBehavior.CloseConnection)
 
             If dataObjectType IsNot Nothing Then
                 filler = GetFiller(command, reader, dataObjectType)
@@ -88,7 +88,7 @@ Namespace Data
                     Dim reader As IDataReader = Nothing
 
                     Using New InlineTimer(connectionInfo.Database & "-" & cmd.CommandText, ResponseThread.Current.Timer.Timings)
-                        reader = cmd.ExecuteReader(readerOptions Or CommandBehavior.CloseConnection Or CommandBehavior.SequentialAccess)
+                        reader = cmd.ExecuteReader(readerOptions Or CommandBehavior.CloseConnection)
 
                         handler(reader, data)
 
@@ -118,7 +118,7 @@ Namespace Data
                     Dim reader As IDataReader = Nothing
 
                     Using New InlineTimer(connectionInfo.Database & "-" & cmd.CommandText, ResponseThread.Current.Timer.Timings)
-                        reader = cmd.ExecuteReader(readerOptions Or CommandBehavior.CloseConnection Or CommandBehavior.SequentialAccess)
+                        reader = cmd.ExecuteReader(readerOptions Or CommandBehavior.CloseConnection)
                         If dataObjectType IsNot Nothing Then
                             filler = GetFiller(command, reader, dataObjectType)
                             handler(filler, reader, data)
