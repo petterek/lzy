@@ -29,11 +29,14 @@ Namespace CQRS.Transform
                     Dim s = Runtime.Context.Current.Storage
                     Dim cm = Runtime.Context.Current.ChickenMode
                     Dim Errors As New Concurrent.ConcurrentBag(Of Exception)
+                    Dim currentCulture = System.Threading.Thread.CurrentThread.CurrentCulture
 
                     CType(result, IList).
                         Cast(Of Object).
                         AsParallel.ForAll(Sub(o As Object)
                                               Try
+                                                  System.Threading.Thread.CurrentThread.CurrentCulture = currentCulture
+                                                  System.Threading.Thread.CurrentThread.CurrentUICulture = currentCulture
                                                   Using New Runtime.SpawnThreadContext(user, s, cm)
                                                       Dim temp = TransformAndAddAction(action, If(transformer Is Nothing, transformerFactory.GetTransformer(action, o), transformer), o)
                                                       If temp IsNot Nothing Then
