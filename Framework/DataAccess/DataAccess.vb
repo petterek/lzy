@@ -5,7 +5,7 @@ Imports System.Reflection
 Imports System.Xml
 
 ''' <summary>
-''' 
+'''
 ''' </summary>
 ''' <remarks></remarks>
 Public Class DataAccessFactory
@@ -15,7 +15,7 @@ Public Class DataAccessFactory
     ''' <returns></returns>
     ''' <remarks></remarks>
     Public Shared Function DataAccess() As IDataAccess
-        'Her kan vi legge inn logikk for å instansiere riktig type data klasse avhenging av fks verdier i appconfig. 
+        'Her kan vi legge inn logikk for å instansiere riktig type data klasse avhenging av fks verdier i appconfig.
         If ClassFactory.ContainsKey(Of IDataAccess)() Then
             Return ClassFactory.GetTypeInstance(Of IDataAccess)()
         Else
@@ -189,8 +189,13 @@ Public Class DataAccessFactory
                     While reader.Read
                         Dim value As New T
                         For Each s In props
-                            If s.Value Is Nothing Then Continue For '????
-                            s.Value.SetValue(value, If(TypeOf (reader(s.Key)) Is DBNull, Nothing, reader(s.Key)), Nothing)
+                            If Not s.Value Is Nothing Then
+                                s.Value.SetValue(value, If(TypeOf (reader(s.Key)) Is DBNull, Nothing, reader(s.Key)), Nothing)
+                            ElseIf value.GetType().IsPrimitive
+                                value = CType(reader(s.Key), T)
+                            Else
+                                Continue For
+                            End If
                         Next
                         If tType.IsAssignableFrom(GetType(IORDataObject)) Then
                             CType(value, IORDataObject).FillResult = FillResultEnum.DataFound
@@ -205,7 +210,7 @@ Public Class DataAccessFactory
         Return True
     End Function
 #End Region
-    
+
     Private Shared _plugInCollection As Dictionary(Of String, IDataModificationPlugin)
     Private Shared ReadOnly O As New Object
     Private Shared _dataAccess As IDataAccess
@@ -341,7 +346,7 @@ Public Class CommandInfo
     End Property
 
     Public Property CommandQuery() As Linq.Expressions.Expression
-    
+
 
     Public Overrides Function ToString() As String
         Dim res As New System.Text.StringBuilder
@@ -408,7 +413,7 @@ Public Class ParameterInfo
             _Value = value
         End Set
     End Property
-    
+
 End Class
 
 Public Enum CommandInfoCommandTypeEnum As Integer
