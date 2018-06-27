@@ -19,6 +19,9 @@ Namespace Transform
                 If Not context.RunAsParallel OrElse Setup.ChickenMode Then
 
                     For Each e In CType(result, IList)
+                        If Not CheckSecurity(context, e) Then
+                            Continue For
+                        End If
                         res = Transform(context, e)
                         If res IsNot Nothing Then
                             ret.Enqueue(res)
@@ -50,6 +53,9 @@ Namespace Transform
                 End If
                 Return retList
             Else
+                If Not CheckSecurity(context, result) Then
+                    Return Nothing
+                End If
                 Dim temp = Transform(context, result)
                 Return temp
             End If
