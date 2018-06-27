@@ -49,8 +49,11 @@ Public Class Store
 
         If connection.State = ConnectionState.Closed Then
             connection.Open()
-            command.ExecuteNonQuery()
-            connection.Close()
+            Try
+                command.ExecuteNonQuery()
+            Finally
+                connection.Close()
+            End Try
         Else
             command.ExecuteNonQuery()
         End If
@@ -59,36 +62,42 @@ Public Class Store
     End Sub
 
     Public Shared Sub Exec(Of T)(connection As IDbConnection, command As IDbCommand, data As T)
-        Dim wasClosed = connection.State = ConnectionState.Closed
         command.Connection = connection
 
         If connection.State = ConnectionState.Closed Then
             connection.Open()
-        End If
-
-        Using reader = command.ExecuteReader(CommandBehavior.CloseConnection Or CommandBehavior.SingleResult Or CommandBehavior.SingleRow)
-            ReadOne(Of T)(GetFiller(command, reader, data.GetType()), reader, New FillStatus(Of T)(data))
-        End Using
-
-        If wasClosed Then
-            connection.Close()
+            Try
+                Using reader = command.ExecuteReader(CommandBehavior.CloseConnection Or CommandBehavior.SingleResult Or CommandBehavior.SingleRow)
+                    ReadOne(Of T)(GetFiller(command, reader, data.GetType()), reader, New FillStatus(Of T)(data))
+                End Using
+            Finally
+                connection.Close()
+            End Try
+        Else
+            Using reader = command.ExecuteReader(CommandBehavior.CloseConnection Or CommandBehavior.SingleResult Or CommandBehavior.SingleRow)
+                ReadOne(Of T)(GetFiller(command, reader, data.GetType()), reader, New FillStatus(Of T)(data))
+            End Using
         End If
     End Sub
 
     Public Shared Sub Exec(Of T As New)(connection As IDbConnection, command As IDbCommand, data As List(Of T))
-        Dim wasClosed = connection.State = ConnectionState.Closed
         command.Connection = connection
 
         If connection.State = ConnectionState.Closed Then
             connection.Open()
-        End If
-        Using reader = command.ExecuteReader(CommandBehavior.CloseConnection Or CommandBehavior.SingleResult)
-            Dim filler = New ListFiller()
-            filler.FillList(GetFiller(command, reader, GetType(T)), reader, New FillStatus(Of List(Of T))(data))
-        End Using
-
-        If wasClosed Then
-            connection.Close()
+            Try
+                Using reader = command.ExecuteReader(CommandBehavior.CloseConnection Or CommandBehavior.SingleResult)
+                    Dim filler = New ListFiller()
+                    filler.FillList(GetFiller(command, reader, GetType(T)), reader, New FillStatus(Of List(Of T))(data))
+                End Using
+            Finally
+                connection.Close()
+            End Try
+        Else
+            Using reader = command.ExecuteReader(CommandBehavior.CloseConnection Or CommandBehavior.SingleResult)
+                Dim filler = New ListFiller()
+                filler.FillList(GetFiller(command, reader, GetType(T)), reader, New FillStatus(Of List(Of T))(data))
+            End Using
         End If
     End Sub
 
@@ -99,16 +108,15 @@ Public Class Store
 
         command.Connection = connection
         connection.Open()
-        Dim ret = command.ExecuteScalar()
-
-        command.Dispose()
-        connection.Close()
-        connection.Dispose()
-
-        If ret IsNot DBNull.Value Then Return CType(ret, T)
-
-        Return CType(Nothing, T)
-
+        Try
+            Dim ret = command.ExecuteScalar()
+            If ret IsNot DBNull.Value Then Return CType(ret, T)
+            Return CType(Nothing, T)
+        Finally
+            command.Dispose()
+            connection.Close()
+            connection.Dispose()
+        End Try
     End Function
 
 
